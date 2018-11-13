@@ -6,7 +6,7 @@ const Mutation = require('./resolvers/mutation');
 const Subscription = require('./resolvers/subscription');
 const Date = require('./resolvers/date');
 const jwt = require('jsonwebtoken');
-const {JWT_SECRET} = require('./config');
+const {JWT_SECRET, MONGODB_URI} = require('./config');
 
 const resolvers= {
   Query,
@@ -35,6 +35,6 @@ const server = new GraphQLServer({
 })
 
 if (require.main === module) {
-  mongoose.connect('mongodb://localhost/code-talk');
+  mongoose.connect(MONGODB_URI);
   server.start(() => console.log(`Server is running`));
 }
