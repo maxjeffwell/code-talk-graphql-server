@@ -1,0 +1,18 @@
+scalar Date
+
+type Query {
+	hi: String!
+}
+
+type Mutation {
+	signup(email: String!, password: String!): String!
+	login(email: String!, password: String!): String!
+}
+
+type Subscription {
+	hi: String!
+
+}
+
+
+
