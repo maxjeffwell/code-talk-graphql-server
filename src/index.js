@@ -35,6 +35,8 @@ const server = new GraphQLServer({
 })
 
 if (require.main === module) {
-  mongoose.connect(MONGODB_URI);
+  mongoose.connect(MONGODB_URI, {
+    useNewUrlParser: true
+  });
   server.start(() => console.log(`Server is running`));
 }
