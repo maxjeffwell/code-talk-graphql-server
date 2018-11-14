@@ -5,6 +5,6 @@ const {JWT_SECRET} = require('../../config');
 
 module.exports = async (root, args) => {
   const hashedPassword = await bcrypt.hash(args.password, 10);
-  const user = await User.create({email: args.email, password: hashedPassword});
+  const user = await User.create({username: args.username, email: args.email, password: hashedPassword});
   return jwt.sign({user}, JWT_SECRET);
 }
