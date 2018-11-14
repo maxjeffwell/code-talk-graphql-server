@@ -7,6 +7,9 @@ const Subscription = require('./resolvers/subscription');
 const Date = require('./resolvers/date');
 const jwt = require('jsonwebtoken');
 const {JWT_SECRET, MONGODB_URI} = require('./config');
+const dotenv = require('dotenv');
+
+dotenv.load();
 
 const resolvers= {
   Query,
@@ -35,8 +38,10 @@ const server = new GraphQLServer({
 })
 
 if (require.main === module) {
-  mongoose.connect(MONGODB_URI, {
+  mongoose.Promise = global.Promise;
+  mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost/code-talk', {
     useNewUrlParser: true
   });
+  mongoose.set('useCreateIndex', true);;
   server.start(() => console.log(`Server is running`));
 }
