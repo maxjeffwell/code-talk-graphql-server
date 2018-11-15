@@ -1,7 +1,7 @@
 type Query {
 #	channels: [Channels]
 #	channels(id: Int!): channel
-	messages(channelId: ID!): [Message!]
+	message(id: ID!): [Message!]
 	users(id: ID!): [User]
 #	user(id: Int, search: String): User
 
@@ -10,7 +10,7 @@ type Query {
 type Mutation {
 	signup(username: String!, email: String!, password: String!): String!
 	login(email: String!, password: String!): String!
-	message(body: String!, userId: ID!, channelId: ID!, user: String!): Message!
+	message(body: String!, user: String!): Message!
 }
 
 type Message {
