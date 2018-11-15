@@ -1,17 +1,41 @@
-scalar Date
-
 type Query {
-	hi: String!
+#	channels: [Channels]
+#	channels(id: Int!): channel
+	messages(channelId: ID!): [Message!]
+	users(id: ID!): [User]
+#	user(id: Int, search: String): User
+
 }
 
 type Mutation {
 	signup(username: String!, email: String!, password: String!): String!
 	login(email: String!, password: String!): String!
+	message(body: String!, userId: ID!, channelId: ID!, user: String!): Message!
+}
+
+type Message {
+	id: ID!
+	body: String!
+	user: User!
+#	channel: Channel!
+	createdAt: String!
+
+}
+
+#type Channel {
+#	id: ID!
+#	name: String!
+#	users: [User!]!
+#	messages: [Message!]!
+#}
+
+type User {
+	id: ID!
+	username: String!
 }
 
 type Subscription {
-	hi: String!
-
+	newMessage(channelId: ID!): Message!
 }
 
 
