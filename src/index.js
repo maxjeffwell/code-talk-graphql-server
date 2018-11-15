@@ -4,7 +4,7 @@ const typeDefs='./src/schema.graphql';
 const Query = require('./resolvers/query');
 const Mutation = require('./resolvers/mutation');
 const Subscription = require('./resolvers/subscription');
-const Date = require('./resolvers/date');
+
 const jwt = require('jsonwebtoken');
 const { JWT_SECRET } = require('./config');
 
@@ -15,8 +15,7 @@ dotenv.load();
 const resolvers= {
   Query,
   Mutation,
-  Subscription,
-  Date
+  Subscription
 }
 
 const pubsub = new PubSub();
