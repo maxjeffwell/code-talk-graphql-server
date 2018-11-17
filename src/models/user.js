@@ -1,5 +1,4 @@
 const mongoose  = require('mongoose');
-const { Schema } = mongoose;
 
 const UserSchema = new mongoose.Schema({
   username: {
@@ -16,10 +15,6 @@ const UserSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  channels: {
-    type: [Schema.Types.ObjectId],
-    ref: 'Channel'
-  }
 });
 
 module.exports = mongoose.model('User', UserSchema);

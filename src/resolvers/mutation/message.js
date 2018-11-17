@@ -1,8 +1,8 @@
 const Message = require('../../models/message');
 
 module.exports = async(root, args, context) => {
-  const { body, user } = args.message;
-  const message = await Message.create({ body, user });
+  const { text } = args.message;
+  const message = await Message.create({ text });
   context.pubsub.publish('NEW_MESSAGE', { newMessage: message});
   return message;
 };
