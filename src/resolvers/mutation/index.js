@@ -1,9 +1,9 @@
 const signup = require('./signup');
 const login = require('./login');
-const message = require('./message');
+const createMessage = require('./createMessage');
 
 module.exports = {
   signup,
   login,
-  message
+  createMessage
 };

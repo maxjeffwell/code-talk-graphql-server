@@ -1,23 +1,22 @@
 type Query {
-	user(id: ID!, username: String!): User
+	otherUsers(id: ID!): User
     messages(id: ID!, text: String!): [Message]!
 }
 
 type Mutation {
 	signup(username: String!, email: String!, password: String!): String!
 	login(email: String!, password: String!): String!
-	message(id: ID!, text: String!, createdAt: String!): Message!
+	createMessage(id: ID!, text: String!, createdAt: String!): Message!
 }
 
 type Message {
 	id: ID!
 	text: String!
     createdAt: String!
-    sentBy(id: ID!, userName: String!): User!
+    sentBy(userName: String!): User!
 }
 
 type User {
-	id: ID!
 	username: String!
 }
 

@@ -1,5 +1,7 @@
-const messages = require('./messages');
+const messages = require('./messageQuery');
+const otherUsers = require('./otherUsers')
 
-module.exports ={
-  messages
+module.exports = {
+  messages,
+  otherUsers
 }
