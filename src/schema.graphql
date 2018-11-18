@@ -18,6 +18,7 @@ type Message {
 
 type User {
 	username: String!
+	messages: [Message]
 }
 
 type Subscription {
