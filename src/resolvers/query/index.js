@@ -1,7 +1,5 @@
-const messages = require('./messageQuery');
-const otherUsers = require('./otherUsers')
+const viewChatRoom = require('./viewChatRoom');
 
 module.exports = {
-  messages,
-  otherUsers
-}
+  viewChatRoom
+};

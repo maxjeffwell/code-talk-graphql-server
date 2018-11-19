@@ -1,6 +1,5 @@
 type Query {
-	otherUsers(id: ID!): User
-    messages(id: ID!, text: String!): [Message]!
+	viewChatRoom(id: String!): ChatRoom
 }
 
 type Mutation {
@@ -26,6 +25,12 @@ type Subscription {
 input newMessage {
     text: String!,
     username: String!
+}
+
+type ChatRoom {
+    id: ID!
+    name: String!
+    description: String!
 }
 
 
