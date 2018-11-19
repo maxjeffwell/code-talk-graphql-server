@@ -6,23 +6,26 @@ type Query {
 type Mutation {
 	signup(username: String!, email: String!, password: String!): String!
 	login(email: String!, password: String!): String!
-	createMessage(id: ID!, text: String!, createdAt: String!): Message!
+	createMessage(message: newMessage): Boolean!
 }
 
 type Message {
-	id: ID!
 	text: String!
-    createdAt: String!
-    sentBy(userName: String!): User!
+    username: String!
 }
 
 type User {
 	username: String!
-	messages: [Message]
+	messages: [Message]!
 }
 
 type Subscription {
-	newMessage(id: ID!): Message!
+	newMessage: Message!
+}
+
+input newMessage {
+    text: String!,
+    username: String!
 }
 
 
