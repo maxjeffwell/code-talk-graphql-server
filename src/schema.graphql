@@ -1,41 +1,31 @@
 type Query {
-#	channels: [Channels]
-#	channels(id: Int!): channel
-	message(id: ID!): [Message!]
-	users(id: ID!): [User]
-#	user(id: Int, search: String): User
-
+	otherUsers(id: ID!): User
+    messages(id: ID!, text: String!): [Message]!
 }
 
 type Mutation {
 	signup(username: String!, email: String!, password: String!): String!
 	login(email: String!, password: String!): String!
-	message(body: String!, user: String!): Message!
+	createMessage(message: newMessage): Boolean!
 }
 
 type Message {
-	id: ID!
-	body: String!
-	user: User!
-#	channel: Channel!
-	createdAt: String!
-
+	text: String!
+    username: String!
 }
 
-#type Channel {
-#	id: ID!
-#	name: String!
-#	users: [User!]!
-#	messages: [Message!]!
-#}
-
 type User {
-	id: ID!
 	username: String!
+	messages: [Message]!
 }
 
 type Subscription {
-	newMessage(channelId: ID!): Message!
+	newMessage: Message!
+}
+
+input newMessage {
+    text: String!,
+    username: String!
 }
 
 

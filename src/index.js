@@ -12,7 +12,7 @@ dotenv = require('dotenv');
 
 dotenv.load();
 
-const resolvers= {
+const resolvers = {
   Query,
   Mutation,
   Subscription
@@ -43,5 +43,13 @@ if (require.main === module) {
     useNewUrlParser: true
   });
   mongoose.set('useCreateIndex', true);;
+  const db = mongoose.connection;
+  db.on('error', ()  => {
+    console.log('Failed to connect to mongoose')
+  });
+  db.once('open', () => {
+    console.log('Connected to mongoose')
+  });
+
   server.start(() => console.log(`Server is running`));
 }

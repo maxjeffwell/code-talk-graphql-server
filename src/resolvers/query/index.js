@@ -1,3 +1,7 @@
-const message = require('./message');
+const messages = require('./messageQuery');
+const otherUsers = require('./otherUsers')
 
-module.exports = { message };
+module.exports = {
+  messages,
+  otherUsers
+}

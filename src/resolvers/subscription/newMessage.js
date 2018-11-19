@@ -1,5 +1,6 @@
 module.exports = {
   subscribe: (root, args, context) => {
-    return context.pubsub.asyncIterator('NEW_MESSAGE');
+      return context.pubsub.asyncIterator('PUBSUB_NEW_MESSAGE');
+    }
   }
-}
+
