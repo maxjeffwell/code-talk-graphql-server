@@ -1,5 +1,7 @@
-const viewChatRoom = require('./viewChatRoom');
+// const viewChatRoom = require('./viewChatRoom');
+const messages = require('./messages');
 
 module.exports = {
-  viewChatRoom
+  // viewChatRoom
+  messages
 };
