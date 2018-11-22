@@ -18,6 +18,8 @@ const resolvers = {
   Subscription
 }
 
+let username = 'unknown';
+
 const pubsub = new PubSub();
 const server = new GraphQLServer({
   typeDefs,
