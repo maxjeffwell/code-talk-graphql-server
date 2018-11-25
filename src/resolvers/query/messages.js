@@ -1,17 +1,14 @@
 const Message = require('../../models/message');
-// const User = require('../../models/user');
-//
-// module.exports = async(root, args, context) => {
-//   const decodedToken = context.isAuthorized();
-//   const isUser = await User.findById(decodedToken.user._id);
-//   if (isUser) {
-//     return await Message.find();
-//   } else {
-//     throw('Unauthorized');
-//   }
-// }
+const User = require('../../models/user');
 
-module.exports = async() => {
-  return await Message.find();
+module.exports = async(root, args, context) => {
+  const decodedToken = context.isAuthorized();
+  const isUser = await User.findById(decodedToken.user._id);
+  if (isUser) {
+    return await Message.find();
+  } else {
+    throw('Unauthorized');
+  }
 }
+
 

@@ -27,7 +27,7 @@ type Subscription {
 }
 
 input newMessage {
-    text: String!,
+    text: String!
     username: String
 }
 
