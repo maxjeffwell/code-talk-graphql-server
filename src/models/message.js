@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const User = require('./user');
 
 const messageSchema = new mongoose.Schema({
   text: {
@@ -8,7 +9,11 @@ const messageSchema = new mongoose.Schema({
   username: {
     type: String,
     required: true
-  }
+  },
+    sentBy: {
+    type: String,
+        ref: User
+    }
 });
 
 module.exports = mongoose.model('Message', messageSchema);

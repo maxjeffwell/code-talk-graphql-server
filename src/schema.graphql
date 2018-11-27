@@ -1,3 +1,5 @@
+scalar Date
+
 type Query {
 	viewChatRooms: [ChatRoom]!
 	messages: [Message]!
@@ -12,13 +14,16 @@ type Mutation {
 
 type Message {
 	text: String!
+    createdAt: Date!
     username: String
+	sentBy: User
 }
+
 
 type User {
 	id: ID!
     username: String!
-	createdAt: String!
+	createdAt: Date!
     messages: [Message]!
 }
 
@@ -28,7 +33,6 @@ type Subscription {
 
 input newMessage {
     text: String!
-    username: String
 }
 
 type ChatRoom {

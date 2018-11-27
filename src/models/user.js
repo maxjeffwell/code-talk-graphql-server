@@ -1,7 +1,8 @@
 const mongoose  = require('mongoose');
+const Message = require('./message');
 
 const UserSchema = new mongoose.Schema({
-  id: mongoose.Schema.Types.ObjectId,
+  // id: mongoose.Schema.Types.ObjectId,
   username: {
     type: String,
     unique: true,
@@ -18,8 +19,9 @@ const UserSchema = new mongoose.Schema({
     required: true
   },
   messages: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Message'
+    // type: mongoose.Schema.Types.ObjectId,
+      type: 'String',
+      ref: Message
   }]
 
 });
