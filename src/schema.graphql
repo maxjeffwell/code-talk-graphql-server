@@ -1,24 +1,30 @@
 type Query {
-	viewChatRooms: [ChatRoom]!
+#	viewChatRooms: [ChatRoom]!
+	info: String!
+	packageName: String!
 	messages: [Message]!
+	currentUser: User
 }
 
 type Mutation {
 	signup(username: String!, email: String!, password: String!): String!
 	login(email: String!, password: String!): String!
-	createMessage(message: newMessage!): Boolean!
-#    createChatRoom(input: createChatRoomInput!): Boolean!
+	createMessage(message: newMessage!): String!
+	logout: User
+	#    createChatRoom(input: createChatRoomInput!): Boolean!
 }
 
 type Message {
+	id: ID
 	text: String!
-    username: String
+	user: User
 }
 
 type User {
-	id: ID!
-    username: String!
-	createdAt: String!
+	id: ID
+    email: String
+	username: String!
+#	createdAt: String!
     messages: [Message]!
 }
 
@@ -28,14 +34,13 @@ type Subscription {
 
 input newMessage {
     text: String!
-    username: String
 }
 
-type ChatRoom {
-    id: ID!
-    name: String!
-    description: String!
-}
+#type ChatRoom {
+#    id: ID!
+#    name: String!
+#    description: String!
+#}
 
 #input createChatRoomInput {
 #    name: String!
