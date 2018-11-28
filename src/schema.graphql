@@ -1,3 +1,5 @@
+scalar Date
+
 type Query {
 #	viewChatRooms: [ChatRoom]!
 	info: String!
@@ -17,14 +19,27 @@ type Mutation {
 type Message {
 	id: ID
 	text: String!
+<<<<<<< HEAD
 	user: User
+=======
+    createdAt: Date!
+    username: String
+	sentBy: User
+>>>>>>> ee5b12644939a105736df3f22c519ebc110c3746
 }
 
+
 type User {
+<<<<<<< HEAD
 	id: ID
     email: String
 	username: String!
 #	createdAt: String!
+=======
+	id: ID!
+    username: String!
+	createdAt: Date!
+>>>>>>> ee5b12644939a105736df3f22c519ebc110c3746
     messages: [Message]!
 }
 
