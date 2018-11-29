@@ -7,5 +7,5 @@ module.exports = {
   signup,
   login,
   createMessage,
-  logout
+  // logout
 };
