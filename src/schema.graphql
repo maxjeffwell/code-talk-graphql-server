@@ -12,7 +12,6 @@ type Mutation {
 	signup(username: String!, email: String!, password: String!): String!
 	login(email: String!, password: String!): String!
 	createMessage(message: newMessage!): String!
-	logout: User
 	#    createChatRoom(input: createChatRoomInput!): Boolean!
 }
 
@@ -52,6 +51,5 @@ input newMessage {
 #    topic: String!
 #    messages: [Message]!
 #}
-
 
 
