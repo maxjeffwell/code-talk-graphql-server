@@ -11,14 +11,14 @@ type Query {
 type Mutation {
 	signup(username: String!, email: String!, password: String!): String!
 	login(email: String!, password: String!): String!
-	createMessage(message: newMessage!): String!
+	createMessage(message: newMessage!): Message
 	#    createChatRoom(input: createChatRoomInput!): Boolean!
 }
 
 type Message {
 	id: ID
 	text: String!
-	user: User
+#	user: User
     createdAt: Date!
     username: String
 }
@@ -38,6 +38,7 @@ type Subscription {
 
 input newMessage {
     text: String!
+	username: String!
 }
 
 #type ChatRoom {
