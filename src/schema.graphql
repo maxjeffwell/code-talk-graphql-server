@@ -3,8 +3,7 @@ scalar Date
 type Query {
 	info: String!
 	packageName: String!
-	messages: [Message]!
-	currentUser: User
+	messages: [Message!]!
 }
 
 type Mutation {
@@ -15,17 +14,15 @@ type Mutation {
 }
 
 type Message {
-	id: ID
+	id: ID!
 	text: String!
-    created_at: Date
-    sentBy: String
+    user: User!
 }
 
 type User {
-	id: ID
-    email: String
-	username: String
-#    messages: [Message]!
+	id: ID!
+    email: String!
+	username: String!
 }
 
 type Subscription {
