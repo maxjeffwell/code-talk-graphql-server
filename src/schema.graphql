@@ -1,7 +1,6 @@
 scalar Date
 
 type Query {
-#	viewChatRooms: [ChatRoom]!
 	info: String!
 	packageName: String!
 	messages: [Message]!
@@ -12,24 +11,21 @@ type Mutation {
 	signup(username: String!, email: String!, password: String!): String!
 	login(email: String!, password: String!): String!
 	createMessage(message: newMessage!): Message
-	#    createChatRoom(input: createChatRoomInput!): Boolean!
+
 }
 
 type Message {
 	id: ID
 	text: String!
-#	user: User
-    createdAt: Date!
-    username: String
+    created_at: Date
+    sentBy: String
 }
-
 
 type User {
 	id: ID
     email: String
-	username: String!
-#	createdAt: String!
-    messages: [Message]!
+	username: String
+#    messages: [Message]!
 }
 
 type Subscription {
@@ -37,20 +33,9 @@ type Subscription {
 }
 
 input newMessage {
-    text: String!
-	username: String!
+	text: String!
+	created_at: Date
+	id: ID
 }
-
-#type ChatRoom {
-#    id: ID!
-#    name: String!
-#    description: String!
-#}
-
-#input createChatRoomInput {
-#    name: String!
-#    topic: String!
-#    messages: [Message]!
-#}
 
 
