@@ -6,11 +6,13 @@ const messageSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  username: {
-    type: String
+  created_at: {
+    type: Date,
+    required: true,
+    default: Date.now
   },
   sentBy: {
-    type: String,
+    type: mongoose.Schema.Types.ObjectId,
     ref: User
     }
 });
