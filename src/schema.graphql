@@ -9,18 +9,19 @@ type Query {
 type Mutation {
 	signup(username: String!, email: String!, password: String!): String!
 	login(email: String!, password: String!): String!
-	createMessage(message: newMessage!): Message
+	createMessage(message: newMessage!): Boolean!
 
 }
 
 type Message {
-	id: ID!
+	id: Int!
 	text: String!
     user: User!
+	createdAt: String!
 }
 
 type User {
-	id: ID!
+	id: Int!
     email: String!
 	username: String!
 }
