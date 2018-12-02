@@ -1,11 +1,13 @@
-const Message = require('../../models/message');
-const User = require('../../models/user');
+const { Message } = require('../../models/message');
+const { User } = require('../../models/user');
 
 module.exports = async(root, args, context) => {
   const decodedToken = context.isAuthorized();
-  const isUser = await User.findById(decodedToken.user._id);
+  const isUser = await User.findByPk(decodedToken.user.id);
   if (isUser) {
-    return await Message.find();
+    return await Message.findAll(
+      { order: [['createdAt', 'ASC']] }
+    );
   } else {
     throw('Unauthorized');
   }

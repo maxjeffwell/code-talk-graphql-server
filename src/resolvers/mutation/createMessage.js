@@ -1,4 +1,4 @@
-const Message = require('../../models/message');
+const { Message } = require('../../models/message');
 
 module.exports = async(_, { message }, { pubsub }) => {
   const dbMessage = await Message.create({ ...message });

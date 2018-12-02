@@ -31,8 +31,6 @@ type Subscription {
 
 input newMessage {
 	text: String!
-	created_at: Date
-	id: ID
 }
 
 
