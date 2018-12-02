@@ -1,5 +1,5 @@
 const { GraphQLServer, PubSub } = require('graphql-yoga');
-const { sequelize } = require('./db/sequelize')
+const { sequelize } = require('./db/sequelize');
 const typeDefs='./src/schema.graphql';
 const Query = require('./resolvers/query');
 const Mutation = require('./resolvers/mutation');
