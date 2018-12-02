@@ -12,7 +12,8 @@ const Message = sequelize.define('message', { // creates message table
       Message.belongsTo(models.User, {
         foreignKey: {
           name: 'userId',
-          field: 'user_id'
+          field: 'user_id',
+          allowNull: false
         }
       });
     }

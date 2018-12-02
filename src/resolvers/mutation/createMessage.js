@@ -1,23 +1,17 @@
 const { Message } = require('../../models/message');
 const { User } = require('../../models/user');
 
-// module.exports = async(_, { message }, { pubsub }) => {
-//   const dbMessage = await Message.create({ ...message });
-//   pubsub.publish('PUBSUB_NEW_MESSAGE', { newMessage: dbMessage });
-//   return true;
-// };
-
 module.exports = async(parent, args, { pubsub }) => {
   try {
     const dbMessage = await Message.create({
       ... args,
-      user_id: User.id
+      userId: User.id
     });
 
     const asyncFunc = async () => {
       const currentUser = await User.findOne({
         where: {
-          id: User.id,
+          id: User.id
         },
       });
 
