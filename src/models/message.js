@@ -1,25 +1,21 @@
-const Sequelize = require('sequelize');
-const { sequelize } = require('../db/sequelize');
-
+export default (sequelize, DataTypes) => {
 const Message = sequelize.define('message', { // creates message table
   text: {
-    type: Sequelize.STRING,
+    type: DataTypes.STRING,
     underscored: true
   },
-}, {
-  classMethods: {
-    associate: function (models) {
-      Message.belongsTo(models.User, {
-        foreignKey: {
-          name: 'userId',
-          field: 'user_id',
-          allowNull: false
-        }
-      });
-    }
-  }
 });
 
-module.exports = {
-  Message
+Message.associate = (models) => {
+  Message.belongsTo(models.User, {
+    foreignKey: {
+      name: 'userId',
+      field: 'user_id',
+      allowNull: false
+    },
+  });
+};
+
+return Message;
+
 };

@@ -1,4 +1,5 @@
-require('dotenv').config();
+import dotenv from 'dotenv';
+dotenv.config({ silent: true });
 
 module.exports = {
   DATABASE_URL: process.env.DATABASE_URL,

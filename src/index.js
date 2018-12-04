@@ -1,17 +1,15 @@
 const { GraphQLServer, PubSub } = require('graphql-yoga');
-const { sequelize } = require('./db/sequelize');
 const typeDefs='./src/schema.graphql';
 const Query = require('./resolvers/query');
 const Mutation = require('./resolvers/mutation');
 const Subscription = require('./resolvers/subscription');
 const Date = require('./resolvers/date');
 
+import models from './models';
+
 const jwt = require('jsonwebtoken');
 const { JWT_SECRET } = require('./config');
 
-dotenv = require('dotenv');
-
-dotenv.load();
 
 const resolvers = {
   Query,
@@ -36,9 +34,9 @@ const server = new GraphQLServer({
       return decodedToken;
     }
   })
-})
+});
 
-  sequelize.sync().then(function () {
+  models.sequelize.sync({}).then(function () {
   server.start(() => console.log(`Server is running`));
 });
 

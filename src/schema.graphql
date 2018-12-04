@@ -3,19 +3,20 @@ scalar Date
 type Query {
 	info: String!
 	packageName: String!
-	messages: [Message!]!
+	messages: [Message]!
+	allUsers: [User]!
 }
 
 type Mutation {
-	signup(username: String!, email: String!, password: String!): String!
+	signup(username: String!, email: String!, password: String!): SignupResponse!
 	login(email: String!, password: String!): String!
-	createMessage(message: newMessage!): Boolean!
+	createMessage(message: newMessage!): Message!
 
 }
 
 type Message {
-	id: Int!
-	text: String!
+	id: Int
+	text: String
     user: User!
 	createdAt: String!
 }
@@ -32,6 +33,18 @@ type Subscription {
 
 input newMessage {
 	text: String!
+}
+
+type SignupResponse {
+	ok: Boolean!
+	user: User
+	errors: [Error!]
+}
+
+
+type Error {
+	path: String!
+	message: String
 }
 
 
