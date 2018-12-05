@@ -4,28 +4,27 @@ type Query {
 	info: String!
 	packageName: String!
 	messages: [Message]!
-	currentUser: User
+	allUsers: [User]!
 }
 
 type Mutation {
-	signup(username: String!, email: String!, password: String!): String!
+	signup(username: String!, email: String!, password: String!): SignupResponse!
 	login(email: String!, password: String!): String!
-	createMessage(message: newMessage!): Message
+	createMessage(message: newMessage!): Message!
 
 }
 
 type Message {
-	id: ID
-	text: String!
-    created_at: Date
-    sentBy: String
+	id: Int
+	text: String
+    user: User!
+	createdAt: String!
 }
 
 type User {
-	id: ID
-    email: String
-	username: String
-#    messages: [Message]!
+	id: Int!
+    email: String!
+	username: String!
 }
 
 type Subscription {
@@ -34,8 +33,18 @@ type Subscription {
 
 input newMessage {
 	text: String!
-	created_at: Date
-	id: ID
+}
+
+type SignupResponse {
+	ok: Boolean!
+	user: User
+	errors: [Error!]
+}
+
+
+type Error {
+	path: String!
+	message: String
 }
 
 

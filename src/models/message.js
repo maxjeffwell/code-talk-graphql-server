@@ -1,21 +1,21 @@
-const mongoose = require('mongoose');
-const User = require('./user');
-
-const messageSchema = new mongoose.Schema({
+export default (sequelize, DataTypes) => {
+const Message = sequelize.define('message', { // creates message table
   text: {
-    type: String,
-    required: true
+    type: DataTypes.STRING,
+    underscored: true
   },
-  created_at: {
-    type: Date,
-    required: true,
-    default: Date.now
-  },
-  sentBy: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: User
-    }
 });
 
-module.exports = mongoose.model('Message', messageSchema);
+Message.associate = (models) => {
+  Message.belongsTo(models.User, {
+    foreignKey: {
+      name: 'userId',
+      field: 'user_id',
+      allowNull: false
+    },
+  });
+};
 
+return Message;
+
+};

@@ -1,17 +1,15 @@
 const { GraphQLServer, PubSub } = require('graphql-yoga');
-const mongoose = require('mongoose');
 const typeDefs='./src/schema.graphql';
 const Query = require('./resolvers/query');
 const Mutation = require('./resolvers/mutation');
 const Subscription = require('./resolvers/subscription');
 const Date = require('./resolvers/date');
 
+import models from './models';
+
 const jwt = require('jsonwebtoken');
 const { JWT_SECRET } = require('./config');
 
-dotenv = require('dotenv');
-
-dotenv.load();
 
 const resolvers = {
   Query,
@@ -19,7 +17,6 @@ const resolvers = {
   Subscription,
   Date
 }
-
 const pubsub = new PubSub();
 const server = new GraphQLServer({
   typeDefs,
@@ -37,21 +34,9 @@ const server = new GraphQLServer({
       return decodedToken;
     }
   })
-})
+});
 
-if (require.main === module) {
-  mongoose.Promise = global.Promise;
-  mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost/code-talk', {
-    useNewUrlParser: true
-  });
-  mongoose.set('useCreateIndex', true);;
-  const db = mongoose.connection;
-  db.on('error', ()  => {
-    console.log('Failed to connect to mongoose')
-  });
-  db.once('open', () => {
-    console.log('Connected to mongoose')
-  });
-
+  models.sequelize.sync({}).then(function () {
   server.start(() => console.log(`Server is running`));
-}
+});
+

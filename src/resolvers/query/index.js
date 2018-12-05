@@ -1,14 +1,11 @@
-// const viewChatRoom = require('./viewChatRoom');
 const messages = require('./messages');
-const currentUser = require('./currentUser');
 const info = require('./info');
 const packageName = require('./packageName');
-
+const allUsers = require('./allUsers');
 
 module.exports = {
-  // viewChatRoom
   messages,
-  currentUser,
+  allUsers,
   info,
   packageName
 };

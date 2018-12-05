@@ -1,21 +1,45 @@
-const mongoose  = require('mongoose');
-// const Message = require('./message');
+export default (sequelize, DataTypes) => {
+  const User = sequelize.define('user', { // creates user table
+    username: {
+      type: DataTypes.STRING,
+      unique: true,
+      allowNull: false,
+      validate: {
+        isAlphanumeric: {
+          args: true,
+          msg: 'User names must consist of letters and numbers only'
+        },
+        len: {
+          args: [4, 15],
+          msg: 'User names must be between 4 and 15 characters long'
+        },
+      },
+    },
+    email: {
+      type: DataTypes.STRING,
+      unique: true,
+      validate: {
+        isEmail: {
+          args: true,
+          msg: 'Invalid email address'
+        },
+      },
+    },
+    password: {
+      type: DataTypes.STRING
+    },
+  });
 
-const UserSchema = new mongoose.Schema({
-  id: mongoose.Schema.Types.ObjectId,
-  username: {
-    type: String,
-    unique: true,
-    required: true
-  },
-	email: {
-    type: String,
-    required: true
-  },
-	password: {
-    type: String,
-    required: true
-  }
-});
+User.associate = (models) => {
+  User.hasMany(models.Message, {
+    foreignKey: {
+      allowNull: false
+    },
+  });
+};
 
-module.exports = mongoose.model('User', UserSchema);
+return User;
+
+};
+
+
