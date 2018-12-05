@@ -1,42 +1,111 @@
-const { GraphQLServer, PubSub } = require('graphql-yoga');
-const typeDefs='./src/schema.graphql';
-const Query = require('./resolvers/query');
-const Mutation = require('./resolvers/mutation');
-const Subscription = require('./resolvers/subscription');
-const Date = require('./resolvers/date');
+import express from 'express';
+import bodyParser from 'body-parser';
+import { graphqlExpress, graphiqlExpress } from 'apollo-server-express';
+import { makeExecutableSchema } from 'graphql-tools';
+import path from 'path';
+import { fileLoader, mergeTypes, mergeResolvers } from 'merge-graphql-schemas';
+import cors from 'cors';
+import jwt from 'jsonwebtoken';
+import { createServer } from 'http';
+import { execute, subscribe } from 'graphql';
+import { SubscriptionServer } from 'subscriptions-transport-ws';
+
+import dotenv from 'dotenv';
+dotenv.load();
 
 import models from './models';
+import { refreshTokens } from './auth';
 
-const jwt = require('jsonwebtoken');
-const { JWT_SECRET } = require('./config');
+import { JWT_SECRET, JWT_SECRET2 } from './config';
 
 
-const resolvers = {
-  Query,
-  Mutation,
-  Subscription,
-  Date
-}
-const pubsub = new PubSub();
-const server = new GraphQLServer({
-  typeDefs,
-  resolvers,
-  context: incomingData => ({
-    incomingData,
-    pubsub,
-    isAuthorized: () => {
-      const AuthHeader = incomingData.request.header('authorization');
-      if(!AuthHeader){
-        throw('Unauthorized');
-      }
-      const token = AuthHeader.replace('Bearer ', '');
-      const decodedToken = jwt.verify(token, JWT_SECRET);
-      return decodedToken;
-    }
-  })
+const typeDefs = mergeTypes(fileLoader(path.join(__dirname, './schema')));
+
+const resolvers = mergeResolvers(fileLoader(path.join(__dirname, './resolvers')));
+
+const schema = makeExecutableSchema({
+	typeDefs,
+	resolvers,
 });
 
-  models.sequelize.sync({}).then(function () {
-  server.start(() => console.log(`Server is running`));
+const app = express();
+
+app.use(cors('*'));
+
+const addUser = async (req, res, next) => {
+	const token = req.headers['x-token'];
+	if (token) {
+		try {
+			const { user } = jwt.verify(token, JWT_SECRET);
+			req.user = user;
+		} catch (err) {
+			const refreshToken = req.headers['x-refresh-token'];
+			const newTokens = await refreshTokens(token, refreshToken, models, JWT_SECRET, JWT_SECRET2);
+			if (newTokens.token && newTokens.refreshToken) {
+				res.set('Access-Control-Expose-Headers', 'x-token, x-refresh-token');
+				res.set('x-token', newTokens.token);
+				res.set('x-refresh-token', newTokens.refreshToken);
+			}
+			req.user = newTokens.user;
+		}
+	}
+	next();
+};
+
+app.use(addUser);
+
+const graphqlEndpoint = '/graphql';
+
+app.use(
+	graphqlEndpoint,
+	bodyParser.json(),
+	graphqlExpress(req => ({
+		schema,
+		context: {
+			models,
+			user: req.user,
+			JWT_SECRET,
+			JWT_SECRET2,
+		},
+	})),
+);
+
+app.use(
+	'/graphiql',
+	graphiqlExpress({
+		endpointURL: graphqlEndpoint,
+		subscriptionsEndpoint: 'ws://localhost:8081/subscriptions',
+	}),
+);
+
+const server = createServer(app);
+
+models.sequelize.sync({}).then(() => {
+	server.listen(8081, () => {
+		new SubscriptionServer(
+			{
+				execute,
+				subscribe,
+				schema,
+				onConnect: async ({ token, refreshToken }, webSocket) => {
+					if (token && refreshToken) {
+						try {
+							const { user } = jwt.verify(token, JWT_SECRET);
+							return { models, user };
+						} catch (err) {
+							const newTokens = await refreshTokens(token, refreshToken, models, JWT_SECRET, JWT_SECRET2);
+							return { models, user: newTokens.user };
+						}
+					}
+
+					return { models };
+				},
+			},
+			{
+				server,
+				path: '/subscriptions',
+			},
+		);
+	});
 });
 
