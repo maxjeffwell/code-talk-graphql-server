@@ -6,6 +6,7 @@ export default `
     public: Boolean!
     messages: [Message!]!
     users: [User!]!
+    dm: Boolean!
   }
 
   type ChannelResponse {
@@ -13,8 +14,14 @@ export default `
     channel: Channel
     errors: [Error!]
   }
+  
+  type DMChannelResponse {
+    id: Int!
+    name: String!
+  }
 
   type Mutation {
     createChannel(teamId: Int!, name: String!, public: Boolean=false): ChannelResponse!
+    getOrCreateChannel(teamId: Int!, members: [Int!]!): DMChannelResponse!
   }
 `;
