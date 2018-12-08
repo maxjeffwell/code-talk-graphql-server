@@ -1,82 +1,68 @@
-import { PubSub, withFilter } from 'graphql-subscriptions';
+import Sequelize from 'sequelize';
+import { combineResolvers } from 'graphql-resolvers';
 
-import requiresAuth, { requiresTeamAccess } from '../permissions';
-
-const pubsub = new PubSub();
-pubsub.ee.setMaxListeners(30);
-
-const NEW_CHANNEL_MESSAGE = 'NEW_CHANNEL_MESSAGE';
+import pubsub, { EVENTS } from '../subscription';
+import { isAuthenticated, isMessageOwner } from './authorization';
 
 export default {
-	Subscription: {
-		newChannelMessage: {
-			subscribe: requiresTeamAccess.createResolver(withFilter(
-				() => pubsub.asyncIterator(NEW_CHANNEL_MESSAGE),
-				(payload, args) => payload.channelId === args.channelId,
-			)),
-		},
-	},
-	Message: {
-		user: ({ user, userId }, args, { models }) => {
-			if (user) {
-				return user;
-			}
-
-			return models.User.findOne({ where: { id: userId } }, { raw: true });
-		},
-	},
 	Query: {
-		messages: requiresAuth.createResolver(async (parent, { channelId }, { models, user }) => {
-			const channel = await models.Channel.findOne({ raw: true, where:
-					{ id: channelId } });
+		messages: async (parent, { limit = 100 }, { models }) => {
 
-			if (!channel.public) {
-				const member = await models.PCMember.findOne({
-					raw: true,
-					where: { channelId, userId: user.id },
-				});
-				if (!member) {
-					throw new Error('Not Authorized');
-				}
-			}
+			const messages = await models.Message.findAll({
+				order: [['createdAt', 'DESC']],
+				limit: limit + 1
+			});
 
-			return models.Message.findAll(
-				{ order: [['created_at', 'ASC']], where: { channelId } },
-				{ raw: true },
-			);
-		}),
-	},
-	Mutation: {
-		createMessage: requiresAuth.createResolver(async (parent, args, { models, user }) => {
-			try {
-				const message = await models.Message.create({
-					...args,
-					userId: user.id,
-				});
+			const hasNextPage = messages.length > limit;
+			// const edges = hasNextPage ? messages.slice(0, -1) : messages;
 
-				const asyncFunc = async () => {
-					const currentUser = await models.User.findOne({
-						where: {
-							id: user.id,
-						},
+			return {
+				// edges,
+				pageInfo: {
+					hasNextPage
+				},
+			};
+		},
+		message: async (parent, { id }, { models }) => {
+			return await models.Message.findById(id);
+			},
+		},
+
+		Mutation: {
+			createMessage: combineResolvers(
+				isAuthenticated,
+				async (parent, { text }, { models, me }) => {
+					const message = await models.Message.create({
+						text,
+						userId: me.id
 					});
 
-					pubsub.publish(NEW_CHANNEL_MESSAGE, {
-						channelId: args.channelId,
-						newChannelMessage: {
-							...message.dataValues,
-							user: currentUser.dataValues,
-						},
+					pubsub.publish(EVENTS.MESSAGE.CREATED, {
+						messageCreated: { message },
 					});
-				};
 
-				asyncFunc();
+					return message;
+				},
+			),
 
-				return true;
-			} catch (err) {
-				console.log(err);
-				return false;
-			}
-		}),
-	},
+			deleteMessage: combineResolvers(
+				isAuthenticated,
+				isMessageOwner,
+				async (parent, { id }, { models }) => {
+					return await models.Message.destroy({ where: { id } });
+				},
+			),
+		},
+
+		Message: {
+			user: async (message, args, { loaders }) => {
+				return await loaders.user.load(message.userId);
+			},
+		},
+
+		Subscription: {
+			messageCreated: {
+				subscribe: () => pubsub.asyncIterator(EVENTS.MESSAGE.CREATED)
+			},
+		},
 };
