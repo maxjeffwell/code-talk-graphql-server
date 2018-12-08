@@ -7,7 +7,7 @@ if (process.env.DATABASE_URL) {
 	});
 } else {
 	sequelize = new Sequelize(
-		process.env.TEST_DB_NAME || process.env.DB_NAME,
+		process.env.TEST_DATABASE || process.env.DATABASE,
 		process.env.DB_USER,
 		process.env.DB_PASSWORD,
 		{
