@@ -1,32 +1,33 @@
 import Sequelize from 'sequelize';
-const { DATABASE_URL } = require('../config');
 
-const sequelize = new Sequelize(DATABASE_URL, {
-	dialect: 'postgres',
-	operatorsAliases: Sequelize.Op,
-	define: {
-		underscored: true,
-	},
-});
+let sequelize;
+if (process.env.DATABASE_URL) {
+	sequelize = new Sequelize(process.env.DATABASE_URL, {
+		dialect: 'postgres'
+	});
+} else {
+	sequelize = new Sequelize(
+		process.env.TEST_DB_NAME || process.env.DB_NAME,
+		process.env.DB_USER,
+		process.env.DB_PASSWORD,
+		{
+			dialect:'postgres'
+		},
+	);
+}
 
 const models = {
 	User: sequelize.import('./user'),
-	Channel: sequelize.import('./channel'),
 	Message: sequelize.import('./message'),
-	Team: sequelize.import('./team'),
-	Member: sequelize.import('./member'),
-	DirectMessage: sequelize.import('./directMessage'),
-	PCMember: sequelize.import('./pcmember')
 };
 
-Object.keys(models).forEach((modelName) => {
-	if ('associate' in models[modelName]) {
-		models[modelName].associate(models);
+Object.keys(models).forEach(key => {
+	if ('associate' in models[key]) {
+		models[key].associate(models);
 	}
 });
 
-models.sequelize = sequelize;
-models.Sequelize = Sequelize;
+export { sequelize };
 
 export default models;
 
