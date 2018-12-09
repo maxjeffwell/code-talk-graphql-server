@@ -1,23 +1,38 @@
-export default `
+import { gql } from 'apollo-server-express';
 
-  type Message {
-    id: Int!
-    text: String!
-    user: User!
-    channel: Channel!
-    created_at: String!
-  }
+export default gql`
+    extend type Query {
+        messages(cursor: String, limit: Int): MessageConnection!
+        message(id: ID!): Message!
+    }
 
-  type Subscription {
-    newChannelMessage(channelId: Int!): Message!
-  }
+    extend type Mutation {
+        createMessage(text: String!): Message!
+        deleteMessage(id: ID!): Boolean!
+    }
 
-  type Query {
-    messages(channelId: Int!): [Message!]!
-  }
+    type MessageConnection {
+        edges: [Message!]!
+        pageInfo: PageInfo!
+    }
 
-  type Mutation {
-    createMessage(channelId: Int!, text: String!): Boolean!
-  }
+      type PageInfo {
+        hasNextPage: Boolean!
+    #   endCursor: String!
+      }
 
+    type Message {
+        id: ID!
+        text: String!
+        createdAt: Date!
+        user: User!
+    }
+
+    extend type Subscription {
+        messageCreated: MessageCreated!
+    }
+
+    type MessageCreated {
+        message: Message!
+    }
 `;
