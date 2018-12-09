@@ -14,10 +14,10 @@ export default {
 			});
 
 			const hasNextPage = messages.length > limit;
-			// const edges = hasNextPage ? messages.slice(0, -1) : messages;
+			const edges = hasNextPage ? messages.slice(0, -1) : messages;
 
 			return {
-				// edges,
+				edges,
 				pageInfo: {
 					hasNextPage
 				},
