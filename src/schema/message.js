@@ -13,13 +13,13 @@ export default gql`
 
     type MessageConnection {
         edges: [Message!]!
-        #    pageInfo: PageInfo!
+        pageInfo: PageInfo!
     }
 
-    #  type PageInfo {
-    #    hasNextPage: Boolean!
-    #    endCursor: String!
-    #  }
+      type PageInfo {
+        hasNextPage: Boolean!
+#        endCursor: String!
+      }
 
     type Message {
         id: ID!
@@ -36,4 +36,3 @@ export default gql`
         message: Message!
     }
 `;
-

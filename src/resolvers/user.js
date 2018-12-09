@@ -37,7 +37,7 @@ export default {
 			const user = await models.User.create({
 				username,
 				email,
-				password
+				password,
 			});
 
 			return { token: createToken(user, secret, '30m') };

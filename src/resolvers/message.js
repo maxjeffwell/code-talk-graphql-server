@@ -4,13 +4,27 @@ import { combineResolvers } from 'graphql-resolvers';
 import pubsub, { EVENTS } from '../subscription';
 import { isAuthenticated, isMessageOwner } from './authorization';
 
+const toCursorHash = string => Buffer.from(string).toString('base64');
+
+const fromCursorHash = string =>
+	Buffer.from(string, 'base64').toString('ascii');
+
 export default {
 	Query: {
-		messages: async (parent, { limit = 100 }, { models }) => {
+		messages: async (parent, { cursor, limit = 100 }, { models }) => {
+			const cursorOptions = cursor ? {
+				where: {
+					createdAt: {
+						[Sequelize.Op.lt]: fromCursorHash(cursor),
+					},
+				},
+			}
+			: {};
 
 			const messages = await models.Message.findAll({
 				order: [['createdAt', 'DESC']],
-				limit: limit + 1
+				limit: limit + 1,
+				cursorOptions
 			});
 
 			const hasNextPage = messages.length > limit;

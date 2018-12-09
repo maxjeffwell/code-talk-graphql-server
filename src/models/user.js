@@ -16,7 +16,7 @@ export default (sequelize, DataTypes) => {
 					},
 					len: {
 						args: [3, 25],
-						msg: 'The username needs to be between 3 and 25 characters long',
+						msg: 'Your username must be between 3 and 25 characters long',
 					},
 				},
 			},
@@ -38,8 +38,8 @@ export default (sequelize, DataTypes) => {
 				validate: {
 					notEmpty: true,
 					len: {
-						args: [7, 52],
-						msg: 'The password needs to be between 7 and 52 characters long',
+						args: [3, 75],
+						msg: 'Your password needs to be between 3 and 72 characters long',
 					},
 				},
 			},

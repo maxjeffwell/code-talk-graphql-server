@@ -4,7 +4,7 @@ import * as userApi from './api';
 
 describe('users', () => {
 	describe('user(id: String!): User', () => {
-		it('returns a user when user can be found', async () => {
+		it('returns a user when a user can be found', async () => {
 			const expectedResult = {
 				data: {
 					user: {
@@ -103,7 +103,7 @@ describe('users', () => {
 	});
 
 	describe('signUp, updateUser, deleteUser', () => {
-		it('signs up a user, updates a user and deletes the user as admin', async () => {
+		it('signs up a user, updates a user, and deletes the user as admin', async () => {
 			// sign up
 
 			let {
