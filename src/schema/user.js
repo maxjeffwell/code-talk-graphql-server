@@ -1,34 +1,33 @@
-export default `
+import { gql } from 'apollo-server-express';
 
-  type User {
-    id: Int!
-    username: String!
-    email: String!
-    teams: [Team!]!
-  }
+export default gql`
+    extend type Query {
+        users: [User!]
+        user(id: ID!): User
+        me: User
+    }
 
-  type Query {
-    me: User!
-    allUsers: [User!]!
-    getUser(userId: Int!): User
-  }
+    extend type Mutation {
+        signUp(
+            username: String!
+            email: String!
+            password: String!
+        ): Token!
 
-  type RegisterResponse {
-    ok: Boolean!
-    user: User
-    errors: [Error!]
-  }
+        signIn(login: String!, password: String!): Token!
+        updateUser(username: String!): User!
+        deleteUser(id: ID!): Boolean!
+    }
 
-  type LoginResponse {
-    ok: Boolean!
-    token: String
-    refreshToken: String
-    errors: [Error!]
-  }
+    type Token {
+        token: String!
+    }
 
-  type Mutation {
-    register(username: String!, email: String!, password: String!): RegisterResponse!
-    login(email: String!, password: String!): LoginResponse!
-  }
-
-`;
+    type User {
+        id: ID!
+        username: String!
+        email: String!
+        role: String
+        messages: [Message!]
+    }
+`
