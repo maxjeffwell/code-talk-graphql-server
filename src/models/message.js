@@ -1,9 +1,6 @@
-export default (sequelize, DataTypes) => {
+const message = (sequelize, DataTypes) => {
 	const Message = sequelize.define('message', {
-		text: DataTypes.STRING,
-		validate: {
-			notEmpty: true
-		},
+		text: DataTypes.STRING
 	});
 
 	Message.associate = (models) => {
@@ -12,3 +9,5 @@ export default (sequelize, DataTypes) => {
 
 	return Message;
 };
+
+export default message;

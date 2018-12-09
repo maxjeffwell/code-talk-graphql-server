@@ -8,9 +8,9 @@ import cors from 'cors';
 import jwt from 'jsonwebtoken';
 
 import schema from './schema';
+import resolvers from './resolvers';
 import models, { sequelize } from './models';
 import loaders from './loaders';
-import resolvers from './resolvers';
 
 const app = express();
 
@@ -57,7 +57,7 @@ const server = new ApolloServer({
 		}
 
 		if (req) {
-			const me = await.getMe(req);
+			const me = await getMe(req);
 
 			return {
 				models,
@@ -78,8 +78,8 @@ server.applyMiddleware({ app, path: '/graphql'});
 const httpServer = http.createServer(app);
 server.installSubscriptionHandlers(httpServer);
 
-const isTest = !!process.env.TEST_DATABASE;
-const isProduction = !!process.env.DATABASE_URL;
+// const isTest = !!process.env.TEST_DATABASE;
+// const isProduction = !!process.env.DATABASE_URL;
 
 const port = process.env.PORT || 8000;
 
