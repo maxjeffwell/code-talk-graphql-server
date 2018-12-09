@@ -37,11 +37,11 @@ const server = new ApolloServer({
 	formatError: error => {
 		const message = error.message
 			.replace('SequelizeValidationError: ', '')
-			.replace('Validation error: ', '');
+			.replace('Validation Error: ', '');
 
 		return {
 			...error,
-			message,
+			message
 		};
 	},
 	context: async ({ req, connection }) => {
@@ -78,7 +78,7 @@ server.applyMiddleware({ app, path: '/graphql'});
 const httpServer = http.createServer(app);
 server.installSubscriptionHandlers(httpServer);
 
-// const isTest = !!process.env.TEST_DATABASE;
+// const isTest = !!process.env.TEST_DATABASE_URL;
 // const isProduction = !!process.env.DATABASE_URL;
 
 const port = process.env.PORT || 8000;

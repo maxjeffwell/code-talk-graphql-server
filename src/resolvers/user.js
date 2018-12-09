@@ -4,6 +4,7 @@ import { AuthenticationError, UserInputError } from 'apollo-server';
 
 import { isAdmin, isAuthenticated } from './authorization';
 
+
 const createToken = async (user, secret, expiresIn) => {
 	const { id, email, username, role } = user;
 	return await jwt.sign({ id, email, username, role }, secret, {

@@ -8,7 +8,7 @@ export const isAdmin = combineResolvers(
   isAuthenticated,
   (parent, args, { me: { role } }) =>
     role === 'ADMIN'
-  ? skip : new ForbiddenError('Not authenticated as an administrator'),
+  ? skip : new ForbiddenError('Not authenticated as an administrator')
 );
 
 export const isMessageOwner = async (parent, { id }, { models, me}) => {
