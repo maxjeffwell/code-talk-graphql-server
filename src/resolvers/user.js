@@ -4,6 +4,7 @@ import { AuthenticationError, UserInputError } from 'apollo-server';
 
 import { isAdmin, isAuthenticated } from './authorization';
 
+
 const createToken = async (user, secret, expiresIn) => {
 	const { id, email, username, role } = user;
 	return await jwt.sign({ id, email, username, role }, secret, {
@@ -40,7 +41,7 @@ export default {
 				password,
 			});
 
-			return { token: createToken(user, secret, '30m') };
+			return { token: createToken(user, secret, '60m') };
 		},
 
 		signIn: async (
@@ -62,7 +63,7 @@ export default {
 				throw new AuthenticationError('Invalid credentials');
 			}
 
-			return { token: createToken(user, secret, '30m') };
+			return { token: createToken(user, secret, '60m') };
 		},
 
 		updateUser: combineResolvers(

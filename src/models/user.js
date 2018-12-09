@@ -12,11 +12,11 @@ export default (sequelize, DataTypes) => {
 					isAlphanumeric: {
 						notEmpty: true,
 						args: true,
-						msg: 'The username can only contain letters and numbers',
+						msg: 'The username can only contain letters and numbers'
 					},
 					len: {
 						args: [3, 25],
-						msg: 'Your username must be between 3 and 25 characters long',
+						msg: 'Your username must be between 3 and 25 characters long'
 					},
 				},
 			},
@@ -28,7 +28,7 @@ export default (sequelize, DataTypes) => {
 					notEmpty: true,
 					isEmail: {
 						args: true,
-						msg: 'Invalid email',
+						msg: 'Invalid email'
 					},
 				},
 			},
@@ -38,8 +38,8 @@ export default (sequelize, DataTypes) => {
 				validate: {
 					notEmpty: true,
 					len: {
-						args: [3, 75],
-						msg: 'Your password needs to be between 3 and 72 characters long',
+						args: [7, 42],
+						msg: 'Your password needs to be between 7 and 42 characters long'
 					},
 				},
 			},
