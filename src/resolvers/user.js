@@ -41,7 +41,7 @@ export default {
 				password,
 			});
 
-			return { token: createToken(user, secret, '60m') };
+			return { token: createToken(user, secret, '30m') };
 		},
 
 		signIn: async (
@@ -63,7 +63,7 @@ export default {
 				throw new AuthenticationError('Invalid credentials');
 			}
 
-			return { token: createToken(user, secret, '60m') };
+			return { token: createToken(user, secret, '30m') };
 		},
 
 		updateUser: combineResolvers(

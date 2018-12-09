@@ -1,9 +1,7 @@
 import bcrypt from 'bcryptjs';
 
-export default (sequelize, DataTypes) => {
-	const User = sequelize.define(
-		'user',
-		{
+const user = (sequelize, DataTypes) => {
+	const User = sequelize.define('user', {
 			username: {
 				type: DataTypes.STRING,
 				unique: true,
@@ -74,15 +72,17 @@ export default (sequelize, DataTypes) => {
 		});
 
 		User.prototype.generatePasswordHash = async function() {
-			const saltRounds = 12;
+			const saltRounds = 10;
 			return await bcrypt.hash(this.password, saltRounds);
 		};
 
-		User.prototype.validatePassword = async password => {
+		User.prototype.validatePassword = async function(password) {
 			return await bcrypt.compare(password, this.password);
 		};
 
 		return User;
 };
+
+export default user;
 
 

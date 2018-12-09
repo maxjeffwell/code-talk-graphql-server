@@ -31,6 +31,7 @@ const getMe = async req => {
 };
 
 const server = new ApolloServer({
+	introspection: true,
 	typeDefs: schema,
 	resolvers,
 	formatError: error => {
@@ -40,7 +41,7 @@ const server = new ApolloServer({
 
 		return {
 			...error,
-			message,
+			message
 		};
 	},
 	context: async ({ req, connection }) => {
@@ -77,15 +78,13 @@ server.applyMiddleware({ app, path: '/graphql'});
 const httpServer = http.createServer(app);
 server.installSubscriptionHandlers(httpServer);
 
-const isTest = !!process.env.TEST_DATABASE_URL;
-const isProduction = !!process.env.DATABASE_URL;
+// const isTest = !!process.env.TEST_DATABASE_URL;
+// const isProduction = !!process.env.DATABASE_URL;
 
 const port = process.env.PORT || 8000;
 
 sequelize.sync({}).then(async () => {
-	if (isTest || isProduction) {
 	httpServer.listen({ port }, () => {
 		console.log(`Apollo Server is running on http://localhost:${port}/graphql`);
 	});
-	}
 });
