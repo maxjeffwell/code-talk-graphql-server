@@ -33,10 +33,14 @@ export default {
 			return {
 				edges,
 				pageInfo: {
-					hasNextPage
+					hasNextPage,
+					endCursor: toCursorHash(
+						edges[edges.length - 1].createdAt.toString()
+					),
 				},
 			};
 		},
+
 		message: async (parent, { id }, { models }) => {
 			return await models.Message.findById(id);
 			},
