@@ -11,7 +11,7 @@ const fromCursorHash = string =>
 
 export default {
 	Query: {
-		messages: async (parent, { cursor, limit = 100 }, { models }) => {
+		messages: async (parent, { cursor, limit = 50 }, { models }) => {
 			const cursorOptions = cursor ? {
 				where: {
 					createdAt: {
@@ -24,7 +24,7 @@ export default {
 			const messages = await models.Message.findAll({
 				order: [['createdAt', 'DESC']],
 				limit: limit + 1,
-				cursorOptions
+				...cursorOptions,
 			});
 
 			const hasNextPage = messages.length > limit;
@@ -80,7 +80,7 @@ export default {
 
 		Subscription: {
 			messageCreated: {
-				subscribe: () => pubsub.asyncIterator(EVENTS.MESSAGE.CREATED)
+				subscribe: () => pubsub.asyncIterator(EVENTS.MESSAGE.CREATED),
 			},
 		},
 };
