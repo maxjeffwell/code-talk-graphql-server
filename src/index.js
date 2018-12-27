@@ -83,7 +83,7 @@ server.installSubscriptionHandlers(httpServer);
 
 const port = process.env.PORT || 8000;
 
-sequelize.sync({
+sequelize.sync({force: true
 
 }).then(async () => {
 	httpServer.listen({ port }, () => {
