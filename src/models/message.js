@@ -7,6 +7,10 @@ const message = (sequelize, DataTypes) => {
 		Message.belongsTo(models.User);
 	};
 
+	Message.associate = (models) => {
+		Message.belongsTo(models.Room);
+	};
+
 	return Message;
 };
 
