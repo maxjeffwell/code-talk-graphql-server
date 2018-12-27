@@ -11,7 +11,7 @@ const fromCursorHash = string =>
 
 export default {
 	Query: {
-		messages: async (parent, { cursor, limit = 50 }, { models }) => {
+		messages: async (parent, { cursor, limit = 5 }, { models }) => {
 			const cursorOptions = cursor ? {
 				where: {
 					createdAt: {
