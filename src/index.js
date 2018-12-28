@@ -90,3 +90,5 @@ sequelize.sync({
 		console.log(`Apollo Server is running on http://localhost:${port}/graphql`);
 	});
 });
+
+

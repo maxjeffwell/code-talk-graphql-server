@@ -1,6 +1,6 @@
 import { combineResolvers } from 'graphql-resolvers';
 
-import pubsub, { EVENTS } from '../subscription';
+import PostgresPubSub, { EVENTS } from '../subscription';
 import { isAuthenticated } from './authorization';
 
 export default {
@@ -12,7 +12,7 @@ export default {
           name
         });
 
-        pubsub.publish(EVENTS.ROOM.CREATED, {
+        PostgresPubSub.publish(EVENTS.ROOM.CREATED, {
           roomCreated: { room },
         });
 
@@ -30,13 +30,10 @@ export default {
 
   Subscription: {
     roomJoined: {
-      subscribe: () => pubsub.asyncIterator(EVENTS.ROOM.JOINED),
+      subscribe: () => PostgresPubSub.asyncIterator(EVENTS.ROOM.JOINED),
     },
     roomLeft: {
-      subscribe: () => pubsub.asyncIterator(EVENTS.ROOM.LEFT),
+      subscribe: () => PostgresPubSub.asyncIterator(EVENTS.ROOM.LEFT),
     },
   },
-
 };
-
-
