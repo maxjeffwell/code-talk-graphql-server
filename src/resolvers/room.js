@@ -4,6 +4,12 @@ import PostgresPubSub, { EVENTS } from '../subscription';
 import { isAuthenticated } from './authorization';
 
 export default {
+  Query: {
+    rooms: async (parent, args, { models }) => {
+      return await models.Room.findAll();
+    }
+  },
+
   Mutation: {
     createRoom: combineResolvers(
       isAuthenticated,
@@ -17,16 +23,16 @@ export default {
         });
 
         return room;
-      },
-    ),
+        },
+      ),
 
     deleteRoom: combineResolvers(
       isAuthenticated,
       async (parent, { id }, { models }) => {
         return await models.Room.destroy({ where: { id } });
-      },
-    ),
-  },
+        },
+      ),
+    },
 
   Subscription: {
     roomJoined: {
@@ -35,5 +41,6 @@ export default {
     roomLeft: {
       subscribe: () => PostgresPubSub.asyncIterator(EVENTS.ROOM.LEFT),
     },
-  },
+  }
 };
+

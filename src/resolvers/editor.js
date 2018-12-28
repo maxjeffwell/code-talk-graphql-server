@@ -1,5 +1,10 @@
-import { combineResolvers } from 'graphql-resolvers';
-
 import PostgresPubSub, { EVENTS } from '../subscription';
-import { isAuthenticated } from './authorization';
+
+export default {
+  Subscription: {
+    editorContent: {
+      subscribe: () => PostgresPubSub.asyncIterator(EVENTS.EDITOR.CONTENT),
+    },
+  },
+};
 

@@ -2,30 +2,35 @@ import { gql } from 'apollo-server-express';
 
 export default gql`
     extend type Query {
-        rooms(id: ID!): [Room!]
+        rooms(id: ID!): [Room]!
     }
 
     extend type Mutation {
         createRoom(name: String!): Room!
         deleteRoom(id: ID!): Boolean!
-
-    }
-    type Room {
-        id: ID!
-        name: String!
-        users: [User!]
     }
 
     extend type Subscription {
-        editorContentState: String!
-        roomJoined: socketChannelSubscribeResponse!
-        roomLeft: socketChannelUnsubscribeResponse!
+        roomJoined: SocketChannelSubscribeResponse!
+        roomLeft: SocketChannelUnsubscribeResponse!
+        roomCreated: RoomCreated!
     }
-    type socketChannelSubscribeResponse {
+    
+    type Room {
+        id: ID!
+        name: String!
+        users: [User!]!
+    }
+
+    type SocketChannelSubscribeResponse {
         channelState: String!
     }
 
-    type socketChannelUnsubscribeResponse {
+    type SocketChannelUnsubscribeResponse {
         channelState: String!
     }
-`
+  
+    type RoomCreated {
+        room: Room!
+    }
+`;
