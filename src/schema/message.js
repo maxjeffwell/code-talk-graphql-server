@@ -16,10 +16,10 @@ export default gql`
         pageInfo: PageInfo!
     }
 
-      type PageInfo {
+    type PageInfo {
         hasNextPage: Boolean!
         endCursor: String!
-      }
+    }
 
     type Message {
         id: ID!
