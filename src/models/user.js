@@ -53,14 +53,9 @@ const user = (sequelize, DataTypes) => {
 			});
 	};
 
-	User.associate = (models) => {
-		User.belongsToMany(models.Room, {
-			through: 'room_member',
-			foreignKey: {
-				name: 'userId',
-			},
-		})
-	};
+	// User.associate = (models) => {
+	// 	User.hasMany(models.Room);
+	// };
 
 	User.findByLogin = async login => {
 		let user = await User.findOne({

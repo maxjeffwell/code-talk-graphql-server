@@ -1,6 +1,11 @@
 const message = (sequelize, DataTypes) => {
 	const Message = sequelize.define('message', {
-		text: DataTypes.STRING
+		text: {
+			type: DataTypes.STRING,
+			validate: {
+				notEmpty: true
+			},
+		},
 	});
 
 	Message.associate = (models) => {

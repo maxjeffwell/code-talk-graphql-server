@@ -11,7 +11,7 @@ const fromCursorHash = string =>
 
 export default {
 	Query: {
-		messages: async (parent, { cursor, limit = 5 }, { models }) => {
+		messages: async (parent, { cursor, limit = 100 }, { models }) => {
 			const cursorOptions = cursor ? {
 					where: {
 						createdAt: {
@@ -35,15 +35,14 @@ export default {
 				pageInfo: {
 					hasNextPage,
 					endCursor: toCursorHash(
-						edges[edges.length - 1].createdAt.toString()
+						edges[edges.length - 1].createdAt.toString(),
 					),
 				},
 			};
 		},
 
-		message: async (parent, { id }, { models }) => {
-			return await models.Message.findById(id);
-		},
+		message: async (parent, { id }, { models }) =>
+			await models.Message.findById(id),
 	},
 
 	Mutation: {
@@ -52,7 +51,7 @@ export default {
 			async (parent, { text }, { models, me }) => {
 				const message = await models.Message.create({
 					text,
-					userId: me.id
+					userId: me.id,
 				});
 
 				PostgresPubSub.publish(EVENTS.MESSAGE.CREATED, {
@@ -74,7 +73,7 @@ export default {
 
 	Message: {
 		user: async (message, args, { loaders }) => {
-			return await loaders.user.id(message);
+			return await loaders.user.load(message.userId);
 		},
 	},
 
