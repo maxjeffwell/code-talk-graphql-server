@@ -2,7 +2,8 @@ import { gql } from 'apollo-server-express';
 
 export default gql`
     extend type Query {
-        rooms(id: ID!): [Room]!
+        rooms: [Room]!
+        room(id: ID!): Room!
     }
 
     extend type Mutation {
@@ -18,8 +19,8 @@ export default gql`
     
     type Room {
         id: ID!
-        name: String!
-        users: [User!]!
+        title: String!
+        users: [User!]
     }
 
     type SocketChannelSubscribeResponse {

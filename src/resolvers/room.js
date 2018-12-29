@@ -1,13 +1,17 @@
 import { combineResolvers } from 'graphql-resolvers';
 
 import PostgresPubSub, { EVENTS } from '../subscription';
-import { isAuthenticated } from './authorization';
+import { isAuthenticated, isAdmin } from './authorization';
 
 export default {
   Query: {
     rooms: async (parent, args, { models }) => {
       return await models.Room.findAll();
-    }
+    },
+
+    room: async (parent, { id }, { models }) => {
+      return await models.Room.findById(id);
+    },
   },
 
   Mutation: {
@@ -27,7 +31,7 @@ export default {
       ),
 
     deleteRoom: combineResolvers(
-      isAuthenticated,
+      isAdmin,
       async (parent, { id }, { models }) => {
         return await models.Room.destroy({ where: { id } });
         },
@@ -35,6 +39,9 @@ export default {
     },
 
   Subscription: {
+    roomCreated: {
+      subscribe: () => PostgresPubSub.asyncIterator(EVENTS.ROOM.CREATED),
+    },
     roomJoined: {
       subscribe: () => PostgresPubSub.asyncIterator(EVENTS.ROOM.JOINED),
     },
