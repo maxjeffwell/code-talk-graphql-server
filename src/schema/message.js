@@ -19,12 +19,12 @@ export default gql`
         edges: [Message!]!
         pageInfo: PageInfo!
     }
-    
+
     type PageInfo {
         hasNextPage: Boolean!
         endCursor: String!
     }
-    
+
     type Message {
         id: ID!
         text: String!

@@ -6,91 +6,91 @@ import { isAdmin, isAuthenticated } from './authorization';
 
 
 const createToken = async (user, secret, expiresIn) => {
-	const { id, email, username, role } = user;
-	return await jwt.sign({ id, email, username, role }, secret, {
-		expiresIn,
-	});
+  const { id, email, username, role } = user;
+  return await jwt.sign({ id, email, username, role }, secret, {
+    expiresIn,
+  });
 };
 
 export default {
-	Query: {
-		users: async (parent, args, { models }) => {
-			return await models.User.findAll();
-		},
-		user: async (parent, { id }, { models }) => {
-			return await models.User.findById(id);
-		},
-		me: async (parent, args, { models, me }) => {
-			if (!me) {
-				return null;
-			}
-			return await models.User.findById(me.id);
-		},
-	},
+  Query: {
+    users: async (parent, args, { models }) => {
+      return await models.User.findAll();
+    },
+    user: async (parent, { id }, { models }) => {
+      return await models.User.findById(id);
+    },
+    me: async (parent, args, { models, me }) => {
+      if (!me) {
+        return null;
+      }
+      return await models.User.findById(me.id);
+    },
+  },
 
-	Mutation: {
-		signUp: async (
-			parent,
-			{ username, email, password },
-			{ models, secret }
-		) => {
-			const user = await models.User.create({
-				username,
-				email,
-				password,
-			});
+  Mutation: {
+    signUp: async (
+      parent,
+      { username, email, password },
+      { models, secret }
+    ) => {
+      const user = await models.User.create({
+        username,
+        email,
+        password,
+      });
 
-			return { token: createToken(user, secret, '1d') };
-		},
+      return { token: createToken(user, secret, '1d') };
+    },
 
-		signIn: async (
-			parent,
-			{ login, password },
-			{ models, secret }
-		) => {
-			const user = await models.User.findByLogin(login);
+    signIn: async (
+      parent,
+      { login, password },
+      { models, secret }
+    ) => {
+      const user = await models.User.findByLogin(login);
 
-			if (!user) {
-				throw new UserInputError(
-					'Invalid credentials'
-				);
-			}
+      if (!user) {
+        throw new UserInputError(
+          'Invalid credentials'
+        );
+      }
 
-			const isValid = await user.validatePassword(password);
+      const isValid = await user.validatePassword(password);
 
-			if (!isValid) {
-				throw new AuthenticationError('Invalid credentials');
-			}
+      if (!isValid) {
+        throw new AuthenticationError('Invalid credentials');
+      }
 
-			return { token: createToken(user, secret, '1d') };
-		},
+      return { token: createToken(user, secret, '1d') };
+    },
 
-		updateUser: combineResolvers(
-			isAuthenticated,
-			async (parent, { username }, { models, me }) => {
-				const user = await models.User.findById(me.id);
-				return await user.update({ username });
-			},
-		),
+    updateUser: combineResolvers(
+      isAuthenticated,
+      async (parent, { username }, { models, me }) => {
+        const user = await models.User.findById(me.id);
+        return await user.update({ username });
+      },
+    ),
 
-		deleteUser: combineResolvers(
-			isAdmin,
-			async (parent, { id }, { models }) => {
-				return await models.User.destroy({
-					where: { id }
-				});
-			},
-		),
-	},
+    deleteUser: combineResolvers(
+      isAdmin,
+      async (parent, { id }, { models }) => {
+        return await models.User.destroy({
+          where: { id }
+        });
+      },
+    ),
+  },
 
-	User: {
-		messages: async (user, args, { models }) => {
-			return await models.Message.findAll({
-				where: {
-					userId: user.id
-				},
-			});
-		},
-	},
+  User: {
+    messages: async (user, args, { models }) => {
+      return await models.Message.findAll({
+        where: {
+          userId: user.id
+        },
+      });
+    },
+  },
 };
 
