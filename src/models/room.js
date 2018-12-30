@@ -18,10 +18,6 @@ const room = (sequelize, DataTypes) => {
     Room.hasMany(models.Message);
   };
 
-  Room.associate = (models) => {
-    Room.hasMany(models.User);
-  };
-
   return Room;
 };
 

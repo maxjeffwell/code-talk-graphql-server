@@ -10,7 +10,7 @@ export default {
     },
 
     room: async (parent, { id }, { models }) => {
-      return await models.Room.findById(id);
+      return await models.Room.findByPk(id);
     },
   },
 

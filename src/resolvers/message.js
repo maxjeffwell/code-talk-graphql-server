@@ -42,7 +42,7 @@ export default {
 		},
 
 		message: async (parent, { id }, { models }) =>
-			await models.Message.findById(id),
+			await models.Message.findByPk(id),
 	},
 
 	Mutation: {

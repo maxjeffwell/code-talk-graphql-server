@@ -55,7 +55,6 @@ const batchMessages = async (keys, models) => {
 		messages.find(message => message.roomId === key));
 }
 
-
 const userLoader = new DataLoader(keys =>
 	batchUsers(keys, models));
 
@@ -109,13 +108,9 @@ server.applyMiddleware({ app, path: '/graphql'});
 const httpServer = http.createServer(app);
 server.installSubscriptionHandlers(httpServer);
 
-// const isTest = !!process.env.TEST_DATABASE_URL;
-// const isProduction = !!process.env.DATABASE_URL;
-
 const port = process.env.PORT || 8000;
 
 sequelize.sync({
-
 
 }).then(async () => {
 	httpServer.listen({ port }, () => {
