@@ -1,42 +1,54 @@
 import { combineResolvers } from 'graphql-resolvers';
 
-import pubsub, { EVENTS } from '../subscription';
-import { isAuthenticated } from './authorization';
+import PostgresPubSub, { EVENTS } from '../subscription';
+import { isAuthenticated, isAdmin } from './authorization';
 
 export default {
+  Query: {
+    rooms: async (parent, args, { models }) => {
+      return await models.Room.findAll();
+    },
+
+    room: async (parent, { id }, { models }) => {
+      return await models.Room.findById(id);
+    },
+  },
+
   Mutation: {
     createRoom: combineResolvers(
       isAuthenticated,
-      async (parent, { name }, { models }) => {
+      async (parent, { name }, { models, me }) => {
         const room = await models.Room.create({
-          name
+          name,
+          userId: me.id,
         });
 
-        pubsub.publish(EVENTS.ROOM.CREATED, {
+        PostgresPubSub.publish(EVENTS.ROOM.CREATED, {
           roomCreated: { room },
         });
 
         return room;
-      },
-    ),
+        },
+      ),
 
     deleteRoom: combineResolvers(
-      isAuthenticated,
+      isAdmin,
       async (parent, { id }, { models }) => {
         return await models.Room.destroy({ where: { id } });
-      },
-    ),
-  },
+        },
+      ),
+    },
 
   Subscription: {
+    roomCreated: {
+      subscribe: () => PostgresPubSub.asyncIterator(EVENTS.ROOM.CREATED),
+    },
     roomJoined: {
-      subscribe: () => pubsub.asyncIterator(EVENTS.ROOM.JOINED),
+      subscribe: () => PostgresPubSub.asyncIterator(EVENTS.ROOM.JOINED),
     },
     roomLeft: {
-      subscribe: () => pubsub.asyncIterator(EVENTS.ROOM.LEFT),
+      subscribe: () => PostgresPubSub.asyncIterator(EVENTS.ROOM.LEFT),
     },
-  },
-
+  }
 };
-
 

@@ -1,6 +1,17 @@
 const room = (sequelize, DataTypes) => {
   const Room = sequelize.define('room', {
-    text: DataTypes.STRING
+    title: {
+      type: DataTypes.STRING,
+      unique: true,
+      allowNull: false,
+      validate: {
+        isAlphanumeric: {
+          notEmpty: true,
+          args: true,
+          msg: 'The room title can only contain letters and numbers'
+        },
+      }
+    }
   });
 
   Room.associate = (models) => {

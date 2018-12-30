@@ -10,7 +10,6 @@ import jwt from 'jsonwebtoken';
 import schema from './schema';
 import resolvers from './resolvers';
 import models, { sequelize } from './models';
-import loaders from './loaders';
 
 const app = express();
 
@@ -30,8 +29,42 @@ const getMe = async req => {
 	}
 };
 
+const batchUsers = async (keys, models) => {
+	const users = await models.User.findAll({
+		where: {
+			id: {
+				$in: keys,
+			},
+		},
+	});
+
+	return keys.map(key =>
+		users.find(user => user.id === key));
+};
+
+const batchMessages = async (keys, models) => {
+	const messages = await models.Message.findAll({
+		where: {
+			id: {
+				$in: keys,
+			},
+		},
+	});
+
+	return keys.map(key =>
+		messages.find(message => message.roomId === key));
+}
+
+
+const userLoader = new DataLoader(keys =>
+	batchUsers(keys, models));
+
+const messageLoader = new DataLoader(keys =>
+	batchMessages(keys, models));
+
 const server = new ApolloServer({
 	introspection: true,
+	playground: true,
 	typeDefs: schema,
 	resolvers,
 	formatError: error => {
@@ -49,9 +82,8 @@ const server = new ApolloServer({
 			return {
 				models,
 				loaders: {
-					user: new DataLoader(keys =>
-							loaders.user.batchUsers(keys, models),
-						),
+					user: userLoader,
+					message: messageLoader,
 				},
 			};
 		}
@@ -64,9 +96,8 @@ const server = new ApolloServer({
 				me,
 				secret: process.env.JWT_SECRET,
 				loaders: {
-					user: new DataLoader(keys =>
-						loaders.user.batchUsers(keys, models),
-					),
+					user: userLoader,
+					message: messageLoader,
 				},
 			};
 		}
@@ -91,3 +122,5 @@ sequelize.sync({
 		console.log(`Apollo Server is running on http://localhost:${port}/graphql`);
 	});
 });
+
+
