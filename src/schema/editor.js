@@ -2,9 +2,9 @@ import { gql } from 'apollo-server-express';
 
 export default gql`
     extend type Subscription {
-        editorContent: EditorContent!
-    }
-
+        editorContentEdited(roomId: ID!): EditorContent!
+        }
+    
     type EditorContent {
         editor: Editor!
     }

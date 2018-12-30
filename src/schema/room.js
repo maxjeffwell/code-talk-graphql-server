@@ -12,9 +12,9 @@ export default gql`
     }
 
     extend type Subscription {
-        roomJoined: SocketChannelSubscribeResponse!
-        roomLeft: SocketChannelUnsubscribeResponse!
-        roomCreated: RoomCreated!
+        userJoined: User!
+        userLeft: User!
+        roomCreated: RoomCreated
     }
     
     type Room {
