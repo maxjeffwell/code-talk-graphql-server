@@ -53,10 +53,6 @@ const user = (sequelize, DataTypes) => {
 			});
 	};
 
-	// User.associate = (models) => {
-	// 	User.hasMany(models.Room);
-	// };
-
 	User.findByLogin = async login => {
 		let user = await User.findOne({
 			where: { username: login },
