@@ -17,10 +17,10 @@ export default {
   Mutation: {
     createRoom: combineResolvers(
       isAuthenticated,
-      async (parent, { title }, { models, user }) => {
+      async (parent, { title }, { models, me }) => {
         const room = await models.Room.create({
           title,
-          userId: user.id,
+          userId: me.id,
         });
 
         PostgresPubSub.publish(EVENTS.ROOM.CREATED, {
