@@ -3,18 +3,18 @@ import { gql } from 'apollo-server-express';
 export default gql`
     extend type Query {
         rooms: [Room]!
-        room(id: ID!): Room!
+        room: Room!
     }
 
     extend type Mutation {
-        createRoom(name: String!): Room!
+        createRoom(title: String!): Room!
         deleteRoom(id: ID!): Boolean!
     }
 
     extend type Subscription {
-        roomJoined: SocketChannelSubscribeResponse!
-        roomLeft: SocketChannelUnsubscribeResponse!
-        roomCreated: RoomCreated!
+        userJoined: User!
+        userLeft: User!
+        roomCreated: RoomCreated
     }
     
     type Room {

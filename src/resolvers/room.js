@@ -10,16 +10,16 @@ export default {
     },
 
     room: async (parent, { id }, { models }) => {
-      return await models.Room.findById(id);
+      return await models.Room.findByPk(id);
     },
   },
 
   Mutation: {
     createRoom: combineResolvers(
       isAuthenticated,
-      async (parent, { name }, { models, me }) => {
+      async (parent, { title }, { models, me }) => {
         const room = await models.Room.create({
-          name,
+          title,
           userId: me.id,
         });
 
@@ -30,6 +30,11 @@ export default {
         return room;
         },
       ),
+
+    // userJoin: combineResolvers(
+    //   isAuthenticated,
+    //   async(parent, { title })
+    // )
 
     deleteRoom: combineResolvers(
       isAdmin,
@@ -43,10 +48,10 @@ export default {
     roomCreated: {
       subscribe: () => PostgresPubSub.asyncIterator(EVENTS.ROOM.CREATED),
     },
-    roomJoined: {
+    userJoined: {
       subscribe: () => PostgresPubSub.asyncIterator(EVENTS.ROOM.JOINED),
     },
-    roomLeft: {
+    userLeft: {
       subscribe: () => PostgresPubSub.asyncIterator(EVENTS.ROOM.LEFT),
     },
   }
