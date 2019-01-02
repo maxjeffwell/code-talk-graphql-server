@@ -52,7 +52,7 @@ const batchMessages = async (keys, models) => {
 	});
 
 	return keys.map(key =>
-		messages.find(message => message.roomId === key));
+		messages.find(message => message.id === key));
 }
 
 const userLoader = new DataLoader(keys =>
