@@ -2,8 +2,8 @@ import { gql } from 'apollo-server-express';
 
 export default gql`
     extend type Query {
-        rooms: [Room]!
-        room: Room!
+        rooms(cursor: String, limit: Int): RoomConnection!
+        room(id: ID!): Room!
     }
 
     extend type Mutation {
@@ -17,9 +17,15 @@ export default gql`
         roomCreated: RoomCreated
     }
     
+    type RoomConnection {
+        edges: [Room!]!
+        pageInfo: PageInfo!
+    }
+    
     type Room {
         id: ID!
         title: String!
+        createdAt: Date!
         users: [User!]
     }
 

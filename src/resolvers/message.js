@@ -75,9 +75,6 @@ export default {
 		user: async (message, args, { loaders }) => {
 			return await loaders.user.load(message.userId);
 		},
-		// room: async (message, args, { loaders }) => {
-		// 	return await loaders.room.load(message.roomId);
-		// }
 	},
 
 	Subscription: {
