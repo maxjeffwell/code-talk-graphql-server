@@ -42,24 +42,24 @@ const batchUsers = async (keys, models) => {
 		users.find(user => user.id === key));
 };
 
-const batchMessages = async (keys, models) => {
-	const messages = await models.Message.findAll({
-		where: {
-			id: {
-				$in: keys,
-			},
-		},
-	});
+// const batchMessages = async (keys, models) => {
+// 	const messages = await models.Message.findAll({
+// 		where: {
+// 			id: {
+// 				$in: keys,
+// 			},
+// 		},
+// 	});
 
-	return keys.map(key =>
-		messages.find(message => message.id === key));
-}
+	// return keys.map(key =>
+	// 	messages.find(message => message.id === key));
+// }
 
 const userLoader = new DataLoader(keys =>
 	batchUsers(keys, models));
 
-const messageLoader = new DataLoader(keys =>
-	batchMessages(keys, models));
+// const messageLoader = new DataLoader(keys =>
+// 	batchMessages(keys, models));
 
 const server = new ApolloServer({
 	introspection: true,
@@ -82,7 +82,7 @@ const server = new ApolloServer({
 				models,
 				loaders: {
 					user: userLoader,
-					message: messageLoader,
+					// message: messageLoader,
 				},
 			};
 		}
@@ -96,7 +96,7 @@ const server = new ApolloServer({
 				secret: process.env.JWT_SECRET,
 				loaders: {
 					user: userLoader,
-					message: messageLoader,
+					// message: messageLoader,
 				},
 			};
 		}
