@@ -63,11 +63,6 @@ export default {
         },
       ),
 
-    // userJoin: combineResolvers(
-    //   isAuthenticated,
-    //   async(parent, { title })
-    // )
-
     deleteRoom: combineResolvers(
       isAdmin,
       async (parent, { id }, { models }) => {
