@@ -1,15 +1,24 @@
 import { gql } from 'apollo-server-express';
 
 export default gql`
-    extend type Subscription {
-        editorContentEdited(roomId: ID!): EditorContent!
-        }
-    
-    type EditorContent {
-        editor: Editor!
+    extend type Query {
+        readCode: Code!
+        info: String
     }
     
-    type Editor {
-        code: String!
+    extend type Mutation {
+        typeCode(code: CodeInput!): Code!
+    }
+    
+    extend type Subscription {
+        typingCode: Code!
+    }
+    
+    input CodeInput {
+        body: String
+    }
+    
+    type Code {
+        body: String
     }
 `;
