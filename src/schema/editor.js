@@ -3,7 +3,6 @@ import { gql } from 'apollo-server-express';
 export default gql`
     extend type Query {
         readCode: Code!
-        info: String
     }
     
     extend type Mutation {
