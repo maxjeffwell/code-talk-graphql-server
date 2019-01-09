@@ -75,12 +75,12 @@ export default {
     roomCreated: {
       subscribe: () => PostgresPubSub.asyncIterator(EVENTS.ROOM.CREATED),
     },
-    userJoined: {
-      subscribe: () => PostgresPubSub.asyncIterator(EVENTS.ROOM.JOINED),
-    },
-    userLeft: {
-      subscribe: () => PostgresPubSub.asyncIterator(EVENTS.ROOM.LEFT),
-    },
+    // userJoined: {
+    //   subscribe: () => PostgresPubSub.asyncIterator(EVENTS.ROOM.JOINED),
+    // },
+    // userLeft: {
+    //   subscribe: () => PostgresPubSub.asyncIterator(EVENTS.ROOM.LEFT),
+    // },
   }
 };
 
