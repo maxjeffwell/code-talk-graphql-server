@@ -7,9 +7,9 @@ export default {
   },
 
   Mutation: {
-    typeCode: (root, args, context) => {
+    typeCode: (root, args) => {
       const { code } = args;
-      context.PostgresPubSub.publish(EVENTS.EDITOR.TYPING_CODE, {typingCode: code});
+      PostgresPubSub.publish(EVENTS.EDITOR.TYPING_CODE, {typingCode: code});
       return code;
     }
   },
