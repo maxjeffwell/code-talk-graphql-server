@@ -1,5 +1,4 @@
 import { expect } from 'chai';
-
 import * as userApi from './api';
 
 describe('users', () => {
