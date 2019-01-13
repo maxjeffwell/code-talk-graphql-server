@@ -118,5 +118,3 @@ sequelize.sync({
 	});
 });
 
-
-//
