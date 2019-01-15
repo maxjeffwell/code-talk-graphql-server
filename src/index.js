@@ -108,13 +108,13 @@ server.applyMiddleware({ app, path: '/graphql'});
 const httpServer = http.createServer(app);
 server.installSubscriptionHandlers(httpServer);
 
-const port = process.env.PORT || 8000;
+const PORT = process.env.PORT || 8000;
 
 sequelize.sync({
 
 }).then(async () => {
-	httpServer.listen({ port }, () => {
-		console.log(`Apollo Server is running on http://localhost:${port}/graphql`);
+	httpServer.listen({ PORT }, () => {
+		console.log(`Apollo Server is running on http://localhost:${PORT}/graphql`);
 	});
 });
 
