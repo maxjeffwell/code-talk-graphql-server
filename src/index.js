@@ -64,6 +64,8 @@ const userLoader = new DataLoader(keys =>
 const server = new ApolloServer({
 	introspection: true,
 	playground: true,
+	debug: true,
+	tracing: true,
 	typeDefs: schema,
 	resolvers,
 	formatError: error => {
