@@ -1,7 +1,8 @@
 import Sequelize from 'sequelize';
 
 const sequelize = new Sequelize(process.env.DATABASE_URL, {
-	dialect: 'postgres'
+	dialect: 'postgres',
+	operatorsAliases: false,
 });
 
 const models = {
