@@ -1,6 +1,7 @@
 import 'dotenv/config';
 import morgan from 'morgan';
 import http from 'http';
+import { Op } from 'sequelize';
 import DataLoader from 'dataloader';
 import express from 'express';
 import { ApolloServer, AuthenticationError } from 'apollo-server-express';
