@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "engines": {
+    "node": "10.6.0"
+  },
   "scripts": {
     "start": "nodemon --exec babel-node src/index.js",
     "test:run-server": "TEST_DATABASE=mytestdatabase npm start",
@@ -43,8 +46,5 @@
     "pg": "^7.8.0",
     "sequelize": "^4.42.0",
     "uuid": "^3.3.2"
-  },
-  "engines": {
-    "node": "10.6.0"
   }
 }
