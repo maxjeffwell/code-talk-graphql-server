@@ -40,7 +40,6 @@
     "express": "^4.16.4",
     "graphql": "^14.1.1",
     "graphql-iso-date": "^3.6.1",
-    "graphql-postgres-subscriptions": "^1.0.5",
     "graphql-resolvers": "^0.3.2",
     "jsonwebtoken": "^8.4.0",
     "pg": "^7.8.0",
