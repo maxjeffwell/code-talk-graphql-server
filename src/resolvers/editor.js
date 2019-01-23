@@ -1,4 +1,4 @@
-import PostgresPubSub, { EVENTS } from '../subscription';
+import PubSub, { EVENTS } from '../subscription';
 
 export default {
 
@@ -9,14 +9,14 @@ export default {
   Mutation: {
     typeCode: (root, args) => {
       const { code } = args;
-      PostgresPubSub.publish(EVENTS.EDITOR.TYPING_CODE, {typingCode: code});
+      PubSub.publish(EVENTS.EDITOR.TYPING_CODE, {typingCode: code});
       return code;
     }
   },
 
   Subscription: {
     typingCode: {
-      subscribe: () => PostgresPubSub.asyncIterator(EVENTS.EDITOR.TYPING_CODE),
+      subscribe: () => PubSub.asyncIterator(EVENTS.EDITOR.TYPING_CODE),
     },
   },
 };

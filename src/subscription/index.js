@@ -1,4 +1,4 @@
-import { PostgresPubSub } from "graphql-postgres-subscriptions";
+import { PubSub } from "apollo-server";
 
 import * as MESSAGE_EVENTS from './message';
 import * as EDITOR_EVENTS from './editor';
@@ -10,4 +10,4 @@ export const EVENTS = {
 	ROOM: ROOM_EVENTS,
 };
 
-export default new PostgresPubSub();
+export default new PubSub();

@@ -1,7 +1,7 @@
 import Sequelize from 'sequelize';
 import { combineResolvers } from 'graphql-resolvers';
 
-import PostgresPubSub, { EVENTS } from '../subscription';
+import PubSub, { EVENTS } from '../subscription';
 import { isAuthenticated, isAdmin } from './authorization';
 
 const toCursorHash = string => Buffer.from(string).toString('base64');
@@ -55,7 +55,7 @@ export default {
           userId: me.id,
         });
 
-        PostgresPubSub.publish(EVENTS.ROOM.CREATED, {
+        PubSub.publish(EVENTS.ROOM.CREATED, {
           roomCreated: { room },
         });
 
@@ -73,14 +73,8 @@ export default {
 
   Subscription: {
     roomCreated: {
-      subscribe: () => PostgresPubSub.asyncIterator(EVENTS.ROOM.CREATED),
+      subscribe: () => PubSub.asyncIterator(EVENTS.ROOM.CREATED),
     },
-    // userJoined: {
-    //   subscribe: () => PostgresPubSub.asyncIterator(EVENTS.ROOM.JOINED),
-    // },
-    // userLeft: {
-    //   subscribe: () => PostgresPubSub.asyncIterator(EVENTS.ROOM.LEFT),
-    // },
   }
 };
 

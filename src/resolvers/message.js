@@ -2,7 +2,7 @@ import Sequelize from 'sequelize';
 import { combineResolvers } from 'graphql-resolvers';
 
 import { isAuthenticated, isMessageOwner } from './authorization';
-import PostgresPubSub, { EVENTS } from '../subscription';
+import PubSub, { EVENTS } from '../subscription';
 
 const toCursorHash = string => Buffer.from(string).toString('base64');
 
@@ -54,7 +54,7 @@ export default {
 					userId: me.id,
 				});
 
-				PostgresPubSub.publish(EVENTS.MESSAGE.CREATED, {
+				PubSub.publish(EVENTS.MESSAGE.CREATED, {
 					messageCreated: { message },
 				});
 
@@ -79,7 +79,7 @@ export default {
 
 	Subscription: {
 		messageCreated: {
-			subscribe: () => PostgresPubSub.asyncIterator(EVENTS.MESSAGE.CREATED),
+			subscribe: () => PubSub.asyncIterator(EVENTS.MESSAGE.CREATED),
 		},
 	},
 };
