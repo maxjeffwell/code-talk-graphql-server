@@ -1,16 +1,18 @@
 import 'dotenv/config';
+import cors from 'cors';
 import morgan from 'morgan';
 import http from 'http';
-import { Op } from 'sequelize';
+import jwt from 'jsonwebtoken';
+// import { Op } from 'sequelize';
 import DataLoader from 'dataloader';
 import express from 'express';
-import { ApolloServer, AuthenticationError } from 'apollo-server-express';
-import cors from 'cors';
-import jwt from 'jsonwebtoken';
+import { ApolloServer,
+	AuthenticationError } from 'apollo-server-express';
 
 import schema from './schema';
 import resolvers from './resolvers';
 import models, { sequelize } from './models';
+import loaders from './loaders';
 
 const app = express();
 
@@ -30,18 +32,18 @@ const getMe = async req => {
 	}
 };
 
-const batchUsers = async (keys, models) => {
-	const users = await models.User.findAll({
-		where: {
-			id: {
-				[Op.in]: keys,
-			},
-		},
-	});
-
-	return keys.map(key =>
-		users.find(user => user.id === key));
-};
+// const batchUsers = async (keys, models) => {
+// 	const users = await models.User.findAll({
+// 		where: {
+// 			id: {
+// 				[Op.in]: keys,
+// 			},
+// 		},
+// 	});
+//
+// 	return keys.map(key =>
+// 		users.find(user => user.id === key));
+// };
 
 // const batchMessages = async (keys, models) => {
 // 	const messages = await models.Message.findAll({
@@ -56,8 +58,8 @@ const batchUsers = async (keys, models) => {
 	// 	messages.find(message => message.id === key));
 // }
 
-const userLoader = new DataLoader(keys =>
-	batchUsers(keys, models));
+// const userLoader = new DataLoader(keys =>
+// 	batchUsers(keys, models));
 
 // const messageLoader = new DataLoader(keys =>
 // 	batchMessages(keys, models));
@@ -84,7 +86,9 @@ const server = new ApolloServer({
 			return {
 				models,
 				loaders: {
-					user: userLoader,
+					user: new DataLoader(keys =>
+						loaders.user.batchUsers(keys, models),
+						),
 					// message: messageLoader,
 				},
 			};
@@ -98,7 +102,9 @@ const server = new ApolloServer({
 				me,
 				secret: process.env.JWT_SECRET,
 				loaders: {
-					user: userLoader,
+					user: new DataLoader(keys=>
+						loaders.user.batchUsers(keys, models),
+						),
 					// message: messageLoader,
 				},
 			};
