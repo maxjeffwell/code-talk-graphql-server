@@ -6,7 +6,8 @@ import jwt from 'jsonwebtoken';
 import DataLoader from 'dataloader';
 import express from 'express';
 import { ApolloServer,
-	AuthenticationError } from 'apollo-server-express';
+	AuthenticationError
+} from 'apollo-server-express';
 
 import schema from './schema';
 import resolvers from './resolvers';
@@ -26,7 +27,7 @@ const getMe = async req => {
 		try {
 			return await jwt.verify(token, process.env.JWT_SECRET);
 		} catch(e) {
-			throw new AuthenticationError('Your session has expired. Please sign in again');
+			throw new AuthenticationError('Your session has expired. Please sign in again.');
 		}
 	}
 };
@@ -78,6 +79,15 @@ const server = new ApolloServer({
 });
 
 server.applyMiddleware({ app, path: '/graphql' });
+
+if (process.env.NODE_ENV === 'production') {
+	app.use(express.static('client/build'));
+
+	const path = require('path');
+	app.get('*', (req, res) => {
+		res.sendFile(path.resolve(__dirname, 'client', 'build', 'index.html'));
+	});
+}
 
 const httpServer = http.createServer(app);
 server.installSubscriptionHandlers(httpServer);
