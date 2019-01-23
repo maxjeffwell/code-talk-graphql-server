@@ -3,7 +3,6 @@ import cors from 'cors';
 import morgan from 'morgan';
 import http from 'http';
 import jwt from 'jsonwebtoken';
-// import { Op } from 'sequelize';
 import DataLoader from 'dataloader';
 import express from 'express';
 import { ApolloServer,
@@ -32,38 +31,6 @@ const getMe = async req => {
 	}
 };
 
-// const batchUsers = async (keys, models) => {
-// 	const users = await models.User.findAll({
-// 		where: {
-// 			id: {
-// 				[Op.in]: keys,
-// 			},
-// 		},
-// 	});
-//
-// 	return keys.map(key =>
-// 		users.find(user => user.id === key));
-// };
-
-// const batchMessages = async (keys, models) => {
-// 	const messages = await models.Message.findAll({
-// 		where: {
-// 			id: {
-// 				$in: keys,
-// 			},
-// 		},
-// 	});
-
-	// return keys.map(key =>
-	// 	messages.find(message => message.id === key));
-// }
-
-// const userLoader = new DataLoader(keys =>
-// 	batchUsers(keys, models));
-
-// const messageLoader = new DataLoader(keys =>
-// 	batchMessages(keys, models));
-
 const server = new ApolloServer({
 	introspection: true,
 	playground: true,
@@ -89,7 +56,6 @@ const server = new ApolloServer({
 					user: new DataLoader(keys =>
 						loaders.user.batchUsers(keys, models),
 						),
-					// message: messageLoader,
 				},
 			};
 		}
@@ -105,7 +71,6 @@ const server = new ApolloServer({
 					user: new DataLoader(keys=>
 						loaders.user.batchUsers(keys, models),
 						),
-					// message: messageLoader,
 				},
 			};
 		}
