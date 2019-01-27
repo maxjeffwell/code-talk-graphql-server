@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import * as userApi from './api';
+import * as api from './api';
 
 describe('users', () => {
 	describe('user(id: String!): User', () => {
@@ -10,12 +10,12 @@ describe('users', () => {
 						id: '1',
 						username: 'jeff',
 						email: 'jeff@test.example',
-						role: 'ADMIN',
+						role: null,
 					},
 				},
 			};
 
-			const result = await userApi.user({ id: '1' });
+			const result = await api.user({ id: '1' });
 
 			expect(result.data).to.eql(expectedResult);
 		});
@@ -27,7 +27,7 @@ describe('users', () => {
 				},
 			};
 
-			const result = await userApi.user({ id: '42' });
+			const result = await api.user({ id: '42' });
 
 			expect(result.data).to.eql(expectedResult);
 		});
@@ -42,7 +42,7 @@ describe('users', () => {
 							id: '1',
 							username: 'jeff',
 							email: 'jeff@test.example',
-							role: 'ADMIN',
+							role: null,
 						},
 						{
 							id: '2',
@@ -50,11 +50,59 @@ describe('users', () => {
 							email: 'jeff2@test.example',
 							role: null,
 						},
+						{
+							id: '3',
+							username: 'jeff3',
+							email: 'jeff3@test.example',
+							role: null,
+						},
+						{
+							id: '4',
+							username: 'jeff4',
+							email: 'jeff4@test.example',
+							role: null,
+						},
+						{
+							id: '7',
+							username: 'jeff6',
+							email: 'jeff6@test.example',
+							role: null,
+						},
+						{
+							id: '8',
+							username: 'jeff7',
+							email: 'jeff7@test.example',
+							role: null,
+						},
+						{
+							id: '9',
+							username: 'jeff8',
+							email: 'jeff8@test.example',
+							role: null,
+						},
+						{
+							id: '10',
+							username: 'jeff10',
+							email: 'jeff10@test.example',
+							role: null,
+						},
+						{
+							id: '20',
+							username: 'jeff50',
+							email: 'jeff50@test.example',
+							role: 'ADMIN',
+						},
+						{
+							id: '21',
+							username: 'jeff51',
+							email: 'jeff51@test.example',
+							role: null,
+						},
 					],
 				},
 			};
 
-			const result = await userApi.users();
+			const result = await api.users();
 
 			expect(result.data).to.eql(expectedResult);
 		});
@@ -68,7 +116,7 @@ describe('users', () => {
 				},
 			};
 
-			const { data } = await userApi.me();
+			const { data } = await api.me();
 
 			expect(data).to.eql(expectedResult);
 		});
@@ -90,105 +138,14 @@ describe('users', () => {
 						signIn: { token },
 					},
 				},
-			} = await userApi.signIn({
+			} = await api.signIn({
 				login: 'jeff',
 				password: 'username5',
 			});
 
-			const { data } = await userApi.me(token);
+			const { data } = await api.me(token);
 
 			expect(data).to.eql(expectedResult);
-		});
-	});
-
-	describe('signUp, updateUser, deleteUser', () => {
-		it('signs up a user, updates a user, and deletes the user as admin', async () => {
-			// sign up
-
-			let {
-				data: {
-					data: {
-						signUp: { token },
-					},
-				},
-			} = await userApi.signUp({
-				username: 'jeff',
-				email: 'jeff@test.example',
-				password: 'username5',
-			});
-
-			const {
-				data: {
-					data: { me },
-				},
-			} = await userApi.me(token);
-
-			expect(me).to.eql({
-				id: '1',
-				username: 'jeff',
-				email: 'jeff@test.example',
-			});
-
-
-			const {
-				data: {
-					data: { updateUser },
-				},
-			} = await userApi.updateUser({ username: 'jeff' }, token);
-
-			expect(updateUser.username).to.eql('jeff');
-
-			// delete as admin
-
-			const {
-				data: {
-					data: {
-						signIn: { token: adminToken },
-					},
-				},
-			} = await userApi.signIn({
-				login: 'jeff',
-				password: 'username5',
-			});
-
-			const {
-				data: {
-					data: { deleteUser },
-				},
-			} = await userApi.deleteUser({ id: me.id }, adminToken);
-
-			expect(deleteUser).to.eql(true);
-		});
-	});
-
-	describe('deleteUser(id: String!): Boolean!', () => {
-		it('returns an error because only admins can delete a user', async () => {
-			const {
-				data: {
-					data: {
-						signIn: { token },
-					},
-				},
-			} = await userApi.signIn({
-				login: 'Ron',
-				password: 'unknown',
-			});
-
-			const {
-				data: { errors },
-			} = await userApi.deleteUser({ id: '1' }, token);
-
-			expect(errors[0].message).to.eql('Unauthorized');
-		});
-	});
-
-	describe('updateUser(username: String!): User!', () => {
-		it('returns an error because only authenticated users can update a user', async () => {
-			const {
-				data: { errors },
-			} = await userApi.updateUser({ username: 'Hermione' });
-
-			expect(errors[0].message).to.eql('Not authenticated');
 		});
 	});
 
@@ -200,7 +157,7 @@ describe('users', () => {
 						signIn: { token },
 					},
 				},
-			} = await userApi.signIn({
+			} = await api.signIn({
 				login: 'jeff',
 				password: 'username5',
 			});
@@ -215,7 +172,7 @@ describe('users', () => {
 						signIn: { token },
 					},
 				},
-			} = await userApi.signIn({
+			} = await api.signIn({
 				login: 'jeff@test.example',
 				password: 'username5',
 			});
@@ -226,7 +183,7 @@ describe('users', () => {
 		it('returns an error when a user provides a wrong password', async () => {
 			const {
 				data: { errors },
-			} = await userApi.signIn({
+			} = await api.signIn({
 				login: 'jeff',
 				password: 'unknown',
 			});
@@ -238,13 +195,13 @@ describe('users', () => {
 	it('returns an error when a user is not found', async () => {
 		const {
 			data: { errors },
-		} = await userApi.signIn({
+		} = await api.signIn({
 			login: 'unknown',
 			password: 'unknown',
 		});
 
 		expect(errors[0].message).to.eql(
-			'Login credentials not found',
+			'Invalid credentials',
 		);
 	});
 });

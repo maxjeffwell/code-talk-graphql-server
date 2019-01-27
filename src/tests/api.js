@@ -66,64 +66,31 @@ export const users = async () =>
     `,
 	});
 
-export const signUp = async variables =>
+export const messages = async () =>
 	axios.post(API_URL, {
 		query: `
-      mutation(
-        $username: String!,
-        $email: String!,
-        $password: String!
-      ) {
-        signUp(
-          username: $username,
-          email: $email,
-          password: $password
-        ) {
-          token
+  query {
+    messages (limit: 2) {
+        edges {
+          text
         }
       }
-    `,
-		variables,
+    }
+  `,
 	});
 
-export const updateUser = async (variables, token) =>
-	axios.post(
-		API_URL,
-		{
-			query: `
-        mutation ($username: String!) {
-          updateUser(username: $username) {
+export const messagesInclUsers = async () =>
+	axios.post(API_URL, {
+		query: `
+  query {
+    messages (limit: 2) {
+        edges {
+          text
+          user {
             username
           }
         }
-      `,
-			variables,
-		},
-		token
-			? {
-				headers: {
-					'x-token': token,
-				},
-			}
-			: null,
-	);
-
-export const deleteUser = async (variables, token) =>
-	axios.post(
-		API_URL,
-		{
-			query: `
-        mutation ($id: ID!) {
-          deleteUser(id: $id)
-        }
-      `,
-			variables,
-		},
-		token
-			? {
-				headers: {
-					'x-token': token,
-				},
-			}
-			: null,
-	);
+      }
+    }
+  `,
+	});
