@@ -8,8 +8,8 @@
   },
   "scripts": {
     "start": "nodemon --exec babel-node src/index.js",
-    "test:run-server": "TEST_DATABASE=mytestdatabase npm start",
-    "test:execute-test": "mocha --require @babel/register 'src/**/*.spec.js'",
+    "test:run-server": "TEST_DATABASE_URL='postgres://azrizefy:xEB_duse30nGwIYmAlYhvbccsifsop-a@stampy.db.elephantsql.com:5432/azrizefy' npm start",
+    "test:execute-test": "TEST_DATABASE_URL='postgres://azrizefy:xEB_duse30nGwIYmAlYhvbccsifsop-a@stampy.db.elephantsql.com:5432/azrizefy' mocha --require @babel/register 'src/**/*.spec.js'",
     "test": "echo \"No test specified\" && exit 0"
   },
   "keywords": [],
@@ -21,7 +21,7 @@
     "@babel/preset-env": "^7.3.1",
     "@babel/register": "^7.0.0",
     "axios": "^0.18.0",
-    "chai": "4.2.0",
+    "chai": "^4.2.0",
     "eslint": "^5.12.1",
     "eslint-config-airbnb": "^17.1.0",
     "eslint-config-airbnb-base": "^13.1.0",
