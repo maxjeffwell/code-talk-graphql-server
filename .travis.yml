@@ -8,8 +8,7 @@ cache:
 install:
 - npm install
 script:
-- npm run test:run-server
-- npm run test:execute-test
+- npm test
 env:
 - CI=true
 deploy:
