@@ -8,7 +8,7 @@
   },
   "scripts": {
     "start": "nodemon --exec babel-node src/index.js",
-    "test:run-server": "TEST_DATABASE_URL='postgres://azrizefy:xEB_duse30nGwIYmAlYhvbccsifsop-a@stampy.db.elephantsql.com:5432/azrizefy' npm start",
+    "test:run-server": "TEST_DATABASE_URL=process.env.TEST_DATABASE_URL npm start",
     "test:execute-test": "mocha --require @babel/register 'src/**/*.spec.js'",
     "test": "echo \"No test specified\" && exit 0"
   },
