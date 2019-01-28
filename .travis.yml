@@ -1,6 +1,7 @@
 language: node_js
-node_js:
-- node
+node_js: node
+services:
+  - postgresql
 cache:
   directories:
   - node_modules
