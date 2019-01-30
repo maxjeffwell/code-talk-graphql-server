@@ -14,10 +14,10 @@
 ```
 Demo Accounts
 
-Username: demo
+username: demo
 password: demopassword
 
-Username: demo2
+username: demo2
 password: demopassword
 ```
 
