@@ -5,9 +5,11 @@
 
 
 ## Build Status
-![React](https://img.shields.io/badge/react-16.6.0%2B-blue.svg) [![npm version](https://img.shields.io/badge/npm%20package-6.4.1-orange.svg)](https://badge.fury.io/js/npm) [![Build Status](https://travis-ci.org/maxjeffwell/code-talk-graphql-client.svg?branch=master)](https://travis-ci.org/maxjeffwell/code-talk-graphql-client) ![Dependencies](https://img.shields.io/badge/dependencies-up%20to%20date-brightgreen.svg) [![Live Demo](https://img.shields.io/badge/demo-online-green.svg)](https://jmaxwell-code-talk-client.herokuapp.com/)
+[![npm version](https://img.shields.io/badge/npm%20package-6.4.1-orange.svg)](https://badge.fury.io/js/npm) [![Build Status](https://travis-ci.org/maxjeffwell/code-talk-graphql-client.svg?branch=master)](https://travis-ci.org/maxjeffwell/code-talk-graphql-server) ![Dependencies](https://img.shields.io/badge/dependencies-up%20to%20date-brightgreen.svg) [![Live Demo](https://img.shields.io/badge/demo-online-green.svg)](https://jmaxwell-code-talk-server.herokuapp.com/graphql)
 
-## [Live App](https://jmaxwell-code-talk-client.herokuapp.com/)
+## [GraphQL Playground](https://jmaxwell-code-talk-server.herokuapp.com/graphql)
+
+## [Live App](https://jmaxwell-code-talk-client.herokuapp.com)
 
 ```
 Demo Accounts
@@ -39,7 +41,7 @@ Code Talk is a code collaboration tool with real-time text editing and real-time
     * Queries, Mutations, Subscriptions
 * CSS styling implemented with Styled Components
 
-**Back End** [Explore the API here](https://jmaxwell-code-talk-server.herokuapp.com/graphql)
+**Back End** [Explore the API in GraphQL Playground](https://jmaxwell-code-talk-server.herokuapp.com/graphql)
 
 * GraphQL API built using Apollo Server with Express middleware
 * Security
