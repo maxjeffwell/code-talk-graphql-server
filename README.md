@@ -22,6 +22,16 @@ password: demopassword
 ## Motivation
 Code Talk is a code collaboration tool with real-time text editing and real-time messaging features. It emerged from a fascination with GraphQL subscriptions as well as from the immediate satisfaction inherent to real-time applications.
 
+## Screenshots
+
+[![GraphQL Playground Query](https://i.gyazo.com/d6fd9aa100d384ffa77676a4de49aff7.png)](https://gyazo.com/d6fd9aa100d384ffa77676a4de49aff7)
+
+[![GraphQL Playground Mutation](https://i.gyazo.com/e6253780a5b0c37f5ea074afb2b841d6.png)](https://gyazo.com/e6253780a5b0c37f5ea074afb2b841d6)
+
+[![GraphQL Playground Subscription Listening](https://i.gyazo.com/f7a98c8c3075133efa612a5ecdff09e4.png)](https://gyazo.com/f7a98c8c3075133efa612a5ecdff09e4)
+
+[![GraphQL Playground Subscription with Mutation](https://i.gyazo.com/d6f75081e41e03028e7bb5a123597453.png)](https://gyazo.com/d6f75081e41e03028e7bb5a123597453)
+
 ## Technology Stack
 **Front End** [Client GitHub Repo](https://github.com/maxjeffwell/code-talk-graphql-client)
 
@@ -29,7 +39,8 @@ Code Talk is a code collaboration tool with real-time text editing and real-time
     * Queries, Mutations, Subscriptions
 * CSS styling implemented with Styled Components
 
-**Back End**
+**Back End** [Explore the API here](https://jmaxwell-code-talk-server.herokuapp.com/graphql)
+
 * GraphQL API built using Apollo Server with Express middleware
 * Security
     * JWT authentication and password hashing with bcrypt.js
