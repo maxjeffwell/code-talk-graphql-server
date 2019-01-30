@@ -11,7 +11,9 @@ const fromCursorHash = string =>
 
 export default {
   Query: {
-    rooms: async (parent, { cursor, limit = 50 }, { models }) => {
+    rooms: combineResolvers(
+      isAuthenticated,
+      async (parent, { cursor, limit = 50 }, { models }) => {
       const cursorOptions = cursor ? {
           where: {
             createdAt: {
@@ -39,7 +41,7 @@ export default {
           ),
         },
       };
-    },
+    }),
 
     room: async (parent, { id }, { models }) => {
       return await models.Room.findByPk(id);

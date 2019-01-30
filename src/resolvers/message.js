@@ -11,7 +11,9 @@ const fromCursorHash = string =>
 
 export default {
 	Query: {
-		messages: async (parent, { cursor, limit = 10 }, { models }) => {
+		messages: combineResolvers(
+			isAuthenticated,
+			async (parent, { cursor, limit = 10 }, { models }) => {
 			const cursorOptions = cursor ? {
 					where: {
 						createdAt: {
@@ -39,11 +41,11 @@ export default {
 					),
 				},
 			};
-		},
+			}),
 
-		message: async (parent, { id }, { models }) =>
+			message: async (parent, { id }, { models }) =>
 			await models.Message.findByPk(id),
-	},
+},
 
 	Mutation: {
 		createMessage: combineResolvers(

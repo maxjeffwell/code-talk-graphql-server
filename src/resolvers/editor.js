@@ -1,17 +1,23 @@
 import PubSub, { EVENTS } from '../subscription';
+import { isAuthenticated } from './authorization';
+import { combineResolvers } from 'graphql-resolvers';
 
 export default {
 
   Query: {
-    readCode: () => ({body: ``}),
+    readCode: combineResolvers(
+      isAuthenticated,
+      () => ({body: ``}))
   },
 
   Mutation: {
-    typeCode: (root, args) => {
+    typeCode: combineResolvers(
+      isAuthenticated,
+      (root, args) => {
       const { code } = args;
       PubSub.publish(EVENTS.EDITOR.TYPING_CODE, {typingCode: code});
       return code;
-    }
+    })
   },
 
   Subscription: {
