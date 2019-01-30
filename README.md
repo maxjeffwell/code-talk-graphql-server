@@ -23,7 +23,7 @@ password: demopassword
 Code Talk is a code collaboration tool with real-time text editing and real-time messaging features. It emerged from a fascination with GraphQL subscriptions as well as from the immediate satisfaction inherent to real-time applications.
 
 ## Technology Stack
-**Front End** [Client GitHub Repo](https://github.com/maxjeffwell/code-talk-client)
+**Front End** [Client GitHub Repo](https://github.com/maxjeffwell/code-talk-graphql-client)
 
 * React with Apollo Client
     * Queries, Mutations, Subscriptions
