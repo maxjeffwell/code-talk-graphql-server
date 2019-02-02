@@ -55,7 +55,7 @@ Code Talk is a code collaboration tool with real-time text editing and real-time
 **Data Persistence**
 * PostgreSQL connected to Express via Sequelize
 
-**Hosting / SaaS / CICD**
+**Hosting / SaaS / DBaaS / CICD**
 * Github
 * TravisCI
 * Heroku
