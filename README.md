@@ -49,7 +49,7 @@ The format of the header is as follows:
 
 {"x-token": "your token here"}
 
-You can get a token by performing a login mutation and requesting the token in the return object. Or, you can log in client-side and your token will be available in your browser's local storage.
+You can retrieve a token by performing a login mutation and requesting the token in the return object. Or, you can log in client-side and your token will be available in your browser's local storage.
 
 * GraphQL API built using Apollo Server with Express middleware
 * Security
