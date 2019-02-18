@@ -41,8 +41,10 @@ const server = new ApolloServer({
 	resolvers,
 	formatError: error => {
 		const message = error.message
-			.replace('SequelizeValidationError: ', '')
-			.replace('Validation Error: ', '');
+			.replace('SequelizeValidationError:', '')
+			.replace('Validation error:', '')
+			.replace('Validation error:','')
+			.replace('Validation error:','');
 
 		return {
 			...error,

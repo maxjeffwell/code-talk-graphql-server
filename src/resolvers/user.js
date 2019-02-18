@@ -52,14 +52,14 @@ export default {
 
       if (!user) {
         throw new UserInputError(
-          'Invalid credentials'
+          'Invalid credentials. Please try signing in again'
         );
       }
 
       const isValid = await user.validatePassword(password);
 
       if (!isValid) {
-        throw new AuthenticationError('Invalid credentials');
+        throw new AuthenticationError('Invalid credentials. Please try signing in again');
       }
 
       return { token: createToken(user, secret, '1d') };

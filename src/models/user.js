@@ -10,7 +10,7 @@ const user = (sequelize, DataTypes) => {
 				isAlphanumeric: {
 					notEmpty: true,
 					args: true,
-					msg: 'The username can only contain letters and numbers'
+					msg: 'Your username can only contain letters and numbers'
 				},
 				len: {
 					args: [3, 25],
@@ -26,7 +26,7 @@ const user = (sequelize, DataTypes) => {
 				notEmpty: true,
 				isEmail: {
 					args: true,
-					msg: 'Invalid email'
+					msg: 'You entered an invalid email address'
 				},
 			},
 		},
@@ -37,7 +37,7 @@ const user = (sequelize, DataTypes) => {
 				notEmpty: true,
 				len: {
 					args: [7, 42],
-					msg: 'Your password needs to be between 7 and 42 characters long'
+					msg: 'Your password must be between 7 and 42 characters long'
 				},
 			},
 		},
