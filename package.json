@@ -16,23 +16,23 @@
   "author": "Jeff Maxwell <maxjeffwell@gmail.com>",
   "license": "GNU GPLv3",
   "devDependencies": {
-    "@babel/core": "^7.3.3",
+    "@babel/core": "^7.3.4",
     "@babel/node": "^7.2.2",
-    "@babel/preset-env": "^7.3.1",
+    "@babel/preset-env": "^7.3.4",
     "@babel/register": "^7.0.0",
     "axios": "^0.18.0",
     "chai": "^4.2.0",
-    "eslint": "^5.14.1",
+    "eslint": "^5.15.0",
     "eslint-config-airbnb": "^17.1.0",
     "eslint-config-airbnb-base": "^13.1.0",
     "eslint-plugin-import": "^2.16.0",
-    "mocha": "^6.0.1",
+    "mocha": "^6.0.2",
     "morgan": "^1.9.1",
     "nodemon": "^1.18.10"
   },
   "dependencies": {
-    "apollo-server": "^2.4.5",
-    "apollo-server-express": "^2.4.5",
+    "apollo-server": "^2.4.8",
+    "apollo-server-express": "^2.4.8",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "dataloader": "^1.4.0",
@@ -44,7 +44,7 @@
     "graphql-resolvers": "^0.3.2",
     "jsonwebtoken": "^8.5.0",
     "pg": "^7.8.1",
-    "sequelize": "^4.42.0",
+    "sequelize": "^4.42.1",
     "uuid": "^3.3.2"
   }
 }
