@@ -43,18 +43,19 @@ export default {
       };
     }),
 
-    room: async (parent, { id }, { models }) => {
+    room: combineResolvers(
+      isAuthenticated,
+      async (parent, { id }, { models }) => {
       return await models.Room.findByPk(id);
-    },
+    }),
   },
 
   Mutation: {
     createRoom: combineResolvers(
       isAuthenticated,
-      async (parent, { title }, { models, me }) => {
+      async (parent, { title }, { models }) => {
         const room = await models.Room.create({
           title,
-          userId: me.id,
         });
 
         PubSub.publish(EVENTS.ROOM.CREATED, {
