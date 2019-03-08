@@ -66,7 +66,7 @@ export default {
       ),
 
     deleteRoom: combineResolvers(
-      isAdmin,
+      isAuthenticated,
       async (parent, { id }, { models }) => {
         return await models.Room.destroy({ where: { id } });
         },

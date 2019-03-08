@@ -50,9 +50,10 @@ export default {
 	Mutation: {
 		createMessage: combineResolvers(
 			isAuthenticated,
-			async (parent, { text }, { models, me }) => {
+			async (parent, { text, roomId }, { models, me }) => {
 				const message = await models.Message.create({
 					text,
+					roomId,
 					userId: me.id,
 				});
 
