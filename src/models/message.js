@@ -1,10 +1,29 @@
 const message = (sequelize, DataTypes) => {
 	const Message = sequelize.define('message', {
+		id: {
+			type: DataTypes.INTEGER,
+			allowNull: false,
+			field: 'id',
+			primaryKey: true,
+			autoIncrement: true,
+		},
 		text: {
 			type: DataTypes.STRING,
 			validate: {
-				notEmpty: true
+				notEmpty: true,
 			},
+		},
+		roomId: {
+			type: DataTypes.INTEGER,
+			allowNull: false,
+			foreignKey: true,
+			field: 'roomId',
+		},
+		userId: {
+			type: DataTypes.INTEGER,
+			allowNull: false,
+			foreignKey: true,
+			field: 'userId',
 		},
 	});
 

@@ -8,10 +8,6 @@ const room = (sequelize, DataTypes) => {
         notEmpty: true
       },
     },
-    roomId : {
-      type: DataTypes.INTEGER,
-      field: 'roomId'
-    },
   });
 
   Room.associate = (models) => {

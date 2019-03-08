@@ -13,7 +13,7 @@ export default {
 	Query: {
 		messages: combineResolvers(
 			isAuthenticated,
-			async (parent, { cursor, limit = 5 }, { models }) => {
+			async (parent, { cursor, limit = 10 }, { models }) => {
 			const cursorOptions = cursor ? {
 					where: {
 						createdAt: {
@@ -50,10 +50,10 @@ export default {
 	Mutation: {
 		createMessage: combineResolvers(
 			isAuthenticated,
-			async (parent, { text }, { models, me }) => {
+			async (parent, { text, roomId }, { models, me }) => {
 				const message = await models.Message.create({
 					text,
-					roomId: models.Room.roomId,
+					roomId,
 					userId: me.id,
 				});
 
@@ -80,7 +80,7 @@ export default {
 		},
 		room: async (message, args, { loaders }) => {
 			return await loaders.room.load(message.roomId);
-		}
+		},
 	},
 
 	Subscription: {

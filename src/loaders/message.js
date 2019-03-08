@@ -1,9 +1,11 @@
 import { Op } from 'sequelize';
 
 export const batchMessages = async (keys, models) => {
-  const messages = await models.Message.find({
-    id: {
-      [Op.in]: keys,
+  const messages = await models.Message.findAll({
+    where: {
+      id: {
+        [Op.in]: keys,
+      },
     },
   });
 

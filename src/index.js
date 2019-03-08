@@ -35,8 +35,8 @@ const getMe = async req => {
 const server = new ApolloServer({
 	introspection: true,
 	playground: true,
-	// debug: true,
-	// tracing: true,
+	debug: true,
+	tracing: true,
 	typeDefs: schema,
 	resolvers,
 	formatError: error => {
