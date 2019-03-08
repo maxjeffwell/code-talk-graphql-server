@@ -7,7 +7,11 @@ const room = (sequelize, DataTypes) => {
       validate: {
         notEmpty: true
       },
-    }
+    },
+    roomId : {
+      type: DataTypes.INTEGER,
+      field: 'roomId'
+    },
   });
 
   Room.associate = (models) => {

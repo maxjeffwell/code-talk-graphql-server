@@ -2,7 +2,7 @@ import Sequelize from 'sequelize';
 import { combineResolvers } from 'graphql-resolvers';
 
 import PubSub, { EVENTS } from '../subscription';
-import { isAuthenticated, isAdmin } from './authorization';
+import { isAuthenticated } from './authorization';
 
 const toCursorHash = string => Buffer.from(string).toString('base64');
 
@@ -13,7 +13,7 @@ export default {
   Query: {
     rooms: combineResolvers(
       isAuthenticated,
-      async (parent, { cursor, limit = 50 }, { models }) => {
+      async (parent, { cursor, limit = 5 }, { models }) => {
       const cursorOptions = cursor ? {
           where: {
             createdAt: {
@@ -72,6 +72,16 @@ export default {
         },
       ),
     },
+
+  Room: {
+    messages: async (room, args, { models }) => {
+      return await models.Message.findAll({
+        where: {
+          roomId: room.id
+        },
+      });
+      },
+  },
 
   Subscription: {
     roomCreated: {

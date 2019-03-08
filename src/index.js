@@ -71,9 +71,12 @@ const server = new ApolloServer({
 				me,
 				secret: process.env.JWT_SECRET,
 				loaders: {
-					user: new DataLoader(keys=>
-						loaders.user.batchUsers(keys, models),
-						),
+					user: new DataLoader(keys =>
+						loaders.user.batchUsers(keys, models)),
+					message: new DataLoader(keys =>
+						loaders.message.batchMessages(keys, models)),
+					room: new DataLoader(keys =>
+						loaders.room.batchRooms(keys, models)),
 				},
 			};
 		}
