@@ -14,40 +14,40 @@ export default {
     rooms: combineResolvers(
       isAuthenticated,
       async (parent, { cursor, limit = 5 }, { models }) => {
-      const cursorOptions = cursor ? {
-          where: {
-            createdAt: {
-              [Sequelize.Op.lt]: fromCursorHash(cursor),
+        const cursorOptions = cursor ? {
+            where: {
+              createdAt: {
+                [Sequelize.Op.lt]: fromCursorHash(cursor),
+              },
             },
+          }
+          : {};
+
+        const rooms = await models.Room.findAll({
+          order: [['createdAt', 'DESC']],
+          limit: limit + 1,
+          ...cursorOptions,
+        });
+
+        const hasNextPage = rooms.length > limit;
+        const edges = hasNextPage ? rooms.slice(0, -1) : rooms;
+
+        return {
+          edges,
+          pageInfo: {
+            hasNextPage,
+            endCursor: toCursorHash(
+              edges[edges.length - 1].createdAt.toString(),
+            ),
           },
-        }
-        : {};
-
-      const rooms = await models.Room.findAll({
-        order: [['createdAt', 'DESC']],
-        limit: limit + 1,
-        ...cursorOptions,
-      });
-
-      const hasNextPage = rooms.length > limit;
-      const edges = hasNextPage ? rooms.slice(0, -1) : rooms;
-
-      return {
-        edges,
-        pageInfo: {
-          hasNextPage,
-          endCursor: toCursorHash(
-            edges[edges.length - 1].createdAt.toString(),
-          ),
-        },
-      };
-    }),
+        };
+      }),
 
     room: combineResolvers(
       isAuthenticated,
       async (parent, { id }, { models }) => {
-      return await models.Room.findByPk(id);
-    }),
+        return await models.Room.findByPk(id);
+      }),
   },
 
   Mutation: {
@@ -63,16 +63,16 @@ export default {
         });
 
         return room;
-        },
-      ),
+      },
+    ),
 
     deleteRoom: combineResolvers(
       isAuthenticated,
       async (parent, { id }, { models }) => {
         return await models.Room.destroy({ where: { id } });
-        },
-      ),
-    },
+      },
+    ),
+  },
 
   Room: {
     messages: async (room, args, { models }) => {

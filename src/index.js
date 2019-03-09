@@ -1,5 +1,6 @@
 import 'dotenv/config';
 import cors from 'cors';
+import { bodyParserGraphQL } from 'body-parser-graphql';
 import morgan from 'morgan';
 import http from 'http';
 import jwt from 'jsonwebtoken';
@@ -17,6 +18,7 @@ import loaders from './loaders';
 const app = express();
 
 app.use(cors());
+app.use(bodyParserGraphQL());
 
 app.use(morgan('dev'));
 
@@ -56,9 +58,12 @@ const server = new ApolloServer({
 			return {
 				models,
 				loaders: {
-					user: new DataLoader(keys =>
-						loaders.user.batchUsers(keys, models),
-						),
+					message: new DataLoader(keys => loaders.message.batchMessages(keys, models),
+					),
+					room: new DataLoader(keys => loaders.room.batchRooms(keys, models),
+					),
+					user: new DataLoader(keys => loaders.user.batchUsers(keys, models),
+					),
 				},
 			};
 		}
@@ -71,12 +76,12 @@ const server = new ApolloServer({
 				me,
 				secret: process.env.JWT_SECRET,
 				loaders: {
-					user: new DataLoader(keys =>
-						loaders.user.batchUsers(keys, models)),
-					message: new DataLoader(keys =>
-						loaders.message.batchMessages(keys, models)),
-					room: new DataLoader(keys =>
-						loaders.room.batchRooms(keys, models)),
+					message: new DataLoader(keys => loaders.message.batchMessages(keys, models),
+					),
+					room: new DataLoader(keys => loaders.room.batchRooms(keys, models),
+					),
+					user: new DataLoader(keys => loaders.user.batchUsers(keys, models),
+					),
 				},
 			};
 		}

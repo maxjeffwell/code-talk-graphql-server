@@ -2,7 +2,7 @@ import { gql } from 'apollo-server-express';
 
 export default gql`
     extend type Query {
-        messages(cursor: String, limit: Int): MessageConnection!
+        messages(cursor: String, limit: Int, roomId: ID!): MessageConnection!
         message(id: ID!): Message!
     }
     
@@ -12,7 +12,7 @@ export default gql`
     }
 
     extend type Subscription {
-        messageCreated: MessageCreated!
+        messageCreated(roomId: ID!): MessageCreated!
     }
     
     type MessageConnection {

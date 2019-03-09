@@ -11,7 +11,9 @@ const room = (sequelize, DataTypes) => {
   });
 
   Room.associate = (models) => {
-    Room.hasMany(models.Message);
+    Room.hasMany(models.Message, {
+      onDelete: 'CASCADE'
+    });
   };
 
   return Room;

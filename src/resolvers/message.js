@@ -1,5 +1,6 @@
 import Sequelize from 'sequelize';
 import { combineResolvers } from 'graphql-resolvers';
+import { withFilter } from 'graphql-subscriptions';
 
 import { isAuthenticated, isMessageOwner } from './authorization';
 import PubSub, { EVENTS } from '../subscription';
@@ -58,12 +59,12 @@ export default {
 				});
 
 				PubSub.publish(EVENTS.MESSAGE.CREATED, {
+					roomId: args.roomId,
 					messageCreated: { message },
 				});
 
 				return message;
-			},
-		),
+			}),
 
 		deleteMessage: combineResolvers(
 			isAuthenticated,
@@ -75,17 +76,19 @@ export default {
 	},
 
 	Message: {
-		user: async (message, args, { loaders }) => {
-			return await loaders.user.load(message.userId);
-		},
-		room: async (message, args, { loaders }) => {
-			return await loaders.room.load(message.roomId);
+		user: ({ user, userId }, args, { loaders }) => {
+			if (user) {
+				return user;
+			}
+			return loaders.user.load(userId);
 		},
 	},
 
 	Subscription: {
 		messageCreated: {
-			subscribe: () => PubSub.asyncIterator(EVENTS.MESSAGE.CREATED),
+			subscribe: withFilter(() => PubSub.asyncIterator(EVENTS.MESSAGE.CREATED),
+				(payload, args) => payload.roomId === args.roomId,
+			),
 		},
 	},
 };

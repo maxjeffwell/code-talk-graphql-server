@@ -1,18 +1,25 @@
 import { RedisPubSub } from 'graphql-redis-subscriptions';
-
-const PubSub = new RedisPubSub({
-	connection: {
-		host: 'ec2-18-235-137-58.compute-1.amazonaws.com',
-		user: 'h',
-		password: 'p10c9cd0650165fbb99062808ee085a1876a4985e41fe55b1b1fba127db6b4009',
-		port: 28009,
-		retry_strategy: options => Math.max(options.attempt * 100, 3000),
-	},
-});
+import Redis from 'ioredis';
 
 import * as MESSAGE_EVENTS from './message';
 import * as EDITOR_EVENTS from './editor';
 import * as ROOM_EVENTS from './room';
+
+const options = {
+	host: process.env.REDIS_HOST || '127.0.0.1',
+	user: process.env.REDIS_USER,
+	password: process.env.REDIS_PASSWORD,
+	port: process.env.REDIS_PORT,
+	retryStrategy: function(times) {
+		return Math.max(times * 100, 3000);
+	},
+};
+
+const PubSub = new RedisPubSub({
+	options,
+	publisher: new Redis(options),
+	subscriber: new Redis(options)
+});
 
 export const EVENTS = {
 	MESSAGE: MESSAGE_EVENTS,

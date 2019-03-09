@@ -10,13 +10,19 @@ const message = (sequelize, DataTypes) => {
 
 	Message.associate = (models) => {
 		Message.belongsTo(models.User, {
-			foreignKey: 'userId',
+			foreignKey: {
+				name: 'userId',
+				field: 'userId',
+			},
 		});
 	};
 
 	Message.associate = (models) => {
 		Message.belongsTo(models.Room, {
-			foreignKey: 'roomId',
+			foreignKey: {
+				name: 'roomId',
+				field: 'roomId',
+			},
 		});
 	};
 
