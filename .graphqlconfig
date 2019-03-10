@@ -1,0 +1,14 @@
+{
+  "projects": {
+    "code-talk-server": {
+      "extensions": {
+        "endpoints": {
+          "dev": {
+            "url": "http://localhost:8000/graphql",
+            "subscription": "ws://localhost:8000/graphql"
+          }
+        }
+      }
+    }
+  }
+}

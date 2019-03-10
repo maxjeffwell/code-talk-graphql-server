@@ -14,7 +14,7 @@ export default {
 	Query: {
 		messages: combineResolvers(
 			isAuthenticated,
-			async (parent, { cursor, limit = 10 }, { models }) => {
+			async (parent, { cursor, limit = 10, roomId }, { models }) => {
 			const cursorOptions = cursor ? {
 					where: {
 						createdAt: {
@@ -59,7 +59,7 @@ export default {
 				});
 
 				PubSub.publish(EVENTS.MESSAGE.CREATED, {
-					roomId: args.roomId,
+					roomId,
 					messageCreated: { message },
 				});
 
