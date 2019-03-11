@@ -27,10 +27,10 @@ export default gql`
 
     type Message {
         id: ID!
-        text: String!
+        text: String
         createdAt: Date!
         user: User!
-        room: Room!
+        room: Room
     }
     
     type MessageCreated {

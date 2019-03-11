@@ -8,6 +8,7 @@ module.exports = {
 	rules: {
 	    "graphql/template-strings": ['error', {
 	    env: "apollo",
+	    validators: 'all',
 
             // Import default settings for your GraphQL client. Supported values:
             // 'apollo', 'relay', 'lokka', 'fraql', 'literal'i,e, env: 'literal'
