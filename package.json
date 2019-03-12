@@ -29,7 +29,6 @@
     "eslint-plugin-graphql": "^3.0.3",
     "eslint-plugin-import": "^2.16.0",
     "mocha": "^6.0.2",
-    "morgan": "^1.9.1",
     "nodemon": "^1.18.10"
   },
   "dependencies": {
@@ -48,6 +47,7 @@
     "graphql-subscriptions": "^1.0.0",
     "ioredis": "^4.6.2",
     "jsonwebtoken": "^8.5.0",
+    "morgan": "^1.9.1",
     "pg": "^7.8.2",
     "sequelize": "^4.43.0",
     "uuid": "^3.3.2"

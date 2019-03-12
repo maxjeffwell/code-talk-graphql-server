@@ -1,8 +1,8 @@
 {
   "projects": {
     "code-talk-server": {
-    "schemaPath": "code-talk-graphql.graphqls",
-    "includes": ["*.graphqls"],
+    "schemaPath": "src/schema.graphql",
+    "includes": ["*.graphql"],
       "extensions": {
         "endpoints": {
           "dev": {

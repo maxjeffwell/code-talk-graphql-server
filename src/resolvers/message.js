@@ -81,6 +81,12 @@ export default {
       }
       return loaders.user.load(userId);
     },
+    room: ({ room, roomId }, args, { loaders }) => {
+      if (room) {
+        return room;
+      }
+      return loaders.room.load(roomId);
+    },
   },
 
   Subscription: {
