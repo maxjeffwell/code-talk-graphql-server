@@ -32,6 +32,7 @@ const message = (sequelize, DataTypes) => {
         name: 'roomId',
         field: 'roomId',
       },
+      onDelete: 'CASCADE',
     });
   };
 
