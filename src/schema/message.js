@@ -2,7 +2,7 @@ import { gql } from 'apollo-server-express';
 
 export default gql`
     extend type Query {
-        messages(cursor: String, limit: Int!, roomId: ID!): MessageConnection!
+        messages(cursor: String, roomId: ID!): [Message]!
         message(id: ID!): Message!
     }
     
@@ -30,7 +30,9 @@ export default gql`
         text: String
         createdAt: Date!
         user: User!
-        room: Room!
+        room: Room
+        roomId: ID!
+        userId: ID!
     }
     
     type MessageCreated {

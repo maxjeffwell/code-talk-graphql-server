@@ -78,7 +78,7 @@ export default {
     messages: async (room, args, { models }) => {
       return await models.Message.findAll({
         where: {
-          roomId: room.id
+          roomId: args.roomId
         },
       });
       },

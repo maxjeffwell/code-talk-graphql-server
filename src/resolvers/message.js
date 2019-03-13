@@ -1,49 +1,70 @@
-import Sequelize from 'sequelize';
 import { combineResolvers } from 'graphql-resolvers';
 import { withFilter } from 'graphql-subscriptions';
 
 import { isAuthenticated, isMessageOwner } from './authorization';
 import PubSub, { EVENTS } from '../subscription';
 
-const toCursorHash = string => Buffer.from(string).toString('base64');
+// const toCursorHash = string => Buffer.from(string).toString('base64');
 
-const fromCursorHash = string => Buffer.from(string, 'base64').toString('ascii');
+// const fromCursorHash = string => Buffer.from(string, 'base64').toString('ascii');
 
 export default {
   Query: {
+    // messages: combineResolvers(
+    //   isAuthenticated,
+    //   async (parent, { cursor, limit = 10, roomId }, { models }) => {
+    //     const cursorOptions = cursor ? {
+    //       where: {
+    //         createdAt: {
+    //           [Sequelize.Op.lt]: fromCursorHash(cursor),
+    //         }
+    //       },
+    //     }
+    //       : {};
+    //
+    //     const messages = await models.Message.findAll({
+    //       raw: true,
+    //       order: [['createdAt', 'DESC']],
+    //       where: { id: roomId },
+    //       limit: limit + 1,
+    //       ...cursorOptions,
+    //     });
+    //
+    //     const hasNextPage = messages.length > limit;
+    //     const edges = hasNextPage ? messages.slice(0, -1) : messages;
+    //
+    //     return {
+    //       edges,
+    //       pageInfo: {
+    //         hasNextPage,
+    //         endCursor: toCursorHash(
+    //           edges[edges.length - 1].createdAt.toString(),
+    //         ),
+    //       },
+    //     };
+    //   },
+    // ),
+
     messages: combineResolvers(
       isAuthenticated,
-      async (parent, { cursor, limit = 10, roomId }, { models }) => {
-        const cursorOptions = cursor ? {
-          where: {
-            createdAt: {
-              [Sequelize.Op.lt]: fromCursorHash(cursor),
-            },
-          },
-        }
-          : {};
+      async (parent, { cursor, roomId }, { models, me }) => {
+      await models.Room.findOne({ raw: true, where: { id: roomId } });
+      await models.User.findOne({ raw: true, where: { id: me.id } });
 
-        const messages = await models.Message.findAll({
-          order: [['createdAt', 'DESC']],
-          limit: limit + 1,
-          ...cursorOptions,
-          where: { roomId },
-        });
+      const options = {
+        order: [['createdAt', 'DESC']],
+        where: { roomId },
+        limit: 10,
+      };
 
-        const hasNextPage = messages.length > limit;
-        const edges = hasNextPage ? messages.slice(0, -1) : messages;
-
-        return {
-          edges,
-          pageInfo: {
-            hasNextPage,
-            endCursor: toCursorHash(
-              edges[edges.length - 1].createdAt.toString(),
-            ),
-          },
+      if (cursor) {
+        options.where.createdAt = {
+          [models.Op.lt]: cursor,
         };
-      },
-    ),
+      }
+
+      return models.Message.findAll(options, { raw: true });
+    }),
 
     message: async (parent, { id }, { models }) => await models.Message.findByPk(id),
   },
@@ -75,18 +96,18 @@ export default {
   },
 
   Message: {
-    user: ({ user, userId }, args, { loaders }) => {
-      if (user) {
-        return user;
-      }
-      return loaders.user.load(userId);
+    user: async (message, args, { loaders }) => {
+      return await loaders.user.load(message.userId);
     },
-    // room: ({ room, roomId }, args, { loaders }) => {
-    //   if (room) {
-    //     return room;
-    //   }
-    //   return loaders.room.load(roomId);
-    // },
+    room: {
+      messages: async (room, args, { models }) => {
+        return await models.Message.findAll({
+          where: {
+            roomId: args.roomId
+          },
+        });
+      },
+    },
   },
 
   Subscription: {

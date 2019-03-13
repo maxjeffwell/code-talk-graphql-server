@@ -12,7 +12,7 @@ export default gql`
     }
 
     extend type Subscription {
-        roomCreated: RoomCreated
+        roomCreated: RoomCreated!
     }
     
     type RoomConnection {
