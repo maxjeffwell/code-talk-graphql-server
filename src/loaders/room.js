@@ -1,8 +1,10 @@
+import { Op } from 'sequelize';
+
 export const batchRooms = async (keys, models) => {
   const rooms = await models.Room.findAll({
     where: {
       id: {
-        $in: keys,
+        [Op.in]: keys,
       },
     },
   });

@@ -99,16 +99,15 @@ export default {
     user: async (message, args, { loaders }) => {
       return await loaders.user.load(message.userId);
     },
-    room: {
-      messages: async (room, args, { models }) => {
-        return await models.Message.findAll({
-          where: {
-            roomId: args.roomId
-          },
-        });
-      },
+    // room: {
+    //   messages: async (room, args, { models }) => {
+    //     return await models.Message.findAll({
+    //       where: {
+    //         roomId: args.roomId
+    //       },
+    //     });
+    //   },
     },
-  },
 
   Subscription: {
     messageCreated: {
