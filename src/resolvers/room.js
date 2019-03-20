@@ -1,4 +1,4 @@
-import Sequelize from 'sequelize';
+import { Sequelize } from 'sequelize';
 import { combineResolvers } from 'graphql-resolvers';
 
 import PubSub, { EVENTS } from '../subscription';

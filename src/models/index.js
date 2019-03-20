@@ -1,4 +1,4 @@
-import Sequelize from 'sequelize';
+import { Sequelize } from 'sequelize';
 
 const sequelize = new Sequelize(
 	process.env.DATABASE_URL || process.env.TEST_DATABASE_URL, {

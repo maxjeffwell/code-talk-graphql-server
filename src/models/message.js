@@ -7,14 +7,14 @@ const message = (sequelize, DataTypes) => {
         notEmpty: true,
       },
     },
-    roomId: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
-    userId: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    }
+    // roomId: {
+    //   type: DataTypes.INTEGER,
+    //   allowNull: false,
+    // },
+    // userId: {
+    //   type: DataTypes.INTEGER,
+    //   allowNull: false,
+    // }
   });
 
   Message.associate = (models) => {
