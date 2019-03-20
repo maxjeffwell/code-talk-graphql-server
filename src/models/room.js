@@ -12,14 +12,6 @@ const room = (sequelize, DataTypes) => {
 
   Room.associate = (models) => {
     Room.hasMany(models.Message, {});
-
-    Room.belongsToMany(models.User, {
-      through: 'room_member',
-      foreignKey: {
-        name: 'roomId',
-        field: 'roomId',
-      },
-    });
   };
 
   return Room;

@@ -48,9 +48,9 @@ export default {
 
     messages: combineResolvers(
       isAuthenticated,
-      async (parent, { cursor, limit = 10, roomId }, { models, me }) => {
-      const room = await models.Room.findOne({ raw: true, where: { id: roomId } });
-      const user = await models.User.findOne({ raw: true, where: {roomId, userId: me.id } });
+      async (parent, { cursor, limit = 10, roomId }, { models }) => {
+      // const room = await models.Room.findOne({ raw: true, where: { id: roomId } });
+      // const user = await models.User.findOne({ raw: true, where: {roomId, userId: me.id } });
 
       const cursorOptions = cursor
         ? {
@@ -99,6 +99,7 @@ export default {
         });
 
         PubSub.publish(EVENTS.MESSAGE.CREATED, {
+          roomId,
           messageCreated: { message },
         });
 
@@ -117,16 +118,16 @@ export default {
     user: async (message, args, { loaders }) => {
       return await loaders.user.load(message.userId);
     },
+    room: {
+      messages: async (room, args, { models }) => {
+        return await models.Message.findAll({
+          where: {
+            roomId: args.roomId
+          },
+        });
+      },
+    },
   },
-
-    // room: {
-    //   messages: async (room, args, { models }) => {
-    //     return await models.Message.findAll({
-    //       where: {
-    //         roomId: args.roomId
-    //       },
-    //     });
-    //   },
 
   Subscription: {
     messageCreated: {
@@ -134,10 +135,4 @@ export default {
         (payload, args) => payload.roomId === args.roomId)),
     },
   },
-
-  // Subscription: {
-  //   messageCreated: {
-  //     subscribe: () => PubSub.asyncIterator(EVENTS.MESSAGE.CREATED),
-  //   },
-  // },
 };

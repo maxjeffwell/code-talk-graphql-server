@@ -32,6 +32,7 @@ export default gql`
         user: User!
         room: Room
         roomId: ID!
+        userId: ID!
     }
     
     type MessageCreated {
