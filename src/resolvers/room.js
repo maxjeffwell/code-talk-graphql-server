@@ -74,14 +74,20 @@ export default {
     ),
   },
 
+  // Room: {
+  //   messages: async (room, args, { models }) => {
+  //     return await models.Message.findAll({
+  //       where: {
+  //         roomId: args.roomId
+  //       },
+  //     });
+  //     },
+  // },
+
   Room: {
-    messages: async (room, args, { models }) => {
-      return await models.Message.findAll({
-        where: {
-          roomId: args.roomId
-        },
-      });
-      },
+    messages: async (message, args, { loaders }) => {
+      return await loaders.messages.load(message.roomId);
+    },
   },
 
   Subscription: {

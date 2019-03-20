@@ -24,6 +24,8 @@ export default gql`
         email: String!
         role: String
         messages: [Message!]
+        room: [Room!]
+        roomId: ID!
     }
 `;
 

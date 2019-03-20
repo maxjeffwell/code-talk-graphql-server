@@ -91,6 +91,9 @@ export default {
         },
       });
     },
+    room: async (user, args, { loaders }) => {
+      return await loaders.Room.load(user.roomId)
+    },
   },
-};
+}
 

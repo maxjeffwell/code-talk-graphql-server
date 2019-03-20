@@ -7,7 +7,7 @@ export default gql`
     }
 
     extend type Mutation {
-        createRoom(title: String!): Room!
+        createRoom(title: String!, members: [Int!]=[]): Room!
         deleteRoom(id: ID!): Boolean!
     }
 

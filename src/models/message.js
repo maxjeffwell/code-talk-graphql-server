@@ -7,6 +7,14 @@ const message = (sequelize, DataTypes) => {
         notEmpty: true,
       },
     },
+  },
+  {
+    indexes: [
+      {
+        fields: ['createdAt'],
+      },
+    ],
+  });
     // roomId: {
     //   type: DataTypes.INTEGER,
     //   allowNull: false,
@@ -15,7 +23,6 @@ const message = (sequelize, DataTypes) => {
     //   type: DataTypes.INTEGER,
     //   allowNull: false,
     // }
-  });
 
   Message.associate = (models) => {
     Message.belongsTo(models.User, {

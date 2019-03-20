@@ -48,6 +48,13 @@ const user = (sequelize, DataTypes) => {
 			{
 				onDelete: 'CASCADE'
 			});
+		User.belongsToMany(models.Room, {
+			through: 'room_member',
+			foreignKey: {
+				name: 'userId',
+				field: 'userId',
+			},
+		});
 	};
 
 	User.findByLogin = async login => {
