@@ -6,6 +6,7 @@ const user = (sequelize, DataTypes) => {
 			type: DataTypes.STRING,
 			unique: true,
 			allowNull: false,
+			trim: true,
 			validate: {
 				isAlphanumeric: {
 					notEmpty: true,
@@ -22,6 +23,8 @@ const user = (sequelize, DataTypes) => {
 			type: DataTypes.STRING,
 			unique: true,
 			allowNull: false,
+			trim: true,
+			lowercase: true,
 			validate: {
 				notEmpty: true,
 				isEmail: {

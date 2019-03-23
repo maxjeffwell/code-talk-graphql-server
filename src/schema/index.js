@@ -2,7 +2,7 @@ import { gql } from 'apollo-server-express';
 
 import userSchema from './user';
 import messageSchema from './message';
-import roomSchema from './room';
+// import roomSchema from './room';
 import editorSchema from './editor';
 
 const linkSchema = gql`
@@ -19,4 +19,4 @@ const linkSchema = gql`
     }
 `;
 
-export default [linkSchema, userSchema, messageSchema, roomSchema, editorSchema];
+export default [linkSchema, userSchema, messageSchema, editorSchema];

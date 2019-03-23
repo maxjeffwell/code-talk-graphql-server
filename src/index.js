@@ -18,7 +18,12 @@ import loaders from './loaders';
 
 const app = express();
 
-app.use(cors());
+app.use(cors({
+  origin: '*',
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+  optionsSuccessStatus: 200,
+}));
+
 app.use(bodyParserGraphQL());
 
 app.use(morgan('dev'));
@@ -72,8 +77,8 @@ const server = new ApolloServer({
         me,
         secret: process.env.JWT_SECRET,
         loaders: {
-          message: new DataLoader(keys => loaders.message.batchMessages(keys, models)),
-          room: new DataLoader(keys => loaders.room.batchRooms(keys, models)),
+          // message: new DataLoader(keys => loaders.message.batchMessages(keys, models)),
+          // room: new DataLoader(keys => loaders.room.batchRooms(keys, models)),
           user: new DataLoader(keys => loaders.user.batchUsers(keys, models)),
         },
       };

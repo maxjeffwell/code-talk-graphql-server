@@ -3,7 +3,6 @@ import { isAuthenticated } from './authorization';
 import { combineResolvers } from 'graphql-resolvers';
 
 export default {
-
   Query: {
     readCode: combineResolvers(
       isAuthenticated,

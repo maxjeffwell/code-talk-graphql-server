@@ -8,13 +8,7 @@ const message = (sequelize, DataTypes) => {
       },
     },
   },
-  {
-    indexes: [
-      {
-        fields: ['createdAt'],
-      },
-    ],
-  });
+  );
     // roomId: {
     //   type: DataTypes.INTEGER,
     //   allowNull: false,
@@ -33,15 +27,15 @@ const message = (sequelize, DataTypes) => {
     });
   };
 
-  Message.associate = (models) => {
-    Message.belongsTo(models.Room, {
-      foreignKey: {
-        name: 'roomId',
-        field: 'roomId',
-      },
-      onDelete: 'CASCADE',
-    });
-  };
+  // Message.associate = (models) => {
+  //   Message.belongsTo(models.Room, {
+  //     foreignKey: {
+  //       name: 'roomId',
+  //       field: 'roomId',
+  //     },
+  //     onDelete: 'CASCADE',
+  //   });
+  // };
 
   return Message;
 };

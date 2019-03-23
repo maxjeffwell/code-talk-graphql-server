@@ -2,17 +2,21 @@ import { gql } from 'apollo-server-express';
 
 export default gql`
     extend type Query {
-        messages(cursor: String, limit: Int roomId: ID!): MessageConnection!
+#        messages(cursor: String, limit: Int roomId: ID!): MessageConnection!
+        messages(cursor: String, limit: Int): MessageConnection!
         message(id: ID!): Message!
     }
     
     extend type Mutation {
-        createMessage(text: String!, roomId: ID!): Message!
+#        createMessage(text: String!, roomId: ID!): Message!
+        createMessage(text: String!): Message!
         deleteMessage(id: ID!): Boolean!
     }
 
     extend type Subscription {
-        messageCreated(roomId: ID!): MessageCreated!
+#        messageCreated(roomId: ID!): MessageCreated!
+        messageCreated: MessageCreated!
+#        messageDeleted: Boolean!
     }
     
     type MessageConnection {
@@ -30,12 +34,16 @@ export default gql`
         text: String
         createdAt: Date!
         user: User!
-        room: Room
-        roomId: ID!
-        userId: ID!
+#        room: Room
+#        roomId: ID!
+#        userId: ID!
     }
     
     type MessageCreated {
         message: Message!
     }
+    
+#    type MessageDeleted {
+#        message: Boolean!
+#    }
 `;
