@@ -10,13 +10,13 @@ export default gql`
     extend type Mutation {
 #        createMessage(text: String!, roomId: ID!): Message!
         createMessage(text: String!): Message!
-        deleteMessage(id: ID!): Boolean!
+        deleteMessage(id: ID!): Message!
     }
 
     extend type Subscription {
 #        messageCreated(roomId: ID!): MessageCreated!
         messageCreated: MessageCreated!
-#        messageDeleted: Boolean!
+#        messageDeleted: Message
     }
     
     type MessageConnection {
