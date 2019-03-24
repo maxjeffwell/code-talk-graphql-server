@@ -7,6 +7,7 @@ const message = (sequelize, DataTypes) => {
         notEmpty: true,
       },
     },
+    filetype: DataTypes.STRING,
   },
   );
     // roomId: {
