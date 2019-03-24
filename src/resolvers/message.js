@@ -67,11 +67,9 @@ export default {
       isAuthenticated,
       isMessageOwner,
       async (parent, { id }, { models }) => {
-        return await models.Message.destroy({ where: { id } });
-        // PubSub.publish(EVENTS.MESSAGE.DELETED, {
-        //   messageDeleted: { message },
-        // });
-        // return message;
+        const messageDeleted = await models.Message.destroy({ where: { id } });
+        // PubSub.publish(EVENTS.MESSAGE.DELETED, { messageDeleted });
+        return messageDeleted;
       },
     ),
   },
@@ -87,6 +85,7 @@ export default {
       subscribe: () => PubSub.asyncIterator(EVENTS.MESSAGE.CREATED),
     },
     // messageDeleted: {
-    // subscribe: () => PubSub.asyncIterator(EVENTS.MESSAGE.DELETED)},
+    // subscribe: () => PubSub.asyncIterator(EVENTS.MESSAGE.DELETED),
+    // },
     },
   };
