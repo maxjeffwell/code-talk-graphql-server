@@ -47,58 +47,20 @@ export default {
   },
 
   Mutation: {
-    // createMessage: combineResolvers(
-    //   isAuthenticated,
-    //   async (parent, { text, file }, { models, me }) => {
-    //     const message = await models.Message.create({
-    //       text,
-    //
-    //       userId: me.id,
-    //     });
-    //
-    //     PubSub.publish(EVENTS.MESSAGE.CREATED, {
-    //       messageCreated: { message },
-    //     });
-    //
-    //     return message;
-    //   },
-    // ),
-
     createMessage: combineResolvers(
       isAuthenticated,
-      (async (parent, { file, ...args }, { models, me }) => {
-        try {
-          const messageData = args;
-          if (file) {
-            messageData.filetype = file.type;
-            messageData.url = file.path;
-          }
-          const message = await models.Message.create({
-            ...messageData,
-            userId: me.id,
-          });
+      async (parent, { text }, { models, me }) => {
+        const message = await models.Message.create({
+          text,
+          userId: me.id,
+        });
 
-          const asyncFunc = async () => {
-            const me = await models.User.findOne({
-              where: {
-                id: me.id,
-              },
-            });
+        PubSub.publish(EVENTS.MESSAGE.CREATED, {
+          messageCreated: { message },
+        });
 
-            PubSub.publish(EVENTS.MESSAGE.CREATED, {
-              messageCreated: {
-                ...message.dataValues,
-                me: me.dataValues,
-              },
-            });
-          };
-          asyncFunc();
-
-          return message;
-        } catch (err) {
-          console.log(err);
-        }
-      }),
+        return message;
+      },
     ),
 
     deleteMessage: combineResolvers(

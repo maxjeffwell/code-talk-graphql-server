@@ -9,7 +9,7 @@ export default gql`
     
     extend type Mutation {
 #        createMessage(text: String!, roomId: ID!): Message!
-        createMessage(text: String, file: File): Message!
+        createMessage(text: String): Message!
         deleteMessage(id: ID!): Message!
     }
 
@@ -34,7 +34,6 @@ export default gql`
         text: String
         createdAt: Date!
         user: User!
-        filetype: String
 #        room: Room
 #        roomId: ID!
 #        userId: ID!
@@ -44,14 +43,10 @@ export default gql`
         message: Message!
     }
     
-    input File {
-        type: String!
-        path: String!
-    }
-    
 #    type MessageDeleted {
 #        message: Boolean!
 #    }
+
 `;
 
 
