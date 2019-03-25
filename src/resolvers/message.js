@@ -4,19 +4,22 @@ import { combineResolvers } from 'graphql-resolvers';
 import PubSub, { EVENTS } from '../subscription';
 import { isAuthenticated, isMessageOwner } from './authorization';
 
-const toCursorHash = string => Buffer.from(string).toString('base64');
+// const toCursorHash = string => Buffer.from(string).toString('base64');
+// const fromCursorHash = string => Buffer.from(string, 'base64').toString('ascii');
 
-const fromCursorHash = string =>
-  Buffer.from(string, 'base64').toString('ascii');
+const toCursorHash = string => Buffer.from(JSON.stringify(string)).toString('base64');
+const fromCursorHash = string => JSON.parse(Buffer.from(string, 'base64').toString('utf-8'));
 
 export default {
   Query: {
-    messages: async (parent, { cursor, limit = 10 }, { models }) => {
+    messages: async (parent, {cursor, limit = 10}, {models}) => {
       const cursorOptions = cursor
         ? {
           where: {
             createdAt: {
-              [Sequelize.Op.lt]: fromCursorHash(cursor),
+              // [Sequelize.Op.lt]: fromCursorHash(cursor),
+
+              [Sequelize.Op.lt]: new Date(fromCursorHash(cursor)).toISOString(),
             },
           },
         }
@@ -35,13 +38,12 @@ export default {
         edges,
         pageInfo: {
           hasNextPage,
-          endCursor: toCursorHash(
-            edges[edges.length - 1].createdAt.toString(),
-          ),
+          endCursor: toCursorHash(edges[edges.length - 1].createdAt.toString()),
         },
       };
     },
-    message: async (parent, { id }, { models }) => {
+
+    message: async (parent, {id}, {models}) => {
       return await models.Message.findByPk(id);
     },
   },
@@ -49,14 +51,14 @@ export default {
   Mutation: {
     createMessage: combineResolvers(
       isAuthenticated,
-      async (parent, { text }, { models, me }) => {
+      async (parent, {text}, {models, me}) => {
         const message = await models.Message.create({
           text,
           userId: me.id,
         });
 
         PubSub.publish(EVENTS.MESSAGE.CREATED, {
-          messageCreated: { message },
+          messageCreated: {message},
         });
 
         return message;
@@ -66,26 +68,22 @@ export default {
     deleteMessage: combineResolvers(
       isAuthenticated,
       isMessageOwner,
-      async (parent, { id }, { models }) => {
-        const messageDeleted = await models.Message.destroy({ where: { id } });
-        // PubSub.publish(EVENTS.MESSAGE.DELETED, { messageDeleted });
-        return messageDeleted;
+      async (parent, {id}, {models}) => {
+        await models.Message.destroy({where: {id}});
+        return true;
       },
     ),
   },
 
   Message: {
-    user: async (message, args, { loaders }) => {
+    user: async (message, args, {loaders}) => {
       return await loaders.user.load(message.userId);
-    },
+      },
   },
 
   Subscription: {
     messageCreated: {
       subscribe: () => PubSub.asyncIterator(EVENTS.MESSAGE.CREATED),
     },
-    // messageDeleted: {
-    // subscribe: () => PubSub.asyncIterator(EVENTS.MESSAGE.DELETED),
-    // },
-    },
-  };
+  },
+}

@@ -7,17 +7,8 @@ const message = (sequelize, DataTypes) => {
         notEmpty: true,
       },
     },
-    filetype: DataTypes.STRING,
   },
   );
-    // roomId: {
-    //   type: DataTypes.INTEGER,
-    //   allowNull: false,
-    // },
-    // userId: {
-    //   type: DataTypes.INTEGER,
-    //   allowNull: false,
-    // }
 
   Message.associate = (models) => {
     Message.belongsTo(models.User, {
@@ -27,16 +18,6 @@ const message = (sequelize, DataTypes) => {
       },
     });
   };
-
-  // Message.associate = (models) => {
-  //   Message.belongsTo(models.Room, {
-  //     foreignKey: {
-  //       name: 'roomId',
-  //       field: 'roomId',
-  //     },
-  //     onDelete: 'CASCADE',
-  //   });
-  // };
 
   return Message;
 };

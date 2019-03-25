@@ -1,18 +1,24 @@
 import { GraphQLDateTime } from 'graphql-iso-date';
+import { GraphQLUpload } from 'graphql-upload';
 
 import userResolvers from '../resolvers/user';
 import messageResolvers from '../resolvers/message';
-// import roomResolvers from '../resolvers/room';
 import editorResolvers from '../resolvers/editor';
+import uploadsResolvers from './uploads';
 
 const customScalarResolver = {
-  Date: GraphQLDateTime,
+  Date: GraphQLDateTime
+};
+
+const uploadScalarResolver = {
+  Upload: GraphQLUpload
 };
 
 export default [
   customScalarResolver,
+  uploadScalarResolver,
   userResolvers,
   messageResolvers,
-  // roomResolvers,
   editorResolvers,
+  uploadsResolvers,
 ];

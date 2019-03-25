@@ -9,7 +9,7 @@ const sequelize = new Sequelize(
 const models = {
 	User: sequelize.import('./user'),
 	Message: sequelize.import('./message'),
-	// Room: sequelize.import('./room'),
+	Uploads: sequelize.import('./uploads'),
 };
 
 Object.keys(models).forEach(key => {

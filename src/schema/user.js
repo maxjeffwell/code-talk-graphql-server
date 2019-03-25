@@ -3,7 +3,7 @@ import { gql } from 'apollo-server-express';
 export default gql`
     extend type Query {
         users: [User!]
-        user(id: ID!): User
+        user(id: ID!): User!
         me: User
     }
     
@@ -22,9 +22,7 @@ export default gql`
         id: ID!
         username: String!
         email: String!
-        role: String
         messages: [Message!]
-#        room: [Room!]
     }
 `;
 
