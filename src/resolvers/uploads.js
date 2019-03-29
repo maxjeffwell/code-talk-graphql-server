@@ -29,7 +29,7 @@ export default {
 		),
 	},
 	Upload: {
-		user: async (upload, args, {loaders}) => {
+		user: async (upload, args, { loaders }) => {
 			return await loaders.user.load(upload.userId);
 		},
 	},
