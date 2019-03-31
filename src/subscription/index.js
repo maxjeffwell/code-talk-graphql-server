@@ -6,7 +6,8 @@ import * as EDITOR_EVENTS from './editor';
 // import * as ROOM_EVENTS from './room';
 
 const options = {
-	host: 'ec2-18-235-137-58.compute-1.amazonaws.com' || '127.0.0.1',
+	// host: 'ec2-18-235-137-58.compute-1.amazonaws.com' || '127.0.0.1',
+	host: 'ec2-18-235-137-58.compute-1.amazonaws.com',
 	user: 'h',
 	password: 'p10c9cd0650165fbb99062808ee085a1876a4985e41fe55b1b1fba127db6b4009',
 	port: 28009,
