@@ -7,7 +7,7 @@ import * as EDITOR_EVENTS from './editor';
 
 const options = {
 	// host: process.env.REDIS_HOST || '127.0.0.1',
-	host: 'ec2-3-212-186-31.compute-1.compute-1.amazonaws.com' || '127.0.0.1',
+	host: 'ec2-3-212-186-31.compute-1.amazonaws.com' || '127.0.0.1',
 	// user: process.env.REDIS_USER,
 	user: 'h',
 	// password: process.env.REDIS_PASSWORD,
