@@ -13,7 +13,7 @@ const options = {
 	// password: process.env.REDIS_PASSWORD,
 	password: 'p10c9cd0650165fbb99062808ee085a1876a4985e41fe55b1b1fba127db6b4009',
 	// port: process.env.REDIS_PORT,
-	port: 28009,
+	port: 17249,
 	retryStrategy: function(times) {
 		return Math.max(times * 100, 3000);
 	},
