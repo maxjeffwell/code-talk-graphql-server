@@ -75,8 +75,8 @@ You can retrieve a token by performing a login mutation and requesting the token
 * Github
 * TravisCI
 * Heroku
+* Heroku Redis
 * ElephantSQL
-* ioredis
 
 **Optimizations**
 * Cursor-based pagination
