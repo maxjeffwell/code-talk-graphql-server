@@ -34,6 +34,14 @@ Code Talk is a code collaboration tool with real-time text editing and real-time
 
 [![GraphQL Playground Subscription with Mutation](https://i.gyazo.com/d6f75081e41e03028e7bb5a123597453.png)](https://gyazo.com/d6f75081e41e03028e7bb5a123597453)
 
+[![Code Talk Landing](https://i.gyazo.com/2c79818082923f3328d830a02e90a2e7.png)](https://gyazo.com/2c79818082923f3328d830a02e90a2e7)
+
+[![Code Talk Room - Desktop View](https://i.gyazo.com/e9c5d834029981dabe5da31660a14fd0.png)](https://gyazo.com/e9c5d834029981dabe5da31660a14fd0)
+
+[![Code Talk Login](https://i.gyazo.com/09e498593bdf0113793a21096ae94edb.png)](https://gyazo.com/09e498593bdf0113793a21096ae94edb)
+
+[![Code Talk Registration](https://i.gyazo.com/0b77085d85be51cdaeaf2c985f50e6d0.png)](https://gyazo.com/0b77085d85be51cdaeaf2c985f50e6d0)
+
 ## Technology Stack
 **Front End** [Client GitHub Repo](https://github.com/maxjeffwell/code-talk-graphql-client)
 
@@ -68,14 +76,22 @@ You can retrieve a token by performing a login mutation and requesting the token
 * TravisCI
 * Heroku
 * ElephantSQL
+* ioredis
 
 **Optimizations**
 * Cursor-based pagination
-* Implementation of Facebook's dataloader
+* Implementation of Facebook's DataLoader
+* Redis Pub/Sub Engine supporting a scalable GraphQL subscriptions server 
+
+## Next Steps
+* Implement RedisCache as a shared cache storage backend for retrieval of data from the 
+code collaboration textarea. Currently, users who join subsequent to another user's
+input of text in the textarea are not able to see that prior textarea history. 
 
 ## Meta
 
 by Jeff Maxwell maxjeffwell@gmail.com | [https://github.com/maxjeffwell](https://github.com/maxjeffwell)
 
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 Distributed under the GNU GPLv3 License. See ``LICENSE`` for more information.
 
