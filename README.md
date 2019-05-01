@@ -7,11 +7,9 @@
 <h1 align="center"><img width=100% src=https://github.com/maxjeffwell/code-talk-graphql-client/blob/master/src/components/Images/Logo/CodeTalk_Title_Logo.png alt="Code Talk Logo"></h1>
 
 ## Build Status
-[![npm version](https://img.shields.io/badge/npm%20package-6.4.1-30d403.svg?style=popout&logo=npm&logoWidth=40)](https://badge.fury.io/js/npm) [![Build Status](https://img.shields.io/travis/maxjeffwell/code-talk-graphql-server.svg?style=popout&logo=travis&logoWidth=40)](https://travis-ci.org/maxjeffwell/code-talk-graphql-server) ![Dependencies](https://img.shields.io/badge/dependencies-up%20to%20date-30d403.svg?style=popout&logo=appveyor&logoWidth=40) [![Live Demo](https://img.shields.io/badge/demo-online-30d403.svg?style=popout&logo=heroku&logoWidth=40)](https://jmaxwell-code-talk-server.herokuapp.com/graphql)
+[![npm version](https://img.shields.io/badge/npm%20package-6.4.1-30d403.svg?style=popout&logo=npm&logoWidth=30)](https://badge.fury.io/js/npm) [![Build Status](https://img.shields.io/travis/maxjeffwell/code-talk-graphql-server.svg?style=popout&logo=travis&logoWidth=30)](https://travis-ci.org/maxjeffwell/code-talk-graphql-server) ![Dependencies](https://img.shields.io/badge/dependencies-up%20to%20date-30d403.svg?style=popout&logo=appveyor&logoColor=30d403&logoWidth=30) [![Live Demo](https://img.shields.io/badge/demo-online-30d403.svg?style=popout&logo=heroku&logoColor=30d403&logoWidth=30)](https://jmaxwell-code-talk-server.herokuapp.com/graphql)
 
 ## [GraphQL Playground](https://jmaxwell-code-talk-server.herokuapp.com/graphql)
-
-## [Live App](https://jmaxwell-code-talk-client.herokuapp.com)
 
 ```
 Demo Accounts
