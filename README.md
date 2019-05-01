@@ -1,8 +1,10 @@
 # Code Talk
+![GraphQL](https://img.shields.io/badge/GraphQL-badge.svg?style=flat-square&logo=graphql&labelColor=393939&logoColor=30d403&color=grey&logoWidth=30)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-badge.svg?style=flat-square&logo=postgresql&labelColor=393939&logoColor=30d403&color=grey&logoWidth=30)
+![Redis](https://img.shields.io/badge/Redis-blue.svg?style=flat-square&logo=redis&labelColor=393939&logoColor=30d403&color=grey&logoWidth=30)
 > Real-time messaging and code collaboration environment
 
 <h1 align="center"><img width=100% src=https://github.com/maxjeffwell/code-talk-graphql-client/blob/master/src/components/Images/Logo/CodeTalk_Title_Logo.png alt="Code Talk Logo"></h1>
-
 
 ## Build Status
 [![npm version](https://img.shields.io/badge/npm%20package-6.4.1-orange.svg?style=for-the-badge&logo=npm)](https://badge.fury.io/js/npm) [![Build Status](https://img.shields.io/travis/maxjeffwell/code-talk-graphql-server.svg?style=for-the-badge&logo=travis)](https://travis-ci.org/maxjeffwell/code-talk-graphql-server) ![Dependencies](https://img.shields.io/badge/dependencies-up%20to%20date-brightgreen.svg?style=for-the-badge&logo=appveyor) [![Live Demo](https://img.shields.io/badge/demo-online-green.svg?style=for-the-badge&logo=heroku)](https://jmaxwell-code-talk-server.herokuapp.com/graphql)
