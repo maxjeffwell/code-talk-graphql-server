@@ -5,7 +5,7 @@
 
 
 ## Build Status
-[![npm version](https://img.shields.io/badge/npm%20package-6.4.1-orange.svg)](https://badge.fury.io/js/npm) [![Build Status](https://travis-ci.org/maxjeffwell/code-talk-graphql-client.svg?branch=master)](https://travis-ci.org/maxjeffwell/code-talk-graphql-server) ![Dependencies](https://img.shields.io/badge/dependencies-up%20to%20date-brightgreen.svg) [![Live Demo](https://img.shields.io/badge/demo-online-green.svg)](https://jmaxwell-code-talk-server.herokuapp.com/graphql)
+[![npm version](https://img.shields.io/badge/npm%20package-6.4.1-orange.svg?style=for-the-badge&logo=npm)](https://badge.fury.io/js/npm) [![Build Status](https://img.shields.io/travis/maxjeffwell/code-talk-graphql-server.svg?style=for-the-badge&logo=travis)](https://travis-ci.org/maxjeffwell/code-talk-graphql-server) ![Dependencies](https://img.shields.io/badge/dependencies-up%20to%20date-brightgreen.svg?style=for-the-badge&logo=appveyor) [![Live Demo](https://img.shields.io/badge/demo-online-green.svg?style=for-the-badge&logo=heroku)](https://jmaxwell-code-talk-server.herokuapp.com/graphql)
 
 ## [GraphQL Playground](https://jmaxwell-code-talk-server.herokuapp.com/graphql)
 
@@ -63,7 +63,7 @@ You can retrieve a token by performing a login mutation and requesting the token
 * Security
     * JWT authentication and password hashing with bcrypt.js
 * Testing
-     * Integration and End-to-End testing using Mocha and Chai
+    * Integration and End-to-End testing using Mocha and Chai
 * Authorization
     * Session-based protected resolvers
     * Session-based protected routes
