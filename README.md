@@ -51,17 +51,15 @@ Code Talk is a code collaboration tool with real-time text editing and real-time
 * CSS styling implemented with Styled Components
 
 **Back End** [Explore the API in GraphQL Playground](https://jmaxwell-code-talk-server.herokuapp.com/graphql)
->
+```
 Please note that in order to perform queries, mutations (other than the login mutation), or subscriptions using GraphQL Playground, you will have to provide an authorization token in the Playground's http headers, which can be found in the lower left corner of the Playground.
->
-The format of the header is as follows:
->
->
-{"x-token": "your token here"}
->
->
-You can retrieve a token by performing a login mutation and requesting the token in the return object. Or, you can log in client-side and your token will be available in your browser's local storage.
 
+The format of the header is as follows:
+
+{"x-token": "your token here"}
+
+You can retrieve a token by performing a login mutation and requesting the token in the return object. Or, you can log in client-side and your token will be available in your browser's local storage.
+```
 * GraphQL API built using Apollo Server with Express middleware
 * Security
     * JWT authentication and password hashing with bcrypt.js
