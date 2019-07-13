@@ -20,9 +20,9 @@
   "author": "Jeff Maxwell <maxjeffwell@gmail.com>",
   "license": "GNU GPLv3",
   "devDependencies": {
-    "@babel/core": "^7.5.0",
+    "@babel/core": "^7.5.4",
     "@babel/node": "^7.5.0",
-    "@babel/preset-env": "^7.5.2",
+    "@babel/preset-env": "^7.5.4",
     "@babel/register": "^7.4.4",
     "axios": "^0.19.0",
     "babel-eslint": "^10.0.2",
@@ -34,8 +34,8 @@
     "nodemon": "^1.19.1"
   },
   "dependencies": {
-    "apollo-server": "^2.6.7",
-    "apollo-server-express": "^2.6.7",
+    "apollo-server": "^2.6.9",
+    "apollo-server-express": "^2.6.9",
     "bcryptjs": "^2.4.3",
     "body-parser-graphql": "^1.1.0",
     "cors": "^2.8.5",
@@ -50,9 +50,9 @@
     "ioredis": "^4.11.1",
     "jsonwebtoken": "^8.5.1",
     "morgan": "^1.9.1",
-    "npm-check-updates": "^3.1.17",
+    "npm-check-updates": "^3.1.18",
     "pg": "^7.11.0",
-    "sequelize": "^5.9.4",
+    "sequelize": "^5.10.0",
     "uuid": "^3.3.2"
   },
   "heroku-run-build-script": true,
