@@ -7,13 +7,13 @@ import * as EDITOR_EVENTS from './editor';
 
 const options = {
 	// host: process.env.REDIS_HOST || '127.0.0.1',
-	host: 'ec2-3-94-67-220.compute-1.amazonaws.com' || '127.0.0.1',
+	host: 'ec2-3-221-30-141.compute-1.amazonaws.com' || '127.0.0.1',
 	// user: process.env.REDIS_USER,
 	user: 'h',
 	// password: process.env.REDIS_PASSWORD,
 	password: 'p10c9cd0650165fbb99062808ee085a1876a4985e41fe55b1b1fba127db6b4009',
 	// port: process.env.REDIS_PORT,
-	port: 29539,
+	port: 9559,
 	retryStrategy: function(times) {
 		return Math.max(times * 100, 3000);
 	},
