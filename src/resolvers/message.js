@@ -1,5 +1,6 @@
 import { Sequelize } from 'sequelize';
 import { combineResolvers } from 'graphql-resolvers';
+import DOMPurify from 'isomorphic-dompurify';
 
 import PubSub, { EVENTS } from '../subscription';
 import { isAuthenticated, isMessageOwner } from './authorization';
@@ -11,7 +12,9 @@ const fromCursorHash = string =>
 
 export default {
   Query: {
-    messages: async (parent, { cursor, limit = 10 }, { models }) => {
+    messages: combineResolvers(
+      isAuthenticated,
+      async (parent, { cursor, limit = 10 }, { models }) => {
       const cursorOptions = cursor
         ? {
           where: {
@@ -39,19 +42,23 @@ export default {
             edges[edges.length - 1].createdAt.toString(),
           ),
         },
-      };
-    },
-    message: async (parent, { id }, { models }) => {
-      return await models.Message.findByPk(id);
-    },
+      }
+    ),
+    message: combineResolvers(
+      isAuthenticated,
+      async (parent, { id }, { models }) => {
+        return await models.Message.findByPk(id);
+      }
+    ),
   },
 
   Mutation: {
     createMessage: combineResolvers(
       isAuthenticated,
       async (parent, { text }, { models, me }) => {
+        const sanitizedText = DOMPurify.sanitize(text);
         const message = await models.Message.create({
-          text,
+          text: sanitizedText,
           userId: me.id,
         });
 

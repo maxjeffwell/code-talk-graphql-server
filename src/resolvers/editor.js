@@ -1,6 +1,7 @@
 import PubSub, { EVENTS } from '../subscription';
 import { isAuthenticated } from './authorization';
 import { combineResolvers } from 'graphql-resolvers';
+import DOMPurify from 'isomorphic-dompurify';
 
 export default {
   Query: {
@@ -14,8 +15,9 @@ export default {
       isAuthenticated,
       (root, args) => {
       const { code } = args;
-      PubSub.publish(EVENTS.EDITOR.TYPING_CODE, {typingCode: code});
-      return code;
+      const sanitizedCode = DOMPurify.sanitize(code);
+      PubSub.publish(EVENTS.EDITOR.TYPING_CODE, {typingCode: sanitizedCode});
+      return sanitizedCode;
     })
   },
 

@@ -6,6 +6,8 @@ import http from 'http';
 import jwt from 'jsonwebtoken';
 import DataLoader from 'dataloader';
 import express from 'express';
+import rateLimit from 'express-rate-limit';
+import helmet from 'helmet';
 import {
   ApolloServer,
   AuthenticationError,
@@ -18,8 +20,30 @@ import loaders from './loaders';
 
 const app = express();
 
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      scriptSrc: ["'self'"],
+      imgSrc: ["'self'", "data:", "https:"],
+    },
+  },
+}));
+
+const limiter = rateLimit({
+  windowMs: 1 * 60 * 1000, // 1 minute
+  max: 100, // limit each IP to 100 requests per windowMs
+  message: 'Too many requests from this IP, please try again later.',
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+app.use(limiter);
+
 app.use(cors({
-  origin: '*',
+  origin: process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : ['http://localhost:3000'],
+  credentials: true,
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
   optionsSuccessStatus: 200,
 }));
@@ -41,10 +65,10 @@ const getMe = async (req) => {
 };
 
 const server = new ApolloServer({
-  introspection: true,
-  playground: true,
-  debug: true,
-  tracing: true,
+  introspection: process.env.NODE_ENV !== 'production',
+  playground: process.env.NODE_ENV !== 'production',
+  debug: process.env.NODE_ENV !== 'production',
+  tracing: process.env.NODE_ENV !== 'production',
   typeDefs: schema,
   resolvers,
   formatError: (error) => {

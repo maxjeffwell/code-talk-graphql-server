@@ -44,6 +44,11 @@ const user = (sequelize, DataTypes) => {
 				},
 			},
 		},
+		role: {
+			type: DataTypes.ENUM('USER', 'ADMIN'),
+			defaultValue: 'USER',
+			allowNull: false,
+		},
 	});
 
 	User.associate = (models) => {
