@@ -8,48 +8,86 @@
 [33m[nodemon] watching extensions: js,mjs,cjs,json[39m
 [32m[nodemon] starting `babel-node src/index.js`[39m
 Apollo Server is running on http://localhost:8000/graphql
-2025-07-11 12:27:54 [[32minfo[39m]: GraphQL Operation Started  {"query":"{ me { id username } }"}
-2025-07-11 12:27:54 [[32minfo[39m]: ::1 - - [11/Jul/2025:16:27:54 +0000] "POST /graphql HTTP/1.1" 200 21 "-" "curl/8.5.0"  
-2025-07-11 12:31:01 [[32minfo[39m]: ::1 - - [11/Jul/2025:16:31:01 +0000] "GET /graphql HTTP/1.1" 200 - "-" "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"  
-2025-07-11 12:31:03 [[32minfo[39m]: ::1 - - [11/Jul/2025:16:31:03 +0000] "GET /sw.js HTTP/1.1" 404 144 "http://localhost:8000/sw.js" "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"  
-[32m[nodemon] restarting due to changes...[39m
-[32m[nodemon] starting `babel-node src/index.js`[39m
-Apollo Server is running on http://localhost:8000/graphql
-2025-07-11 12:31:13 [[32minfo[39m]: ::1 - - [11/Jul/2025:16:31:13 +0000] "GET /graphql HTTP/1.1" 200 - "-" "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"  
-2025-07-11 12:31:15 [[32minfo[39m]: ::1 - - [11/Jul/2025:16:31:15 +0000] "GET /sw.js HTTP/1.1" 404 144 "http://localhost:8000/sw.js" "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"  
-[32m[nodemon] restarting due to changes...[39m
-[32m[nodemon] starting `babel-node src/index.js`[39m
-Apollo Server is running on http://localhost:8000/graphql
-[32m[nodemon] restarting due to changes...[39m
-[32m[nodemon] starting `babel-node src/index.js`[39m
-Apollo Server is running on http://localhost:8000/graphql
-[32m[nodemon] restarting due to changes...[39m
-[32m[nodemon] starting `babel-node src/index.js`[39m
-Apollo Server is running on http://localhost:8000/graphql
-[32m[nodemon] restarting due to changes...[39m
-[32m[nodemon] starting `babel-node src/index.js`[39m
-Apollo Server is running on http://localhost:8000/graphql
-[32m[nodemon] restarting due to changes...[39m
-[32m[nodemon] starting `babel-node src/index.js`[39m
-Apollo Server is running on http://localhost:8000/graphql
-[32m[nodemon] restarting due to changes...[39m
-[32m[nodemon] starting `babel-node src/index.js`[39m
-Apollo Server is running on http://localhost:8000/graphql
-[32m[nodemon] restarting due to changes...[39m
-[32m[nodemon] starting `babel-node src/index.js`[39m
-Apollo Server is running on http://localhost:8000/graphql
-[32m[nodemon] restarting due to changes...[39m
-[32m[nodemon] starting `babel-node src/index.js`[39m
-Apollo Server is running on http://localhost:8000/graphql
-[32m[nodemon] restarting due to changes...[39m
-[32m[nodemon] starting `babel-node src/index.js`[39m
-Apollo Server is running on http://localhost:8000/graphql
-[32m[nodemon] restarting due to changes...[39m
-[32m[nodemon] starting `babel-node src/index.js`[39m
-Apollo Server is running on http://localhost:8000/graphql
-2025-07-11 12:41:24 [[32minfo[39m]: GraphQL Operation Started  {"query":"{ __schema { queryType { name } } }"}
-2025-07-11 12:41:24 [[32minfo[39m]: ::1 - - [11/Jul/2025:16:41:24 +0000] "POST /graphql HTTP/1.1" 200 53 "-" "curl/8.5.0"  
-2025-07-11 12:41:38 [[32minfo[39m]: GraphQL Operation Started  {"query":"{ me { id username email } }"}
-2025-07-11 12:41:38 [[32minfo[39m]: ::1 - - [11/Jul/2025:16:41:38 +0000] "POST /graphql HTTP/1.1" 200 21 "-" "curl/8.5.0"  
-2025-07-11 12:43:22 [[32minfo[39m]: ::1 - - [11/Jul/2025:16:43:22 +0000] "GET /graphql HTTP/1.1" 200 - "-" "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"  
-2025-07-11 12:43:25 [[32minfo[39m]: ::1 - - [11/Jul/2025:16:43:25 +0000] "GET /sw.js HTTP/1.1" 404 144 "http://localhost:8000/sw.js" "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"  
+WebSocket subscriptions ready at ws://localhost:8000/graphql
+2025-07-11 13:51:54 [[32minfo[39m]: GraphQL Operation Started  {"query":"{ __typename }"}
+2025-07-11 13:51:54 [[32minfo[39m]: ::1 - - [11/Jul/2025:17:51:54 +0000] "POST /graphql HTTP/1.1" 200 32 "-" "curl/8.5.0"  
+2025-07-11 13:53:20 [[32minfo[39m]: ::1 - - [11/Jul/2025:17:53:20 +0000] "GET /graphql HTTP/1.1" 200 - "-" "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"  
+2025-07-11 13:53:20 [[32minfo[39m]: ::1 - - [11/Jul/2025:17:53:20 +0000] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 187 "-" "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"  
+2025-07-11 13:53:26 [[32minfo[39m]: GraphQL Operation Started  {"query":"{ me { id username email role __typename } }"}
+2025-07-11 13:53:26 [[32minfo[39m]: ::1 - - [11/Jul/2025:17:53:26 +0000] "POST /graphql HTTP/1.1" 200 21 "http://localhost:3000/" "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"  
+2025-07-11 13:54:50 [[32minfo[39m]: ::1 - - [11/Jul/2025:17:54:50 +0000] "GET /graphql HTTP/1.1" 200 - "-" "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"  
+2025-07-11 13:54:50 [[32minfo[39m]: ::1 - - [11/Jul/2025:17:54:50 +0000] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 187 "-" "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"  
+2025-07-11 13:55:11 [[32minfo[39m]: ::1 - - [11/Jul/2025:17:55:11 +0000] "GET /graphql HTTP/1.1" 200 - "-" "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"  
+2025-07-11 13:55:11 [[32minfo[39m]: ::1 - - [11/Jul/2025:17:55:11 +0000] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 187 "-" "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"  
+2025-07-11 13:55:29 [[32minfo[39m]: ::1 - - [11/Jul/2025:17:55:29 +0000] "GET /graphql HTTP/1.1" 200 - "-" "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"  
+2025-07-11 13:55:29 [[32minfo[39m]: ::1 - - [11/Jul/2025:17:55:29 +0000] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 187 "-" "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"  
+2025-07-11 13:55:59 [[32minfo[39m]: ::1 - - [11/Jul/2025:17:55:59 +0000] "GET /graphql HTTP/1.1" 200 - "-" "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"  
+2025-07-11 13:57:55 [[32minfo[39m]: ::1 - - [11/Jul/2025:17:57:55 +0000] "GET /graphql HTTP/1.1" 200 - "-" "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"  
+2025-07-11 13:59:09 [[32minfo[39m]: ::1 - - [11/Jul/2025:17:59:09 +0000] "GET /graphql HTTP/1.1" 200 - "-" "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"  
+2025-07-11 13:59:47 [[32minfo[39m]: ::1 - - [11/Jul/2025:17:59:47 +0000] "GET / HTTP/1.1" 404 139 "-" "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"  
+2025-07-11 13:59:53 [[32minfo[39m]: ::1 - - [11/Jul/2025:17:59:53 +0000] "GET /graphql HTTP/1.1" 200 - "-" "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"  
+2025-07-11 14:00:45 [[32minfo[39m]: ::1 - - [11/Jul/2025:18:00:45 +0000] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 187 "-" "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"  
+2025-07-11 14:03:42 [[32minfo[39m]: GraphQL Operation Started  {"query":"{ me { id username email role __typename } }"}
+2025-07-11 14:03:42 [[32minfo[39m]: ::1 - - [11/Jul/2025:18:03:42 +0000] "POST /graphql HTTP/1.1" 200 21 "http://localhost:3000/" "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"  
+2025-07-11 14:03:51 [[32minfo[39m]: GraphQL Operation Started  {"query":"{ me { id username email role __typename } }"}
+2025-07-11 14:03:51 [[32minfo[39m]: ::1 - - [11/Jul/2025:18:03:51 +0000] "POST /graphql HTTP/1.1" 200 21 "http://localhost:3000/" "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"  
+2025-07-11 14:04:10 [[32minfo[39m]: GraphQL Operation Started  {"query":"mutation ($login: String!, $password: String!) { signIn(login: $login, password: $password) { token __typename } }"}
+2025-07-11 14:04:10 [[31merror[39m]: Sign in failed  {"login":"demo","error":"Invalid credentials. Please try signing in again"}
+2025-07-11 14:04:10 [[31merror[39m]: GraphQL Error Encountered Invalid credentials. Please try signing in again  {"path":["signIn"],"locations":[{"line":2,"column":3}]}
+2025-07-11 14:04:10 [[31merror[39m]: GraphQL Error Invalid credentials. Please try signing in again  {"code":"UNAUTHENTICATED","path":["signIn"],"locations":[{"line":2,"column":3}]}
+2025-07-11 14:04:10 [[33mwarn[39m]: GraphQL Response with errors  {"errorCount":1}
+2025-07-11 14:04:10 [[32minfo[39m]: ::1 - - [11/Jul/2025:18:04:10 +0000] "POST /graphql HTTP/1.1" 200 175 "http://localhost:3000/" "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"  
+2025-07-11 14:04:28 [[32minfo[39m]: GraphQL Operation Started  {"query":"mutation ($username: String!, $email: String!, $password: String!) { signUp(username: $username, email: $email, password: $password) { token __typename } }"}
+2025-07-11 14:04:28 [[31merror[39m]: Database Error UserInputError: Password does not meet requirements
+    at Object.signUp (/home/maxjeffwell/GitHub_Projects/code-talk-graphql-server/src/resolvers/user.js:58:17)
+    at field.resolve (/home/maxjeffwell/GitHub_Projects/code-talk-graphql-server/node_modules/apollo-server-core/src/utils/schemaInstrumentation.ts:106:18)
+    at executeField (/home/maxjeffwell/GitHub_Projects/code-talk-graphql-server/node_modules/graphql/execution/execute.js:500:20)
+    at /home/maxjeffwell/GitHub_Projects/code-talk-graphql-server/node_modules/graphql/execution/execute.js:385:22
+    at promiseReduce (/home/maxjeffwell/GitHub_Projects/code-talk-graphql-server/node_modules/graphql/jsutils/promiseReduce.js:23:9)
+    at executeFieldsSerially (/home/maxjeffwell/GitHub_Projects/code-talk-graphql-server/node_modules/graphql/execution/execute.js:381:43)
+    at executeOperation (/home/maxjeffwell/GitHub_Projects/code-talk-graphql-server/node_modules/graphql/execution/execute.js:355:14)
+    at execute (/home/maxjeffwell/GitHub_Projects/code-talk-graphql-server/node_modules/graphql/execution/execute.js:136:20)
+    at execute (/home/maxjeffwell/GitHub_Projects/code-talk-graphql-server/node_modules/apollo-server-core/src/requestPipeline.ts:504:34)
+    at processGraphQLRequest (/home/maxjeffwell/GitHub_Projects/code-talk-graphql-server/node_modules/apollo-server-core/src/requestPipeline.ts:410:28)
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at processHTTPRequest (/home/maxjeffwell/GitHub_Projects/code-talk-graphql-server/node_modules/apollo-server-core/src/runHttpQuery.ts:437:24) {"operation":"signUp","error":"Password does not meet requirements"}
+2025-07-11 14:04:28 [[31merror[39m]: GraphQL Error Encountered Database operation failed  {"path":["signUp"],"locations":[{"line":2,"column":3}]}
+2025-07-11 14:04:28 [[31merror[39m]: GraphQL Error Database operation failed  {"code":"DATABASE_ERROR","path":["signUp"],"locations":[{"line":2,"column":3}]}
+2025-07-11 14:04:28 [[33mwarn[39m]: GraphQL Response with errors  {"errorCount":1}
+2025-07-11 14:04:28 [[32minfo[39m]: ::1 - - [11/Jul/2025:18:04:28 +0000] "POST /graphql HTTP/1.1" 200 143 "http://localhost:3000/" "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"  
+2025-07-11 14:09:11 [[32minfo[39m]: GraphQL Operation Started  {"query":"mutation ($username: String!, $email: String!, $password: String!) { signUp(username: $username, email: $email, password: $password) { token __typename } }"}
+2025-07-11 14:09:11 [[31merror[39m]: Database Error UserInputError: Password does not meet requirements
+    at Object.signUp (/home/maxjeffwell/GitHub_Projects/code-talk-graphql-server/src/resolvers/user.js:58:17)
+    at field.resolve (/home/maxjeffwell/GitHub_Projects/code-talk-graphql-server/node_modules/apollo-server-core/src/utils/schemaInstrumentation.ts:106:18)
+    at executeField (/home/maxjeffwell/GitHub_Projects/code-talk-graphql-server/node_modules/graphql/execution/execute.js:500:20)
+    at /home/maxjeffwell/GitHub_Projects/code-talk-graphql-server/node_modules/graphql/execution/execute.js:385:22
+    at promiseReduce (/home/maxjeffwell/GitHub_Projects/code-talk-graphql-server/node_modules/graphql/jsutils/promiseReduce.js:23:9)
+    at executeFieldsSerially (/home/maxjeffwell/GitHub_Projects/code-talk-graphql-server/node_modules/graphql/execution/execute.js:381:43)
+    at executeOperation (/home/maxjeffwell/GitHub_Projects/code-talk-graphql-server/node_modules/graphql/execution/execute.js:355:14)
+    at execute (/home/maxjeffwell/GitHub_Projects/code-talk-graphql-server/node_modules/graphql/execution/execute.js:136:20)
+    at execute (/home/maxjeffwell/GitHub_Projects/code-talk-graphql-server/node_modules/apollo-server-core/src/requestPipeline.ts:504:34)
+    at processGraphQLRequest (/home/maxjeffwell/GitHub_Projects/code-talk-graphql-server/node_modules/apollo-server-core/src/requestPipeline.ts:410:28)
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at processHTTPRequest (/home/maxjeffwell/GitHub_Projects/code-talk-graphql-server/node_modules/apollo-server-core/src/runHttpQuery.ts:437:24) {"operation":"signUp","error":"Password does not meet requirements"}
+2025-07-11 14:09:11 [[31merror[39m]: GraphQL Error Encountered Database operation failed  {"path":["signUp"],"locations":[{"line":2,"column":3}]}
+2025-07-11 14:09:11 [[31merror[39m]: GraphQL Error Database operation failed  {"code":"DATABASE_ERROR","path":["signUp"],"locations":[{"line":2,"column":3}]}
+2025-07-11 14:09:11 [[33mwarn[39m]: GraphQL Response with errors  {"errorCount":1}
+2025-07-11 14:09:11 [[32minfo[39m]: ::1 - - [11/Jul/2025:18:09:11 +0000] "POST /graphql HTTP/1.1" 200 143 "http://localhost:3000/" "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"  
+2025-07-11 14:09:13 [[32minfo[39m]: GraphQL Operation Started  {"query":"mutation ($username: String!, $email: String!, $password: String!) { signUp(username: $username, email: $email, password: $password) { token __typename } }"}
+2025-07-11 14:09:13 [[31merror[39m]: Database Error UserInputError: Password does not meet requirements
+    at Object.signUp (/home/maxjeffwell/GitHub_Projects/code-talk-graphql-server/src/resolvers/user.js:58:17)
+    at field.resolve (/home/maxjeffwell/GitHub_Projects/code-talk-graphql-server/node_modules/apollo-server-core/src/utils/schemaInstrumentation.ts:106:18)
+    at executeField (/home/maxjeffwell/GitHub_Projects/code-talk-graphql-server/node_modules/graphql/execution/execute.js:500:20)
+    at /home/maxjeffwell/GitHub_Projects/code-talk-graphql-server/node_modules/graphql/execution/execute.js:385:22
+    at promiseReduce (/home/maxjeffwell/GitHub_Projects/code-talk-graphql-server/node_modules/graphql/jsutils/promiseReduce.js:23:9)
+    at executeFieldsSerially (/home/maxjeffwell/GitHub_Projects/code-talk-graphql-server/node_modules/graphql/execution/execute.js:381:43)
+    at executeOperation (/home/maxjeffwell/GitHub_Projects/code-talk-graphql-server/node_modules/graphql/execution/execute.js:355:14)
+    at execute (/home/maxjeffwell/GitHub_Projects/code-talk-graphql-server/node_modules/graphql/execution/execute.js:136:20)
+    at execute (/home/maxjeffwell/GitHub_Projects/code-talk-graphql-server/node_modules/apollo-server-core/src/requestPipeline.ts:504:34)
+    at processGraphQLRequest (/home/maxjeffwell/GitHub_Projects/code-talk-graphql-server/node_modules/apollo-server-core/src/requestPipeline.ts:410:28)
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at processHTTPRequest (/home/maxjeffwell/GitHub_Projects/code-talk-graphql-server/node_modules/apollo-server-core/src/runHttpQuery.ts:437:24) {"operation":"signUp","error":"Password does not meet requirements"}
+2025-07-11 14:09:13 [[31merror[39m]: GraphQL Error Encountered Database operation failed  {"path":["signUp"],"locations":[{"line":2,"column":3}]}
+2025-07-11 14:09:13 [[31merror[39m]: GraphQL Error Database operation failed  {"code":"DATABASE_ERROR","path":["signUp"],"locations":[{"line":2,"column":3}]}
+2025-07-11 14:09:13 [[33mwarn[39m]: GraphQL Response with errors  {"errorCount":1}
+2025-07-11 14:09:13 [[32minfo[39m]: ::1 - - [11/Jul/2025:18:09:13 +0000] "POST /graphql HTTP/1.1" 200 143 "http://localhost:3000/" "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"  

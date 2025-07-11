@@ -1,4 +1,5 @@
-import 'dotenv/config';
+import dotenv from 'dotenv';
+dotenv.config();
 import cors from 'cors';
 import { bodyParserGraphQL } from 'body-parser-graphql';
 import morgan from 'morgan';
@@ -13,7 +14,8 @@ import {
   AuthenticationError,
 } from 'apollo-server-express';
 import { execute, subscribe } from 'graphql';
-import { SubscriptionServer } from 'subscriptions-transport-ws';
+import { useServer } from 'graphql-ws/lib/use/ws';
+import { WebSocketServer } from 'ws';
 import { makeExecutableSchema } from '@graphql-tools/schema';
 import depthLimit from 'graphql-depth-limit';
 
@@ -201,13 +203,19 @@ const startServer = async () => {
   const httpServer = http.createServer(app);
   const port = process.env.PORT || 8000;
 
-  // Create WebSocket subscription server
-  const subscriptionServer = SubscriptionServer.create(
+  // Create WebSocket server for subscriptions
+  const wsServer = new WebSocketServer({
+    server: httpServer,
+    path: '/graphql',
+  });
+
+  // Use graphql-ws for handling subscriptions
+  const serverCleanup = useServer(
     {
       schema: executableSchema,
       execute,
       subscribe,
-      onConnect: (connectionParams, webSocket) => {
+      context: async (ctx, msg, args) => {
         logger.info('WebSocket connection established');
         return {
           models,
@@ -220,14 +228,14 @@ const startServer = async () => {
           },
         };
       },
-      onDisconnect: (webSocket) => {
-        logger.info('WebSocket connection disconnected');
+      onConnect: async (ctx) => {
+        logger.info('Client connected');
+      },
+      onDisconnect: async (ctx, code, reason) => {
+        logger.info('Client disconnected', { code, reason });
       },
     },
-    {
-      server: httpServer,
-      path: '/graphql',
-    }
+    wsServer
   );
 
   await sequelize.sync({});
