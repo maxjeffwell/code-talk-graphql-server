@@ -1,11 +1,13 @@
 .env
 
 .idea
+.claude
 
 node_modules
 
 IMPROVEMENT_PLAN.md
 UPDATE_SUMMARY.md
+CLAUDE.md
 
 logfile
 

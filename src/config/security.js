@@ -180,7 +180,6 @@ export const validateEnvironment = () => {
     'DATABASE_URL',
     'JWT_SECRET',
     'REDIS_HOST',
-    'REDIS_PASSWORD',
   ];
   
   const missing = required.filter(key => !process.env[key]);

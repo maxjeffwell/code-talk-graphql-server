@@ -1,20 +1,12 @@
 import { Sequelize } from 'sequelize';
+import { database } from '../config/index.js';
 import User from './user.js';
 import Message from './message.js';
 // import Room from './room.js';
 
 const sequelize = new Sequelize(
-  process.env.DATABASE_URL || process.env.TEST_DATABASE_URL,
-  {
-    dialect: 'postgres',
-    logging: false,
-    pool: {
-      max: 5,
-      min: 0,
-      acquire: 30000,
-      idle: 10000,
-    },
-  },
+  database.url || database.testUrl,
+  database.options
 );
 
 const models = {

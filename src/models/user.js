@@ -1,4 +1,4 @@
-import bcrypt from 'bcryptjs';
+import bcryptjs from 'bcryptjs';
 
 const user = (sequelize, DataTypes) => {
   const User = sequelize.define('user', {
@@ -79,11 +79,11 @@ const user = (sequelize, DataTypes) => {
 
   User.prototype.generatePasswordHash = async function() {
     const saltRounds = 10;
-    return await bcrypt.hash(this.password, saltRounds);
+    return await bcryptjs.hash(this.password, saltRounds);
   };
 
   User.prototype.validatePassword = async function(password) {
-    return await bcrypt.compare(password, this.password);
+    return await bcryptjs.compare(password, this.password);
   };
 
   return User;
