@@ -1,0 +1,55 @@
+
+> code-talk-server@1.0.0 start
+> nodemon --exec babel-node src/index.js
+
+[33m[nodemon] 3.1.10[39m
+[33m[nodemon] to restart at any time, enter `rs`[39m
+[33m[nodemon] watching path(s): *.*[39m
+[33m[nodemon] watching extensions: js,mjs,cjs,json[39m
+[32m[nodemon] starting `babel-node src/index.js`[39m
+Apollo Server is running on http://localhost:8000/graphql
+2025-07-11 12:27:54 [[32minfo[39m]: GraphQL Operation Started  {"query":"{ me { id username } }"}
+2025-07-11 12:27:54 [[32minfo[39m]: ::1 - - [11/Jul/2025:16:27:54 +0000] "POST /graphql HTTP/1.1" 200 21 "-" "curl/8.5.0"  
+2025-07-11 12:31:01 [[32minfo[39m]: ::1 - - [11/Jul/2025:16:31:01 +0000] "GET /graphql HTTP/1.1" 200 - "-" "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"  
+2025-07-11 12:31:03 [[32minfo[39m]: ::1 - - [11/Jul/2025:16:31:03 +0000] "GET /sw.js HTTP/1.1" 404 144 "http://localhost:8000/sw.js" "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"  
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `babel-node src/index.js`[39m
+Apollo Server is running on http://localhost:8000/graphql
+2025-07-11 12:31:13 [[32minfo[39m]: ::1 - - [11/Jul/2025:16:31:13 +0000] "GET /graphql HTTP/1.1" 200 - "-" "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"  
+2025-07-11 12:31:15 [[32minfo[39m]: ::1 - - [11/Jul/2025:16:31:15 +0000] "GET /sw.js HTTP/1.1" 404 144 "http://localhost:8000/sw.js" "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"  
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `babel-node src/index.js`[39m
+Apollo Server is running on http://localhost:8000/graphql
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `babel-node src/index.js`[39m
+Apollo Server is running on http://localhost:8000/graphql
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `babel-node src/index.js`[39m
+Apollo Server is running on http://localhost:8000/graphql
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `babel-node src/index.js`[39m
+Apollo Server is running on http://localhost:8000/graphql
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `babel-node src/index.js`[39m
+Apollo Server is running on http://localhost:8000/graphql
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `babel-node src/index.js`[39m
+Apollo Server is running on http://localhost:8000/graphql
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `babel-node src/index.js`[39m
+Apollo Server is running on http://localhost:8000/graphql
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `babel-node src/index.js`[39m
+Apollo Server is running on http://localhost:8000/graphql
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `babel-node src/index.js`[39m
+Apollo Server is running on http://localhost:8000/graphql
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `babel-node src/index.js`[39m
+Apollo Server is running on http://localhost:8000/graphql
+2025-07-11 12:41:24 [[32minfo[39m]: GraphQL Operation Started  {"query":"{ __schema { queryType { name } } }"}
+2025-07-11 12:41:24 [[32minfo[39m]: ::1 - - [11/Jul/2025:16:41:24 +0000] "POST /graphql HTTP/1.1" 200 53 "-" "curl/8.5.0"  
+2025-07-11 12:41:38 [[32minfo[39m]: GraphQL Operation Started  {"query":"{ me { id username email } }"}
+2025-07-11 12:41:38 [[32minfo[39m]: ::1 - - [11/Jul/2025:16:41:38 +0000] "POST /graphql HTTP/1.1" 200 21 "-" "curl/8.5.0"  
+2025-07-11 12:43:22 [[32minfo[39m]: ::1 - - [11/Jul/2025:16:43:22 +0000] "GET /graphql HTTP/1.1" 200 - "-" "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"  
+2025-07-11 12:43:25 [[32minfo[39m]: ::1 - - [11/Jul/2025:16:43:25 +0000] "GET /sw.js HTTP/1.1" 404 144 "http://localhost:8000/sw.js" "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"  

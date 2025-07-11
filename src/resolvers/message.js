@@ -42,8 +42,8 @@ export default {
             edges[edges.length - 1].createdAt.toString(),
           ),
         },
-      }
-    ),
+      };
+    }),
     message: combineResolvers(
       isAuthenticated,
       async (parent, { id }, { models }) => {
