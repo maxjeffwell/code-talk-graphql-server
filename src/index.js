@@ -12,6 +12,9 @@ import {
   ApolloServer,
   AuthenticationError,
 } from 'apollo-server-express';
+import { execute, subscribe } from 'graphql';
+import { SubscriptionServer } from 'subscriptions-transport-ws';
+import { makeExecutableSchema } from '@graphql-tools/schema';
 import depthLimit from 'graphql-depth-limit';
 
 import schema from './schema';
@@ -21,6 +24,7 @@ import loaders from './loaders';
 import logger from './utils/logger.js';
 import { formatError, errorHandler } from './utils/errors.js';
 import { getUserFromRequest } from './utils/auth.js';
+import pubsub from './subscription';
 
 const app = express();
 
@@ -28,10 +32,10 @@ app.use(
   helmet({
     contentSecurityPolicy: {
       directives: {
-        defaultSrc: ["'self'"],
-        styleSrc: ["'self'", "'unsafe-inline'"],
-        scriptSrc: ["'self'"],
-        imgSrc: ["'self'", 'data:', 'https:'],
+        imgSrc: [`'self'`, 'data:', 'apollo-server-landing-page.cdn.apollographql.com'],
+        scriptSrc: [`'self'`, `https: 'unsafe-inline'`],
+        manifestSrc: [`'self'`, 'apollo-server-landing-page.cdn.apollographql.com'],
+        frameSrc: [`'self'`, 'sandbox.embed.apollographql.com'],
       },
     },
   }),
@@ -47,14 +51,30 @@ const limiter = rateLimit({
 
 app.use(limiter);
 
+// Enhanced CORS configuration with security best practices
 app.use(
   cors({
-    origin: process.env.ALLOWED_ORIGINS
-      ? process.env.ALLOWED_ORIGINS.split(',')
-      : ['http://localhost:3000'],
-    credentials: true,
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
-    optionsSuccessStatus: 200,
+    origin: true, // Allow all origins in development
+    credentials: true, // Allow cookies and authentication headers
+    methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE', 'OPTIONS'],
+    allowedHeaders: [
+      'Origin',
+      'X-Requested-With',
+      'Content-Type',
+      'Accept',
+      'Authorization',
+      'X-Token', // Custom token header
+      'X-Apollo-Tracing' // Apollo GraphQL tracing
+    ],
+    exposedHeaders: [
+      'X-Total-Count',
+      'X-RateLimit-Limit',
+      'X-RateLimit-Remaining',
+      'X-RateLimit-Reset'
+    ],
+    maxAge: 86400, // 24 hours preflight cache
+    optionsSuccessStatus: 200, // For legacy browser support
+    preflightContinue: false // Handle preflight internally
   }),
 );
 
@@ -79,12 +99,17 @@ const getMe = async req => {
   }
 };
 
-const server = new ApolloServer({
-  introspection: process.env.NODE_ENV === 'development',
-  playground: false, // Disabled for security
-  debug: process.env.NODE_ENV === 'development',
+// Create executable schema
+const executableSchema = makeExecutableSchema({
   typeDefs: schema,
   resolvers,
+});
+
+const server = new ApolloServer({
+  introspection: process.env.NODE_ENV === 'development',
+  playground: true,
+  debug: process.env.NODE_ENV === 'development',
+  schema: executableSchema,
   formatError,
   validationRules: [
     depthLimit(10) // Limit query depth to 10 levels
@@ -125,6 +150,7 @@ const server = new ApolloServer({
     if (connection) {
       return {
         models,
+        pubsub,
         loaders: {
           message: new DataLoader(keys => loaders.message.batchMessages(keys, models)),
           messagesByUser: new DataLoader(keys => loaders.message.batchMessagesByUser(keys, models)),
@@ -140,6 +166,7 @@ const server = new ApolloServer({
       return {
         models,
         me,
+        pubsub,
         loaders: {
           message: new DataLoader(keys => loaders.message.batchMessages(keys, models)),
           messagesByUser: new DataLoader(keys => loaders.message.batchMessagesByUser(keys, models)),
@@ -154,7 +181,11 @@ const server = new ApolloServer({
 
 const startServer = async () => {
   await server.start();
-  server.applyMiddleware({ app, path: '/graphql' });
+  server.applyMiddleware({ 
+    app, 
+    path: '/graphql',
+    cors: false // Use our custom CORS middleware instead
+  });
 
   if (process.env.NODE_ENV === 'production') {
     app.use(express.static('client/build'));
@@ -168,13 +199,44 @@ const startServer = async () => {
   }
 
   const httpServer = http.createServer(app);
-
   const port = process.env.PORT || 8000;
+
+  // Create WebSocket subscription server
+  const subscriptionServer = SubscriptionServer.create(
+    {
+      schema: executableSchema,
+      execute,
+      subscribe,
+      onConnect: (connectionParams, webSocket) => {
+        logger.info('WebSocket connection established');
+        return {
+          models,
+          pubsub,
+          loaders: {
+            message: new DataLoader(keys => loaders.message.batchMessages(keys, models)),
+            messagesByUser: new DataLoader(keys => loaders.message.batchMessagesByUser(keys, models)),
+            user: new DataLoader(keys => loaders.user.batchUsers(keys, models)),
+            usersByEmail: new DataLoader(keys => loaders.user.batchUsersByEmail(keys, models)),
+          },
+        };
+      },
+      onDisconnect: (webSocket) => {
+        logger.info('WebSocket connection disconnected');
+      },
+    },
+    {
+      server: httpServer,
+      path: '/graphql',
+    }
+  );
 
   await sequelize.sync({});
   httpServer.listen({ port }, () => {
     console.log(
       `Apollo Server is running on http://localhost:${port}/graphql`,
+    );
+    console.log(
+      `WebSocket subscriptions ready at ws://localhost:${port}/graphql`,
     );
   });
 };
