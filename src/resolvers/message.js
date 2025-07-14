@@ -14,21 +14,24 @@ export default {
   Query: {
     messages: combineResolvers(
       isAuthenticated,
-      async (parent, { cursor, limit = 10 }, { models }) => {
-      const cursorOptions = cursor
-        ? {
-          where: {
-            createdAt: {
-              [Sequelize.Op.lt]: fromCursorHash(cursor),
-            },
+      async (parent, { cursor, limit = 10, roomId }, { models }) => {
+      const whereClause = {
+        ...(cursor && {
+          createdAt: {
+            [Sequelize.Op.lt]: fromCursorHash(cursor),
           },
-        }
-        : {};
+        }),
+        ...(roomId !== undefined && { 
+          roomId: roomId === null ? null : (
+            Number.isInteger(Number(roomId)) ? parseInt(roomId, 10) : null
+          )
+        }),
+      };
 
       const messages = await models.Message.findAll({
         order: [['createdAt', 'DESC']],
         limit: limit + 1,
-        ...cursorOptions,
+        where: whereClause,
       });
 
       const hasNextPage = messages.length > limit;
@@ -55,11 +58,17 @@ export default {
   Mutation: {
     createMessage: combineResolvers(
       isAuthenticated,
-      async (parent, { text }, { models, me }) => {
+      async (parent, { text, roomId }, { models, me }) => {
         const sanitizedText = DOMPurify.sanitize(text);
         const message = await models.Message.create({
           text: sanitizedText,
           userId: me.id,
+          // roomId is optional and can be null for global messages
+          ...(roomId !== undefined && { 
+            roomId: roomId === null ? null : (
+              Number.isInteger(Number(roomId)) ? parseInt(roomId, 10) : null
+            )
+          }),
         });
 
         PubSub.publish(EVENTS.MESSAGE.CREATED, {
@@ -74,9 +83,23 @@ export default {
       isAuthenticated,
       isMessageOwner,
       async (parent, { id }, { models }) => {
-        const messageDeleted = await models.Message.destroy({ where: { id } });
-        // PubSub.publish(EVENTS.MESSAGE.DELETED, { messageDeleted });
-        return messageDeleted;
+        const messageId = parseInt(id, 10);
+        
+        // Get the message before deleting to return it
+        const message = await models.Message.findByPk(messageId);
+        
+        if (!message) {
+          throw new Error('Message not found');
+        }
+        
+        const deletedCount = await models.Message.destroy({ where: { id: messageId } });
+        
+        if (deletedCount === 0) {
+          throw new Error('Message could not be deleted');
+        }
+        
+        PubSub.publish(EVENTS.MESSAGE.DELETED, { messageDeleted: message });
+        return message;
       },
     ),
   },
@@ -91,8 +114,8 @@ export default {
     messageCreated: {
       subscribe: () => PubSub.asyncIterator(EVENTS.MESSAGE.CREATED),
     },
-    // messageDeleted: {
-    // subscribe: () => PubSub.asyncIterator(EVENTS.MESSAGE.DELETED),
-    // },
+    messageDeleted: {
+      subscribe: () => PubSub.asyncIterator(EVENTS.MESSAGE.DELETED),
     },
+  },
   };

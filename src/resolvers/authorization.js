@@ -12,7 +12,12 @@ export const isAdmin = combineResolvers(
 );
 
 export const isMessageOwner = async (parent, { id }, { models, me}) => {
-  const message = await models.Message.findByPk(id, { raw: true });
+  const messageId = parseInt(id, 10);
+  const message = await models.Message.findByPk(messageId, { raw: true });
+
+  if (!message) {
+    throw new ForbiddenError('Message not found');
+  }
 
   if (message.userId !== me.id) {
     throw new ForbiddenError('Not authenticated as message owner');

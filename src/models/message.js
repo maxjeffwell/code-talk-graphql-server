@@ -7,15 +7,11 @@ const message = (sequelize, DataTypes) => {
         notEmpty: true,
       },
     },
+    roomId: {
+      type: DataTypes.INTEGER,
+      allowNull: true, // Allow null for global messages
+    },
   });
-  // roomId: {
-  //   type: DataTypes.INTEGER,
-  //   allowNull: false,
-  // },
-  // userId: {
-  //   type: DataTypes.INTEGER,
-  //   allowNull: false,
-  // }
 
   Message.associate = models => {
     Message.belongsTo(models.User, {
