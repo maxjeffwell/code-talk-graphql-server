@@ -3,7 +3,7 @@ import { GraphQLDateTime } from 'graphql-iso-date';
 import userResolvers from '../resolvers/user';
 import messageResolvers from '../resolvers/message';
 // import roomResolvers from '../resolvers/room';
-import editorResolvers from '../resolvers/editor';
+import editorResolvers from '../resolvers/editor-minimal';
 
 const customScalarResolver = {
   Date: GraphQLDateTime,
