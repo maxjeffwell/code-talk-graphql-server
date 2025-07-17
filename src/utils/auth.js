@@ -2,11 +2,16 @@ import jwt from 'jsonwebtoken';
 import { AuthenticationError } from 'apollo-server-express';
 import logger from './logger.js';
 import { TokenExpiredError } from './errors.js';
+import dotenv from 'dotenv';
+
+// Ensure dotenv is loaded before accessing environment variables
+dotenv.config();
 
 const JWT_SECRET = process.env.JWT_SECRET || '!Pa2z!re3^srbz6oWQ&3kAX579M^uq22';
 const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || JWT_SECRET + '_refresh';
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '15m';
 const JWT_REFRESH_EXPIRES_IN = process.env.JWT_REFRESH_EXPIRES_IN || '7d';
+
 
 // Validate JWT_SECRET is available
 if (!JWT_SECRET) {
