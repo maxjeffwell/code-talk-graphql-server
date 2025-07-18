@@ -23,6 +23,12 @@ export const database = {
   options: {
     dialect: 'postgres',
     logging: server.isDevelopment ? console.log : false,
+    dialectOptions: {
+      ssl: {
+        require: true,
+        rejectUnauthorized: false,
+      },
+    },
     pool: {
       max: parseInt(process.env.DB_POOL_MAX, 10) || 5,
       min: parseInt(process.env.DB_POOL_MIN, 10) || 0,
