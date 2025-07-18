@@ -25,9 +25,6 @@
   "author": "Jeff Maxwell <maxjeffwell@gmail.com>",
   "license": "GNU GPLv3",
   "devDependencies": {
-    "@babel/core": "^7.28.0",
-    "@babel/node": "^7.28.0",
-    "@babel/preset-env": "^7.28.0",
     "@babel/register": "^7.27.1",
     "axios": "^1.7.9",
     "babel-eslint": "^10.1.0",
@@ -42,6 +39,9 @@
     "prettier": "^3.3.3"
   },
   "dependencies": {
+    "@babel/core": "^7.28.0",
+    "@babel/node": "^7.28.0",
+    "@babel/preset-env": "^7.28.0",
     "@graphql-tools/schema": "^10.0.23",
     "apollo-server-express": "^3.13.0",
     "bcryptjs": "^3.0.2",
