@@ -56,7 +56,9 @@ app.use(limiter);
 // Enhanced CORS configuration with security best practices
 app.use(
   cors({
-    origin: true, // Allow all origins in development
+    origin: process.env.NODE_ENV === 'production' 
+      ? process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : false
+      : true, // Allow all origins in development only
     credentials: true, // Allow cookies and authentication headers
     methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE', 'OPTIONS'],
     allowedHeaders: [
@@ -108,8 +110,8 @@ const executableSchema = makeExecutableSchema({
 });
 
 const server = new ApolloServer({
-  introspection: process.env.NODE_ENV === 'development',
-  playground: true,
+  introspection: process.env.ENABLE_INTROSPECTION === 'true' || process.env.NODE_ENV === 'development',
+  playground: process.env.ENABLE_PLAYGROUND === 'true' || process.env.NODE_ENV === 'development',
   debug: process.env.NODE_ENV === 'development',
   schema: executableSchema,
   formatError,

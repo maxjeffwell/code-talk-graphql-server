@@ -4,14 +4,16 @@
   "description": "",
   "main": "index.js",
   "engines": {
-    "node": "18.x"
+    "node": "18.x",
+    "npm": ">=8.0.0"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/npm/npm.git"
   },
   "scripts": {
-    "start": "nodemon --exec babel-node src/index.js",
+    "start": "babel-node src/index.js",
+    "dev": "nodemon --exec babel-node src/index.js",
     "test:run-server": "TEST_DATABASE_URL=process.env.TEST_DATABASE_URL npm start",
     "test:execute-test": "mocha --require @babel/register 'src/**/*.spec.js'",
     "test": "echo \"No test specified\" && exit 0",
