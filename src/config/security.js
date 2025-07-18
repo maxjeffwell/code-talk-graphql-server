@@ -179,10 +179,14 @@ export const validateEnvironment = () => {
   const required = [
     'DATABASE_URL',
     'JWT_SECRET',
-    'REDIS_HOST',
   ];
   
   const missing = required.filter(key => !process.env[key]);
+  
+  // Check for Redis configuration - either REDIS_URL or REDIS_HOST
+  if (!process.env.REDIS_URL && !process.env.REDIS_HOST) {
+    missing.push('REDIS_URL or REDIS_HOST');
+  }
   
   if (missing.length > 0) {
     throw new Error(`Missing required environment variables: ${missing.join(', ')}`);
