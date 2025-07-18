@@ -2,6 +2,7 @@ language: node_js
 node_js: node
 services:
 - postgresql
+- redis
 cache:
   directories:
   - node_modules
@@ -14,7 +15,7 @@ env:
 deploy:
   provider: heroku
   api_key:
-    secure: Z1YgqZ7a6e1Vigab/Nb/SdM//dqEsQThamWfTASd66uOks6MIYOUTKWQE9yoXhpTVymTfo+52dRKdt1tvmdfBl8432c3ANZKJZKp70i2/vqwdUD3SLG1EYaDCp4zq1U5rAjldhRvtVlwm5ePm8UheIFFRme+DAM/jaKNDzUBLEydg7QVWjvD9LclTq2S4e0lFXBnsKBzwvA9l77BDS0rrgi2jnIxuh0w6q30Ued0DeLCCqGg78Ovm9LREj5Vf9uJmG+L1iWgBVoOmzfnTWVXuGhqNa9Oi/A3x+114rFqCk42+lqDKexNvQrdD3cC4z94pfuAzFso3Q6f/HynIbXyvdmbyjZlk2km7H7luMD2uoUDQJLpLPKzHv+JSslirPDVlD8HqeMcH0kMepRnMPcEbkt+dDSLhUK/QOvt54mPNW3c3sg52FSq05R+uo+NQVLcYfD8l2oclXCcbBJbs6/bGTJazaxHp8h7Dbno8C0s8VqDFvBtD/o0OBbjEoan5xJoyElogegqps05ncDpe+jHNpWYCiTbmbiqLvFDbskX4iD2eA8laKNNfa6ijOtH28f/bT88NXbayR8H10ZlxpuU0l1JPgnR6w8wumLfeT6mJr6vMHBDniMwK6uhW6bF0pSmxC8Q9UlVJYQj2G9FpgnaBMwIWrBmaCGxeUZ6/it9354=
-  app: jmaxwell-code-talk-server
+    secure: HRKU-AAxaRf4F7aoZdwlExhiGfcz6ojqpD8RVag4g55skIy6Q_____wJL8iKbRivg
+  app: code-talk-server
   on:
     repo: maxjeffwell/code-talk-graphql-server
