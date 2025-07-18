@@ -57,7 +57,7 @@ app.use(limiter);
 app.use(
   cors({
     origin: process.env.NODE_ENV === 'production' 
-      ? process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : false
+      ? process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : ['https://code-talk-client-c46118c24c30.herokuapp.com']
       : true, // Allow all origins in development only
     credentials: true, // Allow cookies and authentication headers
     methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE', 'OPTIONS'],
@@ -68,6 +68,7 @@ app.use(
       'Accept',
       'Authorization',
       'X-Token', // Custom token header
+      'x-token', // Lowercase variant
       'X-Apollo-Tracing' // Apollo GraphQL tracing
     ],
     exposedHeaders: [
