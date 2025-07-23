@@ -19,7 +19,8 @@
     "test": "echo \"No test specified\" && exit 0",
     "seed": "babel-node src/seeders/index.js",
     "seed:drop": "babel-node src/seeders/index.js --drop",
-    "seed:force": "babel-node src/seeders/index.js --force"
+    "seed:force": "babel-node src/seeders/index.js --force",
+    "seed:rooms": "babel-node src/scripts/seed-rooms.js"
   },
   "keywords": [],
   "author": "Jeff Maxwell <maxjeffwell@gmail.com>",

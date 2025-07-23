@@ -25,40 +25,17 @@ import models, { sequelize } from './models';
 import loaders from './loaders';
 import logger from './utils/logger.js';
 import { formatError, errorHandler } from './utils/errors.js';
-import { getUserFromRequest } from './utils/auth.js';
+import { getUserFromRequest, verifyToken } from './utils/auth.js';
 import pubsub from './subscription';
 
 const app = express();
 
-app.use(
-  helmet({
-    contentSecurityPolicy: {
-      directives: {
-        imgSrc: [`'self'`, 'data:', 'apollo-server-landing-page.cdn.apollographql.com'],
-        scriptSrc: [`'self'`, `https: 'unsafe-inline'`],
-        manifestSrc: [`'self'`, 'apollo-server-landing-page.cdn.apollographql.com'],
-        frameSrc: [`'self'`, 'sandbox.embed.apollographql.com'],
-      },
-    },
-  }),
-);
-
-const limiter = rateLimit({
-  windowMs: 1 * 60 * 1000, // 1 minute
-  max: 100, // limit each IP to 100 requests per windowMs
-  message: 'Too many requests from this IP, please try again later.',
-  standardHeaders: true,
-  legacyHeaders: false,
-});
-
-app.use(limiter);
-
-// Enhanced CORS configuration with security best practices
+// Enhanced CORS configuration with security best practices - MUST BE FIRST
 app.use(
   cors({
     origin: process.env.NODE_ENV === 'production' 
       ? process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : ['https://code-talk-client-c46118c24c30.herokuapp.com']
-      : true, // Allow all origins in development only
+      : ['http://localhost:3000', 'http://localhost:3001'], // Explicitly allow localhost ports in development
     credentials: true, // Allow cookies and authentication headers
     methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE', 'OPTIONS'],
     allowedHeaders: [
@@ -82,6 +59,23 @@ app.use(
     preflightContinue: false // Handle preflight internally
   }),
 );
+
+app.use(
+  helmet({
+    contentSecurityPolicy: false, // Disable CSP for now to avoid conflicts
+    crossOriginEmbedderPolicy: false,
+  }),
+);
+
+const limiter = rateLimit({
+  windowMs: 1 * 60 * 1000, // 1 minute
+  max: 100, // limit each IP to 100 requests per windowMs
+  message: 'Too many requests from this IP, please try again later.',
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+app.use(limiter);
 
 app.use(bodyParserGraphQL());
 
@@ -159,6 +153,7 @@ const server = new ApolloServer({
         loaders: {
           message: new DataLoader(keys => loaders.message.batchMessages(keys, models)),
           messagesByUser: new DataLoader(keys => loaders.message.batchMessagesByUser(keys, models)),
+          room: new DataLoader(keys => loaders.room.batchRooms(keys, models)),
           user: new DataLoader(keys => loaders.user.batchUsers(keys, models)),
           usersByEmail: new DataLoader(keys => loaders.user.batchUsersByEmail(keys, models)),
         },
@@ -175,7 +170,7 @@ const server = new ApolloServer({
         loaders: {
           message: new DataLoader(keys => loaders.message.batchMessages(keys, models)),
           messagesByUser: new DataLoader(keys => loaders.message.batchMessagesByUser(keys, models)),
-          // room: new DataLoader(keys => loaders.room.batchRooms(keys, models)),
+          room: new DataLoader(keys => loaders.room.batchRooms(keys, models)),
           user: new DataLoader(keys => loaders.user.batchUsers(keys, models)),
           usersByEmail: new DataLoader(keys => loaders.user.batchUsersByEmail(keys, models)),
         },
@@ -220,7 +215,29 @@ const startServer = async () => {
       subscribe,
       context: async (ctx, msg, args) => {
         logger.info('WebSocket connection established');
+        
+        // Extract authentication from connection params
+        let me = null;
+        const connectionParams = ctx.connectionParams || {};
+        const token = connectionParams['x-token'] || connectionParams['authorization']?.replace('Bearer ', '');
+        
+        if (token) {
+          try {
+            me = verifyToken(token);
+            logger.info('WebSocket user authenticated', {
+              userId: me.id,
+              username: me.username
+            });
+          } catch (error) {
+            logger.warn('WebSocket authentication failed', {
+              error: error.message,
+              token: token.substring(0, 10) + '...'
+            });
+          }
+        }
+        
         return {
+          me,
           models,
           pubsub,
           loaders: {

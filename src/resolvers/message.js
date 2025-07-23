@@ -108,14 +108,44 @@ export default {
     user: async (message, args, { loaders }) => {
       return await loaders.user.load(message.userId);
     },
+    room: async (message, args, { loaders }) => {
+      return message.roomId ? await loaders.room.load(message.roomId) : null;
+    },
   },
 
   Subscription: {
     messageCreated: {
-      subscribe: () => PubSub.asyncIterator(EVENTS.MESSAGE.CREATED),
+      subscribe: combineResolvers(
+        isAuthenticated,
+        (parent, { roomId }, { me }) => {
+          return PubSub.asyncIterator(EVENTS.MESSAGE.CREATED);
+        }
+      ),
+      resolve: (payload, { roomId }) => {
+        if (roomId !== undefined) {
+          const messageRoomId = payload.messageCreated.message.roomId;
+          
+          // For global chat subscription (roomId === null)
+          // Only show messages without a roomId
+          if (roomId === null && messageRoomId !== null) return null;
+          
+          // For room-specific subscription (roomId !== null)
+          // Only show messages for that specific room
+          if (roomId !== null) {
+            // Filter out global messages from room subscriptions
+            if (messageRoomId === null) return null;
+            // Filter out messages from other rooms
+            if (messageRoomId !== parseInt(roomId, 10)) return null;
+          }
+        }
+        return payload.messageCreated;
+      },
     },
     messageDeleted: {
-      subscribe: () => PubSub.asyncIterator(EVENTS.MESSAGE.DELETED),
+      subscribe: combineResolvers(
+        isAuthenticated,
+        () => PubSub.asyncIterator(EVENTS.MESSAGE.DELETED)
+      ),
     },
   },
   };

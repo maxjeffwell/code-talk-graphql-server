@@ -20,17 +20,14 @@ const message = (sequelize, DataTypes) => {
         field: 'userId',
       },
     });
+    Message.belongsTo(models.Room, {
+      foreignKey: {
+        name: 'roomId',
+        field: 'roomId',
+      },
+      onDelete: 'CASCADE',
+    });
   };
-
-  // Message.associate = (models) => {
-  //   Message.belongsTo(models.Room, {
-  //     foreignKey: {
-  //       name: 'roomId',
-  //       field: 'roomId',
-  //     },
-  //     onDelete: 'CASCADE',
-  //   });
-  // };
 
   return Message;
 };

@@ -12,7 +12,7 @@ export default gql`
     }
 
     extend type Subscription {
-        messageCreated: MessageCreated!
+        messageCreated(roomId: ID): MessageCreated
         messageDeleted: Message!
     }
     
@@ -33,7 +33,7 @@ export default gql`
         user: User!
         userId: ID!
         roomId: ID
-#        room: Room
+        room: Room
     }
     
     type MessageCreated {
