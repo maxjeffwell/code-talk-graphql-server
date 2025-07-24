@@ -1,7 +1,7 @@
 # Code Talk Server
 
 <div align="center">
-  
+
 ![GraphQL](https://img.shields.io/badge/GraphQL-E10098?style=for-the-badge&logo=graphql&logoColor=white)
 ![Apollo-GraphQL](https://img.shields.io/badge/-ApolloGraphQL-311C87?style=for-the-badge&logo=apollo-graphql)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white)
@@ -30,8 +30,7 @@ Code Talk Server is a robust GraphQL API backend that powers real-time code coll
 
 ## 🔗 Live Demo
 
-- **[GraphQL Playground](https://jmaxwell-code-talk-server.herokuapp.com/graphql)** - Explore the API
-- **[Live Application](https://jmaxwell-code-talk-client.herokuapp.com)** - See it in action
+- **[GraphQL Playground](https://code-talk-server-5f982138903e.herokuapp.com/graphql)** - Explore the API
 - **[Client Repository](https://github.com/maxjeffwell/code-talk-graphql-client)** - Frontend code
 
 ### Demo Accounts
@@ -368,7 +367,7 @@ This project is licensed under the GNU GPLv3 License - see the [LICENSE](LICENSE
 ---
 
 <div align="center">
-  
+
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg?style=for-the-badge)](https://www.gnu.org/licenses/gpl-3.0)
 [![npm version](https://img.shields.io/badge/npm-6.14.4-red.svg?style=for-the-badge)](https://www.npmjs.com/)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=for-the-badge)](http://makeapullrequest.com)
