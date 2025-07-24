@@ -76,7 +76,7 @@ You can retrieve a token by performing a login mutation and requesting the token
 * Github
 * Heroku
 * Heroku Redis
-* ElephantSQL
+* Heroku PostgreSQL
 
 **Optimizations**
 * Cursor-based pagination
@@ -90,7 +90,7 @@ input of text in the textarea are not able to see that prior textarea history.
 
 ## Meta
 
-by Jeff Maxwell [maxjeffwell@gmail.com](mailto:maxjeffwell@gmail.com) | [https://github.com/maxjeffwell](https://github.com/maxjeffwell) | [https://www.jeffmaxwell.dev](https://www.jeffmaxwell.dev)
+by Jeff Maxwell [maxjeffwell@gmail.com](mailto:maxjeffwell@gmail.com) | [https://github.com/maxjeffwell](https://github.com/maxjeffwell) | [https://www.el-jefe.me](https://www.el-jefe.me)
 
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg?style=for-the-badge&color=30d403)](https://www.gnu.org/licenses/gpl-3.0)
 Distributed under the GNU GPLv3 License. See ``LICENSE`` for more information.
