@@ -33,7 +33,7 @@ const app = express();
 // Enhanced CORS configuration with security best practices - MUST BE FIRST
 app.use(
   cors({
-    origin: process.env.NODE_ENV === 'production' 
+    origin: process.env.NODE_ENV === 'production'
       ? process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : ['https://code-talk-client-c46118c24c30.herokuapp.com']
       : ['http://localhost:3000', 'http://localhost:3001'], // Explicitly allow localhost ports in development
     credentials: true, // Allow cookies and authentication headers
@@ -105,8 +105,8 @@ const executableSchema = makeExecutableSchema({
 });
 
 const server = new ApolloServer({
-  introspection: process.env.ENABLE_INTROSPECTION === 'true' || process.env.NODE_ENV === 'development',
-  playground: process.env.ENABLE_PLAYGROUND === 'true' || process.env.NODE_ENV === 'development',
+  introspection: true,
+  playground: true,
   debug: process.env.NODE_ENV === 'development',
   schema: executableSchema,
   formatError,
@@ -181,8 +181,8 @@ const server = new ApolloServer({
 
 const startServer = async () => {
   await server.start();
-  server.applyMiddleware({ 
-    app, 
+  server.applyMiddleware({
+    app,
     path: '/graphql',
     cors: false // Use our custom CORS middleware instead
   });
@@ -215,12 +215,12 @@ const startServer = async () => {
       subscribe,
       context: async (ctx, msg, args) => {
         logger.info('WebSocket connection established');
-        
+
         // Extract authentication from connection params
         let me = null;
         const connectionParams = ctx.connectionParams || {};
         const token = connectionParams['x-token'] || connectionParams['authorization']?.replace('Bearer ', '');
-        
+
         if (token) {
           try {
             me = verifyToken(token);
@@ -235,7 +235,7 @@ const startServer = async () => {
             });
           }
         }
-        
+
         return {
           me,
           models,
