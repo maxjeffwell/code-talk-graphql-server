@@ -16,6 +16,7 @@ export default gql`
     
     type Token {
         token: String!
+        refreshToken: String!
     }
     
     type User {
