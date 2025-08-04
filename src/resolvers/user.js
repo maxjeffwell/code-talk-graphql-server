@@ -86,6 +86,10 @@ export default {
           refreshToken: tokens.refreshToken
         };
       } catch (error) {
+        // Re-throw validation and authentication errors without modification
+        if (error instanceof UserInputError || error instanceof AuthenticationError) {
+          throw error;
+        }
         return handleDatabaseError(error, 'signUp');
       }
     },
