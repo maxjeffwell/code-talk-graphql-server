@@ -360,7 +360,7 @@ This project is licensed under the GNU GPLv3 License - see the [LICENSE](LICENSE
 ## 👤 Author
 
 **Jeff Maxwell**
-- Email: [maxjeffwell@gmail.com](mailto:maxjeffwell@gmail.com)
+- Email: [jeff@el-jefe.me](mailto:jeff@el-jefe.me)
 - GitHub: [@maxjeffwell](https://github.com/maxjeffwell)
 - Portfolio: [https://www.el-jefe.me](https://www.el-jefe.me)
 

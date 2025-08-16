@@ -101,3 +101,5 @@ WebSocket subscriptions ready at ws://localhost:8000/graphql
 2025-08-03 21:36:26 [[31merror[39m]: GraphQL Error Database operation failed  {"code":"DATABASE_ERROR","path":["signUp"],"locations":[{"line":2,"column":3}]}
 2025-08-03 21:36:26 [[33mwarn[39m]: GraphQL Response with errors  {"errorCount":1}
 2025-08-03 21:36:26 [[32minfo[39m]: ::1 - - [04/Aug/2025:01:36:26 +0000] "POST /graphql HTTP/1.1" 200 143 "http://localhost:3001/" "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Mobile Safari/537.36"  
+[ioredis] Unhandled error event: Error: read ECONNRESET
+    at TLSWrap.onStreamRead (node:internal/stream_base_commons:216:20)
