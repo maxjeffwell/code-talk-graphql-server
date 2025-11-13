@@ -1,0 +1,63 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master, develop]
+  pull_request:
+    branches: [main, master, develop]
+
+permissions:
+  contents: read
+  packages: write
+  security-events: write
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npm test
+        env:
+          CI: true
+
+      - name: Build Docker image (without push)
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile
+          target: production
+          push: false
+          load: true
+          tags: code-talk-graphql-server:ci-test
+
+      - name: Test Docker image
+        run: |
+          docker run --rm -d --name test-server \
+            -e NODE_ENV=test \
+            -e PORT=8000 \
+            -e DATABASE_URL=postgresql://test:test@localhost:5432/test \
+            -e JWT_SECRET=test_secret \
+            -e REDIS_HOST=localhost \
+            -e REDIS_PORT=6379 \
+            code-talk-graphql-server:ci-test
+
+          sleep 5
+          docker logs test-server
+          docker stop test-server || true
