@@ -23,7 +23,7 @@ export const database = {
   options: {
     dialect: 'postgres',
     logging: server.isDevelopment ? console.log : false,
-    dialectOptions: server.isProduction ? {
+    dialectOptions: server.isProduction || process.env.DB_SSL === 'true' ? {
       ssl: {
         require: true,
         rejectUnauthorized: false,
@@ -60,6 +60,9 @@ export const redis = {
   user: process.env.REDIS_USER,
   db: parseInt(process.env.REDIS_DB, 10) || 0,
   keyPrefix: process.env.REDIS_KEY_PREFIX || 'code-talk:',
+  tls: process.env.REDIS_TLS === 'true' || (process.env.REDIS_URL && process.env.REDIS_URL.startsWith('rediss:')) ? {
+    rejectUnauthorized: false
+  } : undefined,
   retryStrategy: (times) => {
     const delay = Math.min(times * 50, 2000);
     return delay;

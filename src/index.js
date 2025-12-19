@@ -33,9 +33,9 @@ const app = express();
 // Enhanced CORS configuration with security best practices - MUST BE FIRST
 app.use(
   cors({
-    origin: process.env.NODE_ENV === 'production'
-      ? process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : ['https://code-talk-client-c46118c24c30.herokuapp.com']
-      : ['http://localhost:3000', 'http://localhost:3001'], // Explicitly allow localhost ports in development
+    origin: process.env.ALLOWED_ORIGINS
+      ? process.env.ALLOWED_ORIGINS.split(',')
+      : ['http://localhost:3000', 'http://localhost:3001'],
     credentials: true, // Allow cookies and authentication headers
     methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE', 'OPTIONS'],
     allowedHeaders: [
