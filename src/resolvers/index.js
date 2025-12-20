@@ -4,6 +4,7 @@ import userResolvers from '../resolvers/user';
 import messageResolvers from '../resolvers/message';
 import roomResolvers from '../resolvers/room';
 import editorResolvers from '../resolvers/editor-minimal';
+import aiResolvers from '../resolvers/ai';
 
 const customScalarResolver = {
   Date: DateTimeResolver,
@@ -15,4 +16,5 @@ export default [
   messageResolvers,
   roomResolvers,
   editorResolvers,
+  aiResolvers,
 ];

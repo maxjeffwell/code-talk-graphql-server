@@ -4,10 +4,11 @@ import userSchema from './user';
 import messageSchema from './message';
 import roomSchema from './room';
 import editorSchema from './editor';
+import aiSchema from './ai';
 
 const linkSchema = gql`
     scalar Date
-    
+
     type Query {
         _: Boolean
     }
@@ -19,4 +20,4 @@ const linkSchema = gql`
     }
 `;
 
-export default [linkSchema, userSchema, messageSchema, roomSchema, editorSchema];
+export default [linkSchema, userSchema, messageSchema, roomSchema, editorSchema, aiSchema];

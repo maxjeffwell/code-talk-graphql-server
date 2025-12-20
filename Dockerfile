@@ -10,7 +10,7 @@ COPY package*.json ./
 
 # Install production dependencies only
 RUN npm ci --only=production && \
-    npm cache clean --force
+  npm cache clean --force
 
 # Install babel-node for production
 RUN npm install @babel/node @babel/core @babel/preset-env
@@ -20,8 +20,8 @@ COPY . .
 
 # Create non-root user
 RUN addgroup -g 1001 -S nodejs && \
-    adduser -S nodejs -u 1001 && \
-    chown -R nodejs:nodejs /app
+  adduser -S nodejs -u 1001 && \
+  chown -R nodejs:nodejs /app
 
 USER nodejs
 
