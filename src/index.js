@@ -22,6 +22,9 @@ import depthLimit from 'graphql-depth-limit';
 import schema from './schema';
 import resolvers from './resolvers';
 import models, { sequelize } from './models';
+
+// Log AI routes registration
+console.log('AI routes registered successfully');
 import loaders from './loaders';
 import logger from './utils/logger.js';
 import { formatError, errorHandler } from './utils/errors.js';
