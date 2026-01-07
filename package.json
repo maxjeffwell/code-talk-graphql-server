@@ -66,7 +66,6 @@
     "isomorphic-dompurify": "^2.26.0",
     "jsonwebtoken": "^9.0.2",
     "morgan": "^1.10.0",
-    "node-fetch": "^3.3.2",
     "npm-check-updates": "^18.0.1",
     "pg": "^8.16.3",
     "sequelize": "^6.37.7",
