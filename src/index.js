@@ -33,6 +33,10 @@ import pubsub from './subscription';
 
 const app = express();
 
+// Trust proxy headers when behind reverse proxy (Kubernetes Ingress/Traefik)
+// This allows Express to correctly read X-Forwarded-For and other proxy headers
+app.set('trust proxy', true);
+
 // Enhanced CORS configuration with security best practices - MUST BE FIRST
 app.use(
   cors({
