@@ -1,8 +1,6 @@
 const AI_GATEWAY_URL = process.env.AI_GATEWAY_URL || 'http://shared-ai-gateway:8002';
 
-// Use Node.js built-in fetch (available in Node 18+)
-// No need for node-fetch package since we require Node 18+
-const fetch = global.fetch;
+// Note: fetch is a global in Node 18+, we use it directly without assignment
 
 export default {
   Query: {
