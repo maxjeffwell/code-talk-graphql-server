@@ -10,6 +10,14 @@ export default gql`
 
   extend type Mutation {
     """
+    Send a message to the AI assistant and get a response
+    """
+    sendAIMessage(
+      content: String!
+      conversationHistory: [ChatMessageInput!]
+    ): AIMessageResponse!
+
+    """
     Explain a code snippet
     """
     explainCode(
@@ -34,6 +42,20 @@ export default gql`
       difficulty: String
       count: Int
     ): CodeQuiz!
+  }
+
+  input ChatMessageInput {
+    role: String!
+    content: String!
+  }
+
+  type AIMessageResponse {
+    id: ID!
+    content: String!
+    role: String!
+    timestamp: String!
+    backend: String
+    model: String
   }
 
   type AIHealth {

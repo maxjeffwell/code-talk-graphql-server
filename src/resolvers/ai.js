@@ -30,6 +30,48 @@ export default {
   },
 
   Mutation: {
+    sendAIMessage: async (parent, { content, conversationHistory = [] }) => {
+      try {
+        // Build messages array with history
+        const messages = [
+          ...conversationHistory.map(m => ({ role: m.role, content: m.content })),
+          { role: 'user', content }
+        ];
+
+        const response = await fetch(`${AI_GATEWAY_URL}/api/ai/chat`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-App-Name': 'code-talk'
+          },
+          body: JSON.stringify({
+            messages,
+            context: {
+              app: 'code-talk'
+            }
+          })
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
+          throw new Error(errorData.error || `AI Gateway error: ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        return {
+          id: `ai-${Date.now()}`,
+          content: data.response,
+          role: 'assistant',
+          timestamp: new Date().toISOString(),
+          backend: data.backend || null,
+          model: data.model || null
+        };
+      } catch (error) {
+        throw new Error(`Failed to get AI response: ${error.message}`);
+      }
+    },
+
     explainCode: async (parent, { code, language = 'unknown' }) => {
       try {
         const response = await fetch(`${AI_GATEWAY_URL}/api/ai/explain-code`, {
