@@ -1,9 +1,13 @@
+import { combineResolvers } from 'graphql-resolvers';
+import { isAuthenticated } from './authorization';
+
 const AI_GATEWAY_URL = process.env.AI_GATEWAY_URL || 'http://shared-ai-gateway:8002';
 
 // Note: fetch is a global in Node 18+, we use it directly without assignment
 
 export default {
   Query: {
+    // Health check is public
     aiHealth: async () => {
       try {
         const response = await fetch(`${AI_GATEWAY_URL}/health`);
@@ -28,7 +32,9 @@ export default {
   },
 
   Mutation: {
-    sendAIMessage: async (parent, { content, conversationHistory = [] }) => {
+    sendAIMessage: combineResolvers(
+      isAuthenticated,
+      async (parent, { content, conversationHistory = [] }) => {
       try {
         // Build messages array with history
         const messages = [
@@ -68,9 +74,11 @@ export default {
       } catch (error) {
         throw new Error(`Failed to get AI response: ${error.message}`);
       }
-    },
+    }),
 
-    explainCode: async (parent, { code, language = 'unknown' }) => {
+    explainCode: combineResolvers(
+      isAuthenticated,
+      async (parent, { code, language = 'unknown' }) => {
       try {
         const response = await fetch(`${AI_GATEWAY_URL}/api/ai/explain-code`, {
           method: 'POST',
@@ -96,9 +104,11 @@ export default {
       } catch (error) {
         throw new Error(`Failed to explain code: ${error.message}`);
       }
-    },
+    }),
 
-    generateDocumentation: async (parent, { code, language, style = 'jsdoc' }) => {
+    generateDocumentation: combineResolvers(
+      isAuthenticated,
+      async (parent, { code, language, style = 'jsdoc' }) => {
       try {
         const prompt = `Generate ${style} documentation for this ${language} code:
 
@@ -139,9 +149,11 @@ Documentation:`;
       } catch (error) {
         throw new Error(`Failed to generate documentation: ${error.message}`);
       }
-    },
+    }),
 
-    generateCodeQuiz: async (parent, { topic, difficulty = 'medium', count = 3 }) => {
+    generateCodeQuiz: combineResolvers(
+      isAuthenticated,
+      async (parent, { topic, difficulty = 'medium', count = 3 }) => {
       try {
         const response = await fetch(`${AI_GATEWAY_URL}/api/ai/quiz`, {
           method: 'POST',
@@ -169,6 +181,6 @@ Documentation:`;
       } catch (error) {
         throw new Error(`Failed to generate quiz: ${error.message}`);
       }
-    }
+    })
   }
 };
