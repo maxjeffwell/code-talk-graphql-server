@@ -9,6 +9,7 @@ import DataLoader from 'dataloader';
 import express from 'express';
 import rateLimit from 'express-rate-limit';
 import helmet from 'helmet';
+import client from 'prom-client';
 import {
   ApolloServer,
   AuthenticationError,
@@ -31,7 +32,40 @@ import { formatError, errorHandler } from './utils/errors.js';
 import { getUserFromRequest, verifyToken } from './utils/auth.js';
 import pubsub from './subscription';
 
+// Prometheus metrics setup
+const register = new client.Registry();
+client.collectDefaultMetrics({ register });
+
+const httpRequestsTotal = new client.Counter({
+  name: 'http_requests_total',
+  help: 'Total number of HTTP requests',
+  labelNames: ['method', 'route', 'status'],
+  registers: [register]
+});
+
+const httpRequestDuration = new client.Histogram({
+  name: 'http_request_duration_seconds',
+  help: 'Duration of HTTP requests in seconds',
+  labelNames: ['method', 'route', 'status'],
+  buckets: [0.001, 0.005, 0.015, 0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 1, 2, 5],
+  registers: [register]
+});
+
 const app = express();
+
+// Metrics middleware (before other middleware)
+app.use((req, res, next) => {
+  if (req.path === '/metrics' || req.path === '/health') return next();
+  const start = process.hrtime.bigint();
+  res.on('finish', () => {
+    const duration = Number(process.hrtime.bigint() - start) / 1e9;
+    const route = req.route?.path || req.path || 'unknown';
+    const labels = { method: req.method, route, status: res.statusCode.toString() };
+    httpRequestsTotal.inc(labels);
+    httpRequestDuration.observe(labels, duration);
+  });
+  next();
+});
 
 // Trust proxy headers when behind reverse proxy (Kubernetes Ingress/Traefik)
 // This allows Express to correctly read X-Forwarded-For and other proxy headers
@@ -95,6 +129,17 @@ app.use(morgan('combined', {
 
 // Add error handling middleware
 app.use(errorHandler);
+
+// Health check endpoint
+app.get('/health', (req, res) => {
+  res.status(200).json({ status: 'OK', timestamp: new Date().toISOString() });
+});
+
+// Prometheus metrics endpoint
+app.get('/metrics', async (req, res) => {
+  res.set('Content-Type', register.contentType);
+  res.end(await register.metrics());
+});
 
 const getMe = async req => {
   try {
@@ -193,17 +238,6 @@ const startServer = async () => {
     path: '/graphql',
     cors: false // Use our custom CORS middleware instead
   });
-
-  if (process.env.NODE_ENV === 'production') {
-    app.use(express.static('client/build'));
-
-    const path = require('path');
-    app.get('*', (req, res) => {
-      res.sendFile(
-        path.resolve(__dirname, 'client', 'build', 'index.html'),
-      );
-    });
-  }
 
   const httpServer = http.createServer(app);
   const port = process.env.PORT || 8000;
