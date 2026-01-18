@@ -2,13 +2,13 @@ name: Trigger K8s Deploy
 
 on:
   workflow_run:
-    workflows: ["CI"]
+    workflows: ["Docker Build and Push"]
     types: [completed]
     branches: [master, main]
 
 jobs:
   trigger-deploy:
-    # Only trigger if CI succeeded
+    # Only trigger if Docker build succeeded
     if: github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     steps:
