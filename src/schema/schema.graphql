@@ -23,7 +23,8 @@ type Message {
   text: String
   createdAt: DateTime!
   user: User!
-  room: Room!
+  room: Room
+  roomId: ID
 }
 
 type MessageConnection {
@@ -41,8 +42,8 @@ type Mutation {
   signIn(login: String!, password: String!): Token!
   updateUser(username: String!): User!
   deleteUser(id: ID!): Boolean!
-  createMessage(text: String!, roomId: ID!): Message!
-  deleteMessage(id: ID!): Boolean!
+  createMessage(text: String!, roomId: ID): Message!
+  deleteMessage(id: ID!): Message!
   createRoom(title: String!): Room!
   deleteRoom(id: ID!): Boolean!
   typeCode(code: CodeInput!): Code!
@@ -58,7 +59,7 @@ type Query {
   users: [User!]
   user(id: ID!): User
   me: User
-  messages(cursor: String, limit: Int!, roomId: ID!): MessageConnection!
+  messages(cursor: String, limit: Int!, roomId: ID): MessageConnection!
   message(id: ID!): Message!
   rooms(cursor: String, limit: Int): RoomConnection!
   room(id: ID!): Room!
@@ -84,7 +85,8 @@ type RoomCreated {
 
 type Subscription {
   _: Boolean
-  messageCreated(roomId: ID!): MessageCreated!
+  messageCreated(roomId: ID): MessageCreated!
+  messageDeleted: Message!
   roomCreated: RoomCreated
   typingCode: Code!
 }
