@@ -84,21 +84,14 @@ export default {
     deleteRoom: combineResolvers(
       isAuthenticated,
       async (parent, { id }, { models, me }) => {
-        const room = await models.Room.findOne({
-          where: { id },
-          include: [{
-            model: models.User,
-            where: { id: me.id },
-            through: { attributes: [] }
-          }]
-        });
-        
+        const room = await models.Room.findByPk(id);
+
         if (!room) {
-          throw new Error('Room not found or access denied');
+          throw new Error('Room not found');
         }
-        
+
         const result = await models.Room.destroy({ where: { id } });
-        
+
         // Publish room deleted event
         await PubSub.publish(EVENTS.ROOM.DELETED, {
           roomDeleted: { id },
