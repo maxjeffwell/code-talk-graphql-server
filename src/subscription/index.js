@@ -7,7 +7,8 @@ import * as ROOM_EVENTS from './room';
 
 const getRedisOptions = () => {
   if (process.env.REDIS_URL) {
-    return {
+    const useTls = process.env.REDIS_URL.startsWith('rediss://');
+    const options = {
       lazyConnect: true,
       maxRetriesPerRequest: null,
       retryStrategy(times) {
@@ -15,10 +16,13 @@ const getRedisOptions = () => {
         console.log(`Redis connection attempt ${times}, retrying in ${delay}ms...`);
         return delay;
       },
-      tls: {
-        rejectUnauthorized: false,
-      },
     };
+
+    if (useTls) {
+      options.tls = { rejectUnauthorized: false };
+    }
+
+    return options;
   }
 
   return {
