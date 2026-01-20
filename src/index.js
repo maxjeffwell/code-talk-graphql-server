@@ -30,6 +30,7 @@ import loaders from './loaders';
 import logger from './utils/logger.js';
 import { formatError, errorHandler } from './utils/errors.js';
 import { getUserFromRequest, verifyToken } from './utils/auth.js';
+import { serverTimingMiddleware, createTiming } from './utils/timing.js';
 import pubsub from './subscription';
 
 // Prometheus metrics setup
@@ -71,6 +72,9 @@ app.use((req, res, next) => {
 // This allows Express to correctly read X-Forwarded-For and other proxy headers
 app.set('trust proxy', true);
 
+// Server-Timing middleware - tracks request timing for performance monitoring
+app.use(serverTimingMiddleware());
+
 // Enhanced CORS configuration with security best practices - MUST BE FIRST
 app.use(
   cors({
@@ -93,7 +97,8 @@ app.use(
       'X-Total-Count',
       'X-RateLimit-Limit',
       'X-RateLimit-Remaining',
-      'X-RateLimit-Reset'
+      'X-RateLimit-Reset',
+      'Server-Timing'
     ],
     maxAge: 86400, // 24 hours preflight cache
     optionsSuccessStatus: 200, // For legacy browser support
@@ -198,10 +203,14 @@ const server = new ApolloServer({
     }
   ],
   context: async ({ req, connection }) => {
+    // Get timing from request (created by serverTimingMiddleware)
+    const timing = req?.timing || createTiming();
+
     if (connection) {
       return {
         models,
         pubsub,
+        timing,
         loaders: {
           message: new DataLoader(keys => loaders.message.batchMessages(keys, models)),
           messagesByUser: new DataLoader(keys => loaders.message.batchMessagesByUser(keys, models)),
@@ -213,12 +222,14 @@ const server = new ApolloServer({
     }
 
     if (req) {
-      const me = await getMe(req);
+      // Time the authentication check
+      const me = await timing.time('auth', 'JWT verification', () => getMe(req));
 
       return {
         models,
         me,
         pubsub,
+        timing,
         loaders: {
           message: new DataLoader(keys => loaders.message.batchMessages(keys, models)),
           messagesByUser: new DataLoader(keys => loaders.message.batchMessagesByUser(keys, models)),

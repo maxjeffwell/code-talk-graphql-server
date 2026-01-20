@@ -13,7 +13,7 @@ export default {
   Query: {
     rooms: combineResolvers(
       isAuthenticated,
-      async (parent, { cursor, limit = 5 }, { models, me }) => {
+      async (parent, { cursor, limit = 5 }, { models, me, timing }) => {
         const cursorOptions = cursor ? {
             where: {
               createdAt: {
@@ -23,12 +23,14 @@ export default {
           }
           : {};
 
-        const rooms = await models.Room.findAll({
-          order: [['createdAt', 'DESC']],
-          limit: limit + 1,
-          // Remove user filter to show all rooms to all authenticated users
-          ...cursorOptions,
-        });
+        const rooms = await timing.time('db-rooms', 'PostgreSQL rooms query', () =>
+          models.Room.findAll({
+            order: [['createdAt', 'DESC']],
+            limit: limit + 1,
+            // Remove user filter to show all rooms to all authenticated users
+            ...cursorOptions,
+          })
+        );
 
         const hasNextPage = rooms.length > limit;
         const edges = hasNextPage ? rooms.slice(0, -1) : rooms;
@@ -46,13 +48,15 @@ export default {
 
     room: combineResolvers(
       isAuthenticated,
-      async (parent, { id }, { models, me }) => {
-        const room = await models.Room.findByPk(id);
-        
+      async (parent, { id }, { models, me, timing }) => {
+        const room = await timing.time('db-room', 'PostgreSQL room lookup', () =>
+          models.Room.findByPk(id)
+        );
+
         if (!room) {
           throw new Error('Room not found');
         }
-        
+
         return room;
       }),
   },

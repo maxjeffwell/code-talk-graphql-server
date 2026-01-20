@@ -23,21 +23,27 @@ export default {
   Query: {
     users: combineResolvers(
       isAuthenticated,
-      async (parent, args, { models }) => {
-        return await models.User.findAll();
+      async (parent, args, { models, timing }) => {
+        return await timing.time('db-users', 'PostgreSQL users query', () =>
+          models.User.findAll()
+        );
       }
     ),
     user: combineResolvers(
       isAuthenticated,
-      async (parent, { id }, { models }) => {
-        return await models.User.findByPk(id);
+      async (parent, { id }, { models, timing }) => {
+        return await timing.time('db-user', 'PostgreSQL user lookup', () =>
+          models.User.findByPk(id)
+        );
       }
     ),
-    me: async (parent, args, { models, me }) => {
+    me: async (parent, args, { models, me, timing }) => {
       if (!me) {
         return null;
       }
-      return await models.User.findByPk(me.id);
+      return await timing.time('db-me', 'PostgreSQL current user', () =>
+        models.User.findByPk(me.id)
+      );
     },
   },
 
@@ -97,7 +103,7 @@ export default {
     signIn: async (
       parent,
       { login, password },
-      { models }
+      { models, timing }
     ) => {
       try {
         // Sanitize input
@@ -106,13 +112,17 @@ export default {
         // Check rate limiting
         checkAuthRateLimit(login);
 
-        const user = await models.User.findByLogin(login);
+        const user = await timing.time('db-login', 'PostgreSQL user lookup', () =>
+          models.User.findByLogin(login)
+        );
 
         if (!user) {
           throw new AuthenticationError('Invalid credentials. Please try signing in again');
         }
 
-        const isValid = await user.validatePassword(password);
+        const isValid = await timing.time('bcrypt', 'Password verification', () =>
+          user.validatePassword(password)
+        );
 
         if (!isValid) {
           throw new AuthenticationError('Invalid credentials. Please try signing in again');
@@ -122,7 +132,9 @@ export default {
         clearAuthAttempts(login);
 
         // Generate tokens
-        const tokens = await generateTokens(user);
+        const tokens = await timing.time('jwt', 'Token generation', () =>
+          generateTokens(user)
+        );
 
         logger.info('User signed in successfully', {
           userId: user.id,
@@ -130,7 +142,7 @@ export default {
           email: user.email
         });
 
-        return { 
+        return {
           token: tokens.accessToken,
           refreshToken: tokens.refreshToken
         };

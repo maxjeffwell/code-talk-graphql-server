@@ -15,25 +15,27 @@ export default {
   Query: {
     messages: combineResolvers(
       isAuthenticated,
-      async (parent, { cursor, limit = 10, roomId }, { models }) => {
+      async (parent, { cursor, limit = 10, roomId }, { models, timing }) => {
       const whereClause = {
         ...(cursor && {
           createdAt: {
             [Sequelize.Op.lt]: fromCursorHash(cursor),
           },
         }),
-        ...(roomId !== undefined && { 
+        ...(roomId !== undefined && {
           roomId: roomId === null ? null : (
             Number.isInteger(Number(roomId)) ? parseInt(roomId, 10) : null
           )
         }),
       };
 
-      const messages = await models.Message.findAll({
-        order: [['createdAt', 'DESC']],
-        limit: limit + 1,
-        where: whereClause,
-      });
+      const messages = await timing.time('db-messages', 'PostgreSQL messages query', () =>
+        models.Message.findAll({
+          order: [['createdAt', 'DESC']],
+          limit: limit + 1,
+          where: whereClause,
+        })
+      );
 
       const hasNextPage = messages.length > limit;
       const edges = hasNextPage ? messages.slice(0, -1) : messages;
@@ -50,8 +52,10 @@ export default {
     }),
     message: combineResolvers(
       isAuthenticated,
-      async (parent, { id }, { models }) => {
-        return await models.Message.findByPk(id);
+      async (parent, { id }, { models, timing }) => {
+        return await timing.time('db-message', 'PostgreSQL message lookup', () =>
+          models.Message.findByPk(id)
+        );
       }
     ),
   },
