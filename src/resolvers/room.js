@@ -3,6 +3,7 @@ import { combineResolvers } from 'graphql-resolvers';
 
 import PubSub, { EVENTS } from '../subscription';
 import { isAuthenticated } from './authorization';
+import { purgeCodeTalkCache } from '../utils/cloudflare.js';
 
 const toCursorHash = string => Buffer.from(string).toString('base64');
 
@@ -70,6 +71,8 @@ export default {
           roomCreated: { room },
         });
 
+        purgeCodeTalkCache();
+
         return room;
       },
     ),
@@ -96,7 +99,9 @@ export default {
         await PubSub.publish(EVENTS.ROOM.DELETED, {
           roomDeleted: { id },
         });
-        
+
+        purgeCodeTalkCache();
+
         return result;
       },
     ),

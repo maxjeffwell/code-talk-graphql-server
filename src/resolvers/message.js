@@ -4,6 +4,7 @@ import DOMPurify from 'isomorphic-dompurify';
 
 import PubSub, { EVENTS } from '../subscription';
 import { isAuthenticated, isMessageOwner } from './authorization';
+import { purgeCodeTalkCache } from '../utils/cloudflare.js';
 
 const toCursorHash = string => Buffer.from(string).toString('base64');
 
@@ -75,6 +76,9 @@ export default {
           messageCreated: { message },
         });
 
+        // Purge Cloudflare cache on message create
+        purgeCodeTalkCache();
+
         return message;
       },
     ),
@@ -99,6 +103,10 @@ export default {
         }
         
         PubSub.publish(EVENTS.MESSAGE.DELETED, { messageDeleted: message });
+
+        // Purge Cloudflare cache on message delete
+        purgeCodeTalkCache();
+
         return message;
       },
     ),
