@@ -9,23 +9,28 @@ const getRedisOptions = () => {
   if (process.env.REDIS_URL) {
     return {
       lazyConnect: true,
-      maxRetriesPerRequest: 3,
+      maxRetriesPerRequest: null,
       retryStrategy(times) {
-        return Math.max(times * 100, 3000);
+        const delay = Math.min(times * 100, 3000);
+        console.log(`Redis connection attempt ${times}, retrying in ${delay}ms...`);
+        return delay;
       },
       tls: {
         rejectUnauthorized: false,
       },
     };
   }
-  
+
   return {
     host: process.env.REDIS_HOST || '127.0.0.1',
     user: process.env.REDIS_USER,
     password: process.env.REDIS_PASSWORD,
     port: process.env.REDIS_PORT || 6379,
+    maxRetriesPerRequest: null,
     retryStrategy(times) {
-      return Math.max(times * 100, 3000);
+      const delay = Math.min(times * 100, 3000);
+      console.log(`Redis connection attempt ${times}, retrying in ${delay}ms...`);
+      return delay;
     },
   };
 };
