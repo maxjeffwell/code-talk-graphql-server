@@ -413,7 +413,24 @@ const startServer = async () => {
     wsServer
   );
 
-  await sequelize.sync({});
+  // Database initialization
+  // In production: migrations should be run separately via `npm run db:migrate`
+  // In development/test: use sync() for convenience
+  if (isProduction) {
+    // In production, just verify the connection - migrations are run separately
+    try {
+      await sequelize.authenticate();
+      logger.info('Database connection established successfully');
+    } catch (error) {
+      logger.error('Unable to connect to the database:', error);
+      throw error;
+    }
+  } else {
+    // In development/test, sync the schema (but don't force drop tables)
+    await sequelize.sync({});
+    logger.info('Database synced (development mode)');
+  }
+
   httpServer.listen({ port }, () => {
     console.log(
       `Apollo Server is running on http://localhost:${port}/graphql`,

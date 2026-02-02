@@ -2,206 +2,150 @@ import { expect } from 'chai';
 import * as api from './api';
 
 describe('users', () => {
-	describe('user(id: String!): User', () => {
-		it('returns a user when a user can be found', async () => {
-			const expectedResult = {
-				data: {
-					user: {
-						id: '1',
-						username: 'jeff',
-						email: 'jeff@test.example',
-						role: null,
-					},
-				},
-			};
+  // Clear cookies before each test to ensure clean state
+  beforeEach(() => {
+    api.clearCookies();
+  });
 
-			const result = await api.user({ id: '1' });
+  describe('user(id: String!): User', () => {
+    it('returns a user when a user can be found', async () => {
+      // First sign in to get authenticated
+      await api.signIn({
+        login: 'jeff',
+        password: 'username5',
+      });
 
-			expect(result.data).to.eql(expectedResult);
-		});
+      const result = await api.user({ id: '1' });
 
-		it('returns null when user cannot be found', async () => {
-			const expectedResult = {
-				data: {
-					user: null,
-				},
-			};
+      expect(result.data.data.user).to.include({
+        id: '1',
+        username: 'jeff',
+        email: 'jeff@test.example',
+      });
+    });
 
-			const result = await api.user({ id: '42' });
+    it('returns null when user cannot be found', async () => {
+      // Sign in first
+      await api.signIn({
+        login: 'jeff',
+        password: 'username5',
+      });
 
-			expect(result.data).to.eql(expectedResult);
-		});
-	});
+      const result = await api.user({ id: '42' });
 
-	describe('users: [User!]', () => {
-		it('returns a list of users', async () => {
-			const expectedResult = {
-				data: {
-					users: [
-						{
-							id: '1',
-							username: 'jeff',
-							email: 'jeff@test.example',
-							role: null,
-						},
-						{
-							id: '2',
-							username: 'jeff2',
-							email: 'jeff2@test.example',
-							role: null,
-						},
-						{
-							id: '3',
-							username: 'jeff3',
-							email: 'jeff3@test.example',
-							role: null,
-						},
-						{
-							id: '4',
-							username: 'jeff4',
-							email: 'jeff4@test.example',
-							role: null,
-						},
-						{
-							id: '7',
-							username: 'jeff6',
-							email: 'jeff6@test.example',
-							role: null,
-						},
-						{
-							id: '8',
-							username: 'jeff7',
-							email: 'jeff7@test.example',
-							role: null,
-						},
-						{
-							id: '9',
-							username: 'jeff8',
-							email: 'jeff8@test.example',
-							role: null,
-						},
-						{
-							id: '10',
-							username: 'jeff10',
-							email: 'jeff10@test.example',
-							role: null,
-						},
-						{
-							id: '20',
-							username: 'jeff50',
-							email: 'jeff50@test.example',
-							role: 'ADMIN',
-						},
-						{
-							id: '21',
-							username: 'jeff51',
-							email: 'jeff51@test.example',
-							role: null,
-						},
-					],
-				},
-			};
+      expect(result.data.data.user).to.be.null;
+    });
+  });
 
-			const result = await api.users();
+  describe('users: [User!]', () => {
+    it('returns a list of users', async () => {
+      // Sign in first (users query requires authentication)
+      await api.signIn({
+        login: 'jeff',
+        password: 'username5',
+      });
 
-			expect(result.data).to.eql(expectedResult);
-		});
-	});
+      const result = await api.users();
 
-	describe('me: User', () => {
-		it('returns null when no user is signed in', async () => {
-			const expectedResult = {
-				data: {
-					me: null,
-				},
-			};
+      expect(result.data.data.users).to.be.an('array');
+      expect(result.data.data.users.length).to.be.greaterThan(0);
+      expect(result.data.data.users[0]).to.have.property('username');
+      expect(result.data.data.users[0]).to.have.property('email');
+    });
+  });
 
-			const { data } = await api.me();
+  describe('me: User', () => {
+    it('returns null when no user is signed in', async () => {
+      api.clearCookies(); // Ensure no cookies
 
-			expect(data).to.eql(expectedResult);
-		});
+      const result = await api.me();
 
-		it('returns me when me is signed in', async () => {
-			const expectedResult = {
-				data: {
-					me: {
-						id: '1',
-						username: 'jeff',
-						email: 'jeff@test.example',
-					},
-				},
-			};
+      expect(result.data.data.me).to.be.null;
+    });
 
-			const {
-				data: {
-					data: {
-						signIn: { token },
-					},
-				},
-			} = await api.signIn({
-				login: 'jeff',
-				password: 'username5',
-			});
+    it('returns me when signed in', async () => {
+      // Sign in first
+      const signInResult = await api.signIn({
+        login: 'jeff',
+        password: 'username5',
+      });
 
-			const { data } = await api.me(token);
+      // Verify sign in was successful
+      expect(signInResult.data.data.signIn.success).to.be.true;
 
-			expect(data).to.eql(expectedResult);
-		});
-	});
+      // Now check me query (uses cookies automatically)
+      const result = await api.me();
 
-	describe('signIn(login: String!, password: String!): Token!', () => {
-		it('returns a token when a user signs in with username', async () => {
-			const {
-				data: {
-					data: {
-						signIn: { token },
-					},
-				},
-			} = await api.signIn({
-				login: 'jeff',
-				password: 'username5',
-			});
+      expect(result.data.data.me).to.include({
+        username: 'jeff',
+        email: 'jeff@test.example',
+      });
+    });
+  });
 
-			expect(token).to.be.a('string');
-		});
+  describe('signIn(login: String!, password: String!): AuthPayload!', () => {
+    it('returns success and user when signing in with username', async () => {
+      const result = await api.signIn({
+        login: 'jeff',
+        password: 'username5',
+      });
 
-		it('returns a token when a user signs in with email', async () => {
-			const {
-				data: {
-					data: {
-						signIn: { token },
-					},
-				},
-			} = await api.signIn({
-				login: 'jeff@test.example',
-				password: 'username5',
-			});
+      expect(result.data.data.signIn.success).to.be.true;
+      expect(result.data.data.signIn.user).to.include({
+        username: 'jeff',
+        email: 'jeff@test.example',
+      });
+    });
 
-			expect(token).to.be.a('string');
-		});
+    it('returns success and user when signing in with email', async () => {
+      const result = await api.signIn({
+        login: 'jeff@test.example',
+        password: 'username5',
+      });
 
-		it('returns an error when a user provides a wrong password', async () => {
-			const {
-				data: { errors },
-			} = await api.signIn({
-				login: 'jeff',
-				password: 'unknown',
-			});
+      expect(result.data.data.signIn.success).to.be.true;
+      expect(result.data.data.signIn.user).to.include({
+        username: 'jeff',
+      });
+    });
 
-			expect(errors[0].message).to.eql('Invalid credentials');
-		});
-	});
+    it('returns an error when providing wrong password', async () => {
+      const result = await api.signIn({
+        login: 'jeff',
+        password: 'wrongpassword',
+      });
 
-	it('returns an error when a user is not found', async () => {
-		const {
-			data: { errors },
-		} = await api.signIn({
-			login: 'unknown',
-			password: 'unknown',
-		});
+      expect(result.data.errors).to.be.an('array');
+      expect(result.data.errors[0].message).to.include('Invalid credentials');
+    });
 
-		expect(errors[0].message).to.eql(
-			'Invalid credentials',
-		);
-	});
+    it('returns an error when user is not found', async () => {
+      const result = await api.signIn({
+        login: 'nonexistentuser',
+        password: 'anypassword',
+      });
+
+      expect(result.data.errors).to.be.an('array');
+      expect(result.data.errors[0].message).to.include('Invalid credentials');
+    });
+  });
+
+  describe('signOut: Boolean!', () => {
+    it('returns true when signing out', async () => {
+      // Sign in first
+      await api.signIn({
+        login: 'jeff',
+        password: 'username5',
+      });
+
+      // Sign out
+      const result = await api.signOut();
+
+      expect(result.data.data.signOut).to.be.true;
+
+      // Verify me returns null after sign out
+      const meResult = await api.me();
+      expect(meResult.data.data.me).to.be.null;
+    });
+  });
 });

@@ -190,22 +190,38 @@ export const graphqlQueries = {
 };
 
 export const graphqlMutations = {
-  // Authentication mutations
+  // Authentication mutations (httpOnly cookie-based)
   SIGN_UP: `
     mutation SignUp($username: String!, $email: String!, $password: String!) {
       signUp(username: $username, email: $email, password: $password) {
-        token
-        refreshToken
+        success
+        user {
+          id
+          username
+          email
+          role
+        }
       }
     }
   `,
-  
+
   SIGN_IN: `
     mutation SignIn($login: String!, $password: String!) {
       signIn(login: $login, password: $password) {
-        token
-        refreshToken
+        success
+        user {
+          id
+          username
+          email
+          role
+        }
       }
+    }
+  `,
+
+  SIGN_OUT: `
+    mutation SignOut {
+      signOut
     }
   `,
   
