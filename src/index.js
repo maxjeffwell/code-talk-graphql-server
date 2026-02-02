@@ -1,5 +1,6 @@
 import dotenv from 'dotenv';
 dotenv.config();
+import compression from 'compression';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import { bodyParserGraphQL } from 'body-parser-graphql';
@@ -77,6 +78,17 @@ app.use((req, res, next) => {
 // Trust proxy headers when behind reverse proxy (Kubernetes Ingress/Traefik)
 // This allows Express to correctly read X-Forwarded-For and other proxy headers
 app.set('trust proxy', true);
+
+// Response compression - reduces bandwidth and improves response times
+// Only compress responses > 1KB, skip if client requests no compression
+app.use(compression({
+  filter: (req, res) => {
+    if (req.headers['x-no-compression']) return false;
+    return compression.filter(req, res);
+  },
+  threshold: 1024, // Only compress responses larger than 1KB
+  level: 6, // Compression level (1-9), 6 is a good balance of speed vs size
+}));
 
 // Server-Timing middleware - tracks request timing for performance monitoring
 app.use(serverTimingMiddleware());
