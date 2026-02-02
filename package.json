@@ -44,6 +44,8 @@
     "@babel/node": "^7.28.0",
     "@babel/preset-env": "^7.28.0",
     "@graphql-tools/schema": "^10.0.23",
+    "@upstash/ratelimit": "^2.0.8",
+    "@upstash/redis": "^1.36.1",
     "apollo-server-express": "^3.13.0",
     "bcryptjs": "^3.0.2",
     "body-parser-graphql": "^1.1.0",

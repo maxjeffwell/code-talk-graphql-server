@@ -3,6 +3,11 @@ import { AuthenticationError } from 'apollo-server-express';
 import logger from './logger.js';
 import { TokenExpiredError } from './errors.js';
 import dotenv from 'dotenv';
+import {
+  checkAuthRateLimit as checkDistributedAuthRateLimit,
+  clearAuthAttempts as clearDistributedAuthAttempts,
+  isDistributedRateLimiting,
+} from './rateLimiter.js';
 
 // Ensure dotenv is loaded before accessing environment variables
 dotenv.config();
@@ -163,47 +168,43 @@ export const validatePassword = (password) => {
   };
 };
 
-// Rate limiting for authentication attempts
-const authAttempts = new Map();
+// ============================================================================
+// RATE LIMITING - Uses Upstash for distributed rate limiting
+// Falls back to in-memory if Upstash is not configured
+// ============================================================================
 
-export const checkAuthRateLimit = (identifier) => {
-  const now = Date.now();
-  const windowMs = 15 * 60 * 1000; // 15 minutes
-  const maxAttempts = 5;
+/**
+ * Check authentication rate limit (5 attempts per 15 minutes)
+ * Uses Upstash Redis for distributed rate limiting when available
+ * @param {string} identifier - User identifier (email, IP, etc.)
+ * @throws {AuthenticationError} If rate limit exceeded
+ */
+export const checkAuthRateLimit = async (identifier) => {
+  const result = await checkDistributedAuthRateLimit(identifier);
 
-  if (!authAttempts.has(identifier)) {
-    authAttempts.set(identifier, []);
-  }
-
-  const attempts = authAttempts.get(identifier);
-  
-  // Remove old attempts
-  const validAttempts = attempts.filter(timestamp => now - timestamp < windowMs);
-  authAttempts.set(identifier, validAttempts);
-
-  if (validAttempts.length >= maxAttempts) {
-    const oldestAttempt = Math.min(...validAttempts);
-    const timeLeft = windowMs - (now - oldestAttempt);
-    
-    logger.warn('Authentication rate limit exceeded', {
-      identifier,
-      attempts: validAttempts.length,
-      timeLeft: Math.ceil(timeLeft / 1000 / 60) // minutes
-    });
+  if (!result.success) {
+    const now = Date.now();
+    const timeLeftMs = result.reset - now;
+    const timeLeftMinutes = Math.max(1, Math.ceil(timeLeftMs / 1000 / 60));
 
     throw new AuthenticationError(
-      `Too many authentication attempts. Please try again in ${Math.ceil(timeLeft / 1000 / 60)} minutes.`
+      `Too many authentication attempts. Please try again in ${timeLeftMinutes} minutes.`
     );
   }
 
-  // Record this attempt
-  validAttempts.push(now);
-  authAttempts.set(identifier, validAttempts);
+  logger.debug('Auth rate limit check passed', {
+    identifier,
+    remaining: result.remaining,
+    distributed: isDistributedRateLimiting(),
+  });
 };
 
-// Clear auth attempts on successful login
-export const clearAuthAttempts = (identifier) => {
-  authAttempts.delete(identifier);
+/**
+ * Clear auth rate limit attempts (e.g., after successful login)
+ * @param {string} identifier - User identifier
+ */
+export const clearAuthAttempts = async (identifier) => {
+  await clearDistributedAuthAttempts(identifier);
 };
 
 // Input sanitization

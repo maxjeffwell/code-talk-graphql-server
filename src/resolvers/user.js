@@ -61,8 +61,8 @@ export default {
           });
         }
 
-        // Check rate limiting
-        checkAuthRateLimit(email);
+        // Check rate limiting (distributed via Upstash when configured)
+        await checkAuthRateLimit(email);
 
         const user = await models.User.create({
           username,
@@ -71,7 +71,7 @@ export default {
         });
 
         // Clear any previous auth attempts
-        clearAuthAttempts(email);
+        await clearAuthAttempts(email);
 
         // Generate tokens and set httpOnly cookies
         const tokens = await generateTokens(user);
@@ -106,8 +106,8 @@ export default {
         // Sanitize input
         login = sanitizeAuthInput(login);
 
-        // Check rate limiting
-        checkAuthRateLimit(login);
+        // Check rate limiting (distributed via Upstash when configured)
+        await checkAuthRateLimit(login);
 
         const user = await timing.time('db-login', 'PostgreSQL user lookup', () =>
           models.User.findByLogin(login)
@@ -126,7 +126,7 @@ export default {
         }
 
         // Clear any previous auth attempts on successful login
-        clearAuthAttempts(login);
+        await clearAuthAttempts(login);
 
         // Generate tokens and set httpOnly cookies
         const tokens = await timing.time('jwt', 'Token generation', () =>
