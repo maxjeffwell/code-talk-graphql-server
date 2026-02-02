@@ -20,6 +20,11 @@ import { useServer } from 'graphql-ws/lib/use/ws';
 import { WebSocketServer } from 'ws';
 import { makeExecutableSchema } from '@graphql-tools/schema';
 import depthLimit from 'graphql-depth-limit';
+import {
+  getComplexity,
+  simpleEstimator,
+  fieldExtensionsEstimator,
+} from 'graphql-query-complexity';
 
 import schema from './schema';
 import resolvers from './resolvers';
@@ -169,6 +174,15 @@ const executableSchema = makeExecutableSchema({
 // These expose the entire API structure to potential attackers
 const isProduction = process.env.NODE_ENV === 'production';
 
+// Query complexity configuration
+// Prevents DoS attacks via expensive nested queries
+const MAX_QUERY_COMPLEXITY = 1000;
+const COMPLEXITY_CONFIG = {
+  scalarCost: 1,      // Each scalar field costs 1
+  objectCost: 2,      // Each object field costs 2
+  listFactor: 10,     // Lists multiply the child cost by 10
+};
+
 const server = new ApolloServer({
   introspection: !isProduction,
   playground: !isProduction,
@@ -179,6 +193,48 @@ const server = new ApolloServer({
     depthLimit(10) // Limit query depth to 10 levels
   ],
   plugins: [
+    // Query complexity limiting plugin
+    {
+      requestDidStart: () => ({
+        didResolveOperation({ request, document }) {
+          // Calculate query complexity
+          const complexity = getComplexity({
+            schema: executableSchema,
+            operationName: request.operationName,
+            query: document,
+            variables: request.variables,
+            estimators: [
+              // Use field extensions if defined in schema
+              fieldExtensionsEstimator(),
+              // Fallback to simple estimator with configured costs
+              simpleEstimator({
+                defaultComplexity: COMPLEXITY_CONFIG.scalarCost,
+              }),
+            ],
+          });
+
+          // Log complexity for monitoring
+          logger.debug('Query complexity calculated', {
+            operationName: request.operationName,
+            complexity,
+            maxAllowed: MAX_QUERY_COMPLEXITY,
+          });
+
+          // Reject overly complex queries
+          if (complexity > MAX_QUERY_COMPLEXITY) {
+            logger.warn('Query complexity exceeded', {
+              operationName: request.operationName,
+              complexity,
+              maxAllowed: MAX_QUERY_COMPLEXITY,
+            });
+            throw new Error(
+              `Query too complex: ${complexity}. Maximum allowed complexity: ${MAX_QUERY_COMPLEXITY}`
+            );
+          }
+        },
+      }),
+    },
+    // Logging plugin
     {
       requestDidStart() {
         return {
