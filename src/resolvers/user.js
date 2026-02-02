@@ -2,22 +2,17 @@ import { combineResolvers } from 'graphql-resolvers';
 
 import { AuthenticationError, UserInputError } from 'apollo-server-express';
 import { isAdmin, isAuthenticated } from './authorization';
-import { 
-  generateTokens, 
-  validatePassword, 
-  checkAuthRateLimit, 
-  clearAuthAttempts, 
-  sanitizeAuthInput 
+import {
+  generateTokens,
+  validatePassword,
+  checkAuthRateLimit,
+  clearAuthAttempts,
+  sanitizeAuthInput,
+  setAuthCookies,
+  clearAuthCookies,
 } from '../utils/auth.js';
 import { handleDatabaseError } from '../utils/errors.js';
 import logger from '../utils/logger.js';
-
-
-// Legacy function - now using improved auth utils
-const createToken = async (user, secret, expiresIn) => {
-  const tokens = await generateTokens(user);
-  return tokens.accessToken;
-};
 
 export default {
   Query: {
@@ -51,7 +46,7 @@ export default {
     signUp: async (
       parent,
       { username, email, password },
-      { models }
+      { models, res }
     ) => {
       try {
         // Sanitize inputs
@@ -78,8 +73,9 @@ export default {
         // Clear any previous auth attempts
         clearAuthAttempts(email);
 
-        // Generate tokens
+        // Generate tokens and set httpOnly cookies
         const tokens = await generateTokens(user);
+        setAuthCookies(res, tokens);
 
         logger.info('User signed up successfully', {
           userId: user.id,
@@ -87,9 +83,10 @@ export default {
           email: user.email
         });
 
-        return { 
-          token: tokens.accessToken,
-          refreshToken: tokens.refreshToken
+        // Return success with user info (tokens are in httpOnly cookies)
+        return {
+          success: true,
+          user: user,
         };
       } catch (error) {
         // Re-throw validation and authentication errors without modification
@@ -103,7 +100,7 @@ export default {
     signIn: async (
       parent,
       { login, password },
-      { models, timing }
+      { models, res, timing }
     ) => {
       try {
         // Sanitize input
@@ -131,10 +128,11 @@ export default {
         // Clear any previous auth attempts on successful login
         clearAuthAttempts(login);
 
-        // Generate tokens
+        // Generate tokens and set httpOnly cookies
         const tokens = await timing.time('jwt', 'Token generation', () =>
           generateTokens(user)
         );
+        setAuthCookies(res, tokens);
 
         logger.info('User signed in successfully', {
           userId: user.id,
@@ -142,9 +140,10 @@ export default {
           email: user.email
         });
 
+        // Return success with user info (tokens are in httpOnly cookies)
         return {
-          token: tokens.accessToken,
-          refreshToken: tokens.refreshToken
+          success: true,
+          user: user,
         };
       } catch (error) {
         logger.error('Sign in failed', {
@@ -152,6 +151,25 @@ export default {
           error: error.message
         });
         throw error;
+      }
+    },
+
+    signOut: async (parent, args, { res, me }) => {
+      try {
+        // Clear httpOnly auth cookies
+        clearAuthCookies(res);
+
+        logger.info('User signed out', {
+          userId: me?.id,
+          username: me?.username
+        });
+
+        return true;
+      } catch (error) {
+        logger.error('Sign out failed', {
+          error: error.message
+        });
+        return false;
       }
     },
 

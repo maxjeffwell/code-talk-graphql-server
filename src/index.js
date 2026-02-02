@@ -1,6 +1,7 @@
 import dotenv from 'dotenv';
 dotenv.config();
 import cors from 'cors';
+import cookieParser from 'cookie-parser';
 import { bodyParserGraphQL } from 'body-parser-graphql';
 import morgan from 'morgan';
 import http from 'http';
@@ -125,6 +126,9 @@ app.use(limiter);
 
 app.use(bodyParserGraphQL());
 
+// Cookie parser for httpOnly cookie authentication
+app.use(cookieParser());
+
 // Enhanced logging with Winston
 app.use(morgan('combined', {
   stream: {
@@ -161,10 +165,14 @@ const executableSchema = makeExecutableSchema({
   resolvers,
 });
 
+// SECURITY: Disable schema introspection and playground in production
+// These expose the entire API structure to potential attackers
+const isProduction = process.env.NODE_ENV === 'production';
+
 const server = new ApolloServer({
-  introspection: true,
-  playground: true,
-  debug: process.env.NODE_ENV === 'development',
+  introspection: !isProduction,
+  playground: !isProduction,
+  debug: !isProduction,
   schema: executableSchema,
   formatError,
   validationRules: [
@@ -202,7 +210,7 @@ const server = new ApolloServer({
       }
     }
   ],
-  context: async ({ req, connection }) => {
+  context: async ({ req, res, connection }) => {
     // Get timing from request (created by serverTimingMiddleware)
     const timing = req?.timing || createTiming();
 
@@ -228,6 +236,7 @@ const server = new ApolloServer({
       return {
         models,
         me,
+        res, // Pass response object for setting httpOnly cookies
         pubsub,
         timing,
         loaders: {
@@ -259,6 +268,20 @@ const startServer = async () => {
     path: '/graphql',
   });
 
+  // Helper to parse cookies from cookie header string
+  const parseCookies = (cookieHeader) => {
+    const cookies = {};
+    if (cookieHeader) {
+      cookieHeader.split(';').forEach(cookie => {
+        const parts = cookie.split('=');
+        const key = parts[0]?.trim();
+        const value = parts.slice(1).join('=')?.trim();
+        if (key) cookies[key] = value;
+      });
+    }
+    return cookies;
+  };
+
   // Use graphql-ws for handling subscriptions
   const serverCleanup = useServer(
     {
@@ -268,11 +291,33 @@ const startServer = async () => {
       context: async (ctx, msg, args) => {
         logger.info('WebSocket connection established');
 
-        // Extract authentication from connection params
         let me = null;
-        const connectionParams = ctx.connectionParams || {};
-        const token = connectionParams['x-token'] || connectionParams['authorization']?.replace('Bearer ', '');
+        let token = null;
 
+        // First, try to get token from httpOnly cookie via HTTP upgrade request
+        // The socket's HTTP request contains cookies sent during WebSocket handshake
+        const req = ctx.extra?.request;
+        if (req) {
+          const cookieHeader = req.headers?.cookie;
+          const cookies = parseCookies(cookieHeader);
+          token = cookies.token;
+
+          if (token) {
+            logger.info('WebSocket: Found token in httpOnly cookie');
+          }
+        }
+
+        // Fallback: try connection params (for backwards compatibility)
+        if (!token) {
+          const connectionParams = ctx.connectionParams || {};
+          token = connectionParams['x-token'] || connectionParams['authorization']?.replace('Bearer ', '');
+
+          if (token) {
+            logger.info('WebSocket: Found token in connection params');
+          }
+        }
+
+        // Verify the token
         if (token) {
           try {
             me = verifyToken(token);
@@ -286,6 +331,8 @@ const startServer = async () => {
               token: token.substring(0, 10) + '...'
             });
           }
+        } else {
+          logger.info('WebSocket: No authentication token found');
         }
 
         return {

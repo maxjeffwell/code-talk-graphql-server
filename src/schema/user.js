@@ -6,19 +6,23 @@ export default gql`
         user(id: ID!): User
         me: User
     }
-    
+
     extend type Mutation {
-        signUp(username: String!, email: String!, password: String!): Token!
-        signIn(login: String!, password: String!): Token!
+        signUp(username: String!, email: String!, password: String!): AuthPayload!
+        signIn(login: String!, password: String!): AuthPayload!
+        signOut: Boolean!
         updateUser(username: String!): User!
         deleteUser(id: ID!): Boolean!
     }
-    
-    type Token {
-        token: String!
-        refreshToken: String!
+
+    """
+    Authentication response - tokens are set via httpOnly cookies
+    """
+    type AuthPayload {
+        success: Boolean!
+        user: User
     }
-    
+
     type User {
         id: ID!
         username: String!
