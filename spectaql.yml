@@ -1,0 +1,45 @@
+spectaql:
+  targetDir: ./docs/api
+  themeDir: null
+  logoFile: null
+  faviconFile: null
+  displayAllServers: false
+
+introspection:
+  url: http://localhost:8000/graphql
+  # For production, change to your production URL
+  # url: https://code-talk-k8s.el-jefe.me/graphql
+
+  # Optional: headers for introspection query
+  # headers:
+  #   Authorization: Bearer <token>
+
+info:
+  title: Code Talk GraphQL API
+  description: |
+    Real-time collaborative coding and messaging platform.
+
+    ## Authentication
+    Authentication is handled via httpOnly cookies. Use the `signIn` mutation to authenticate,
+    and the cookies will be automatically included in subsequent requests.
+
+    ## Rate Limiting
+    - Authentication: 5 attempts per 15 minutes
+    - API requests: 100 per minute
+    - GraphQL queries: 60 per minute
+
+    ## Query Complexity
+    Maximum query complexity is limited to 1000 points to prevent DoS attacks.
+  version: 1.0.0
+  contact:
+    name: Jeff Maxwell
+    email: maxjeffwell@gmail.com
+  license:
+    name: GNU GPLv3
+    url: https://www.gnu.org/licenses/gpl-3.0.html
+
+servers:
+  - url: https://code-talk-k8s.el-jefe.me/graphql
+    description: Production API
+  - url: http://localhost:8000/graphql
+    description: Local Development

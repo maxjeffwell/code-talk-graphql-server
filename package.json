@@ -27,7 +27,9 @@
     "db:migrate:undo:all": "sequelize-cli db:migrate:undo:all",
     "db:migrate:status": "sequelize-cli db:migrate:status",
     "db:create": "sequelize-cli db:create",
-    "db:drop": "sequelize-cli db:drop"
+    "db:drop": "sequelize-cli db:drop",
+    "docs:generate": "spectaql spectaql.yml",
+    "docs:serve": "spectaql spectaql.yml --development-mode --development-mode-port 4400"
   },
   "keywords": [],
   "author": "Jeff Maxwell <maxjeffwell@gmail.com>",
@@ -45,7 +47,8 @@
     "mocha": "^11.7.1",
     "nodemon": "^3.1.10",
     "prettier": "^3.3.3",
-    "sequelize-cli": "^6.6.5"
+    "sequelize-cli": "^6.6.5",
+    "spectaql": "^3.0.6"
   },
   "dependencies": {
     "@babel/core": "^7.28.0",
