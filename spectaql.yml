@@ -1,45 +1,63 @@
+# SpectaQL Configuration
+# Generates static documentation for the Code Talk GraphQL API
+# Run with: npx spectaql spectaql.yml
+
 spectaql:
+  # Output directory for generated documentation
   targetDir: ./docs/api
-  themeDir: null
-  logoFile: null
-  faviconFile: null
-  displayAllServers: false
 
 introspection:
-  url: http://localhost:8000/graphql
-  # For production, change to your production URL
-  # url: https://code-talk-k8s.el-jefe.me/graphql
+  # Use local schema file (generated with: npx babel-node scripts/export-schema.js)
+  schemaFile: ./schema.graphql
 
-  # Optional: headers for introspection query
-  # headers:
-  #   Authorization: Bearer <token>
+  # Query options
+  queryNameStrategy: none
 
 info:
+  # API metadata displayed in documentation
   title: Code Talk GraphQL API
   description: |
-    Real-time collaborative coding and messaging platform.
+    **Code Talk** is a real-time collaborative coding and messaging platform.
+
+    ## Features
+
+    - **Real-time Messaging**: Send and receive messages instantly via GraphQL subscriptions
+    - **Chat Rooms**: Create and join topic-based chat rooms
+    - **AI Integration**: Get AI-powered code explanations and documentation
+    - **Collaborative Editing**: Real-time code collaboration
 
     ## Authentication
-    Authentication is handled via httpOnly cookies. Use the `signIn` mutation to authenticate,
-    and the cookies will be automatically included in subsequent requests.
+
+    The API uses JWT tokens for authentication. Tokens are stored in httpOnly cookies
+    after successful sign-in. Include cookies in your requests for authenticated operations.
+
+    Most queries and mutations require authentication. Public endpoints:
+    - `aiHealth` - Check AI gateway status
 
     ## Rate Limiting
-    - Authentication: 5 attempts per 15 minutes
-    - API requests: 100 per minute
-    - GraphQL queries: 60 per minute
 
-    ## Query Complexity
-    Maximum query complexity is limited to 1000 points to prevent DoS attacks.
+    - General API: 100 requests per minute
+    - Authentication: 5 attempts per 15 minutes
+    - GraphQL: 60 requests per minute
+
   version: 1.0.0
+
   contact:
-    name: Jeff Maxwell
-    email: maxjeffwell@gmail.com
+    name: Code Talk API Support
+    url: https://github.com/maxjeffwell/code-talk-graphql-server
+
   license:
-    name: GNU GPLv3
-    url: https://www.gnu.org/licenses/gpl-3.0.html
+    name: MIT
+    url: https://opensource.org/licenses/MIT
 
 servers:
   - url: https://code-talk-k8s.el-jefe.me/graphql
-    description: Production API
+    description: Production server
+    production: true
   - url: http://localhost:8000/graphql
-    description: Local Development
+    description: Local development server
+    production: false
+
+# Extensions for additional documentation
+extensions:
+  generateExamples: true

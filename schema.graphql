@@ -1,0 +1,193 @@
+"""
+A date-time string at UTC, such as 2007-12-03T10:15:30Z, compliant with the `date-time` format outlined in section 5.6 of the RFC 3339 profile of the ISO 8601 standard for representation of dates and times using the Gregorian calendar.
+"""
+scalar DateTime
+
+type Query {
+  _: Boolean
+  users: [User!]
+  user(id: ID!): User
+  me: User
+  messages(cursor: String, limit: Int, roomId: ID): MessageConnection!
+  message(id: ID!): Message!
+  rooms(cursor: String, limit: Int): RoomConnection!
+  room(id: ID!): Room!
+  readCode: Code!
+
+  """Check AI Gateway health status"""
+  aiHealth: AIHealth!
+}
+
+type Mutation {
+  _: Boolean
+  signUp(username: String!, email: String!, password: String!): AuthPayload!
+  signIn(login: String!, password: String!): AuthPayload!
+  signOut: Boolean!
+  updateUser(username: String!): User!
+  deleteUser(id: ID!): Boolean!
+  createMessage(text: String!, roomId: ID): Message!
+  deleteMessage(id: ID!): Message!
+  createRoom(title: String!): Room!
+  deleteRoom(id: ID!): Boolean!
+  joinRoom(roomId: ID!): Room!
+  leaveRoom(roomId: ID!): Boolean!
+  typeCode(code: CodeInput!): Code!
+
+  """Send a message to the AI assistant and get a response"""
+  sendAIMessage(content: String!, conversationHistory: [ChatMessageInput!]): AIMessageResponse!
+
+  """Explain a code snippet"""
+  explainCode(code: String!, language: String): CodeExplanation!
+
+  """Generate documentation for code"""
+  generateDocumentation(code: String!, language: String!, style: String): Documentation!
+
+  """Generate quiz questions about code concepts"""
+  generateCodeQuiz(topic: String!, difficulty: String, count: Int): CodeQuiz!
+}
+
+type Subscription {
+  _: Boolean
+  messageCreated(roomId: ID): MessageCreated
+  messageDeleted: Message!
+  roomCreated: RoomCreated!
+  roomDeleted: RoomDeleted!
+  roomUserJoined: RoomUserJoined!
+  roomUserLeft: RoomUserLeft!
+  typingCode: Code!
+}
+
+"""Authentication response - tokens are set via httpOnly cookies"""
+type AuthPayload {
+  success: Boolean!
+  user: User
+}
+
+type User {
+  id: ID!
+  username: String!
+  email: String!
+  role: String
+  messages: [Message!]
+}
+
+type MessageConnection {
+  edges: [Message!]!
+  pageInfo: PageInfo!
+}
+
+type PageInfo {
+  hasNextPage: Boolean!
+  endCursor: String!
+}
+
+type Message {
+  id: ID!
+  text: String
+  createdAt: DateTime!
+  user: User!
+  userId: ID!
+  roomId: ID
+  room: Room
+}
+
+type MessageCreated {
+  message: Message!
+}
+
+type RoomConnection {
+  edges: [Room!]!
+  pageInfo: PageInfo!
+}
+
+type Room {
+  id: ID!
+  title: String!
+  createdAt: DateTime!
+  users: [User!]
+  messages(cursor: String, limit: Int): MessageConnection!
+}
+
+type RoomCreated {
+  room: Room!
+}
+
+type RoomDeleted {
+  id: ID!
+}
+
+type RoomUserJoined {
+  room: Room!
+  user: User!
+}
+
+type RoomUserLeft {
+  roomId: ID!
+  userId: ID!
+}
+
+input CodeInput {
+  body: String
+}
+
+type Code {
+  body: String
+}
+
+input ChatMessageInput {
+  role: String!
+  content: String!
+}
+
+type AIMessageResponse {
+  id: ID!
+  content: String!
+  role: String!
+  timestamp: String!
+  backend: String
+  model: String
+}
+
+type AIHealth {
+  success: Boolean!
+  gateway: GatewayHealth
+  error: String
+}
+
+type GatewayHealth {
+  status: String!
+  gateway: String
+  backend: BackendHealth
+}
+
+type BackendHealth {
+  status: String
+  model_loaded: Boolean
+}
+
+type CodeExplanation {
+  success: Boolean!
+  explanation: String!
+  language: String!
+  code: String!
+}
+
+type Documentation {
+  success: Boolean!
+  documentation: String!
+  language: String!
+  style: String
+}
+
+type CodeQuiz {
+  success: Boolean!
+  topic: String!
+  difficulty: String!
+  count: Int!
+  questions: [QuizQuestion!]!
+}
+
+type QuizQuestion {
+  question: String!
+  answer: String!
+}

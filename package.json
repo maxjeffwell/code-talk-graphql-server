@@ -28,8 +28,9 @@
     "db:migrate:status": "sequelize-cli db:migrate:status",
     "db:create": "sequelize-cli db:create",
     "db:drop": "sequelize-cli db:drop",
-    "docs:generate": "spectaql spectaql.yml",
-    "docs:serve": "spectaql spectaql.yml --development-mode --development-mode-port 4400"
+    "docs:schema": "babel-node scripts/export-schema.js",
+    "docs:generate": "npm run docs:schema && spectaql spectaql.yml",
+    "docs:serve": "npm run docs:schema && spectaql spectaql.yml --development-mode --development-mode-port 4400"
   },
   "keywords": [],
   "author": "Jeff Maxwell <maxjeffwell@gmail.com>",
