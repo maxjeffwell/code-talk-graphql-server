@@ -8,10 +8,11 @@
 import { Redis } from '@upstash/redis';
 import { Ratelimit } from '@upstash/ratelimit';
 import logger from './logger.js';
+import { upstash } from '../config/index.js';
 
 // Check if Upstash is configured
 const isUpstashConfigured = () => {
-  return !!(process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN);
+  return upstash.enabled;
 };
 
 // Create Upstash Redis client
@@ -22,8 +23,8 @@ const createUpstashClient = () => {
 
   try {
     return new Redis({
-      url: process.env.UPSTASH_REDIS_REST_URL,
-      token: process.env.UPSTASH_REDIS_REST_TOKEN,
+      url: upstash.url,
+      token: upstash.token,
     });
   } catch (error) {
     logger.error('Failed to create Upstash Redis client', { error: error.message });

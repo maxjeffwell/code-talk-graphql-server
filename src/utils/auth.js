@@ -1,37 +1,21 @@
-import jwt from 'jsonwebtoken';
+import jwtLib from 'jsonwebtoken';
 import { AuthenticationError } from 'apollo-server-express';
 import logger from './logger.js';
 import { TokenExpiredError } from './errors.js';
-import dotenv from 'dotenv';
 import {
   checkAuthRateLimit as checkDistributedAuthRateLimit,
   clearAuthAttempts as clearDistributedAuthAttempts,
   isDistributedRateLimiting,
 } from './rateLimiter.js';
+import { jwt, server } from '../config/index.js';
 
-// Ensure dotenv is loaded before accessing environment variables
-dotenv.config();
-
-// SECURITY: No fallback secrets - these MUST be set in environment
-const JWT_SECRET = process.env.JWT_SECRET;
-const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET;
-const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '15m';
-const JWT_REFRESH_EXPIRES_IN = process.env.JWT_REFRESH_EXPIRES_IN || '7d';
-
-// Validate JWT secrets are properly configured
-if (!JWT_SECRET || JWT_SECRET.length < 32) {
-  throw new Error(
-    'JWT_SECRET environment variable is required and must be at least 32 characters long. ' +
-    'Generate one with: node -e "console.log(require(\'crypto\').randomBytes(64).toString(\'hex\'))"'
-  );
-}
-
-if (!JWT_REFRESH_SECRET || JWT_REFRESH_SECRET.length < 32) {
-  throw new Error(
-    'JWT_REFRESH_SECRET environment variable is required and must be at least 32 characters long. ' +
-    'Generate one with: node -e "console.log(require(\'crypto\').randomBytes(64).toString(\'hex\'))"'
-  );
-}
+// JWT configuration from centralized config (validated at startup)
+const JWT_SECRET = jwt.secret;
+const JWT_REFRESH_SECRET = jwt.refreshSecret;
+const JWT_EXPIRES_IN = jwt.expiresIn;
+const JWT_REFRESH_EXPIRES_IN = jwt.refreshExpiresIn;
+const JWT_ISSUER = jwt.issuer;
+const JWT_AUDIENCE = jwt.audience;
 
 // Token generation
 export const generateTokens = async (user) => {
@@ -42,19 +26,19 @@ export const generateTokens = async (user) => {
     role: user.role
   };
 
-  const accessToken = jwt.sign(payload, JWT_SECRET, {
+  const accessToken = jwtLib.sign(payload, JWT_SECRET, {
     expiresIn: JWT_EXPIRES_IN,
-    issuer: 'code-talk-server',
-    audience: 'code-talk-client'
+    issuer: JWT_ISSUER,
+    audience: JWT_AUDIENCE
   });
 
-  const refreshToken = jwt.sign(
+  const refreshToken = jwtLib.sign(
     { id: user.id, username: user.username },
     JWT_REFRESH_SECRET,
     {
       expiresIn: JWT_REFRESH_EXPIRES_IN,
-      issuer: 'code-talk-server',
-      audience: 'code-talk-client'
+      issuer: JWT_ISSUER,
+      audience: JWT_AUDIENCE
     }
   );
 
@@ -65,9 +49,9 @@ export const generateTokens = async (user) => {
 export const verifyToken = (token, isRefresh = false) => {
   try {
     const secret = isRefresh ? JWT_REFRESH_SECRET : JWT_SECRET;
-    return jwt.verify(token, secret, {
-      issuer: 'code-talk-server',
-      audience: 'code-talk-client'
+    return jwtLib.verify(token, secret, {
+      issuer: JWT_ISSUER,
+      audience: JWT_AUDIENCE
     });
   } catch (error) {
     logger.error('Token verification failed', {
@@ -241,7 +225,7 @@ const parseDuration = (duration) => {
 // Cookie configuration
 const COOKIE_OPTIONS = {
   httpOnly: true, // SECURITY: Prevents JavaScript access (XSS protection)
-  secure: process.env.NODE_ENV === 'production', // HTTPS only in production
+  secure: server.isProduction, // HTTPS only in production
   sameSite: 'strict', // SECURITY: Prevents CSRF attacks
   path: '/',
 };
@@ -290,14 +274,14 @@ export const clearAuthCookies = (res) => {
 
   res.clearCookie('token', {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
+    secure: server.isProduction,
     sameSite: 'strict',
     path: '/',
   });
 
   res.clearCookie('refreshToken', {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
+    secure: server.isProduction,
     sameSite: 'strict',
     path: '/',
   });

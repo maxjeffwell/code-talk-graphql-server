@@ -1,10 +1,11 @@
-import { 
-  AuthenticationError, 
-  ForbiddenError, 
+import {
+  AuthenticationError,
+  ForbiddenError,
   UserInputError,
-  ApolloError 
+  ApolloError
 } from 'apollo-server-express';
 import logger from './logger.js';
+import { server } from '../config/index.js';
 
 // Custom error classes
 export class ValidationError extends UserInputError {
@@ -122,13 +123,13 @@ export const formatError = (error) => {
 
   // Default error response
   return {
-    message: process.env.NODE_ENV === 'production' 
-      ? 'Internal server error' 
+    message: server.isProduction
+      ? 'Internal server error'
       : sanitizedMessage,
     code: error.extensions?.code || 'INTERNAL_ERROR',
     path: error.path,
     locations: error.locations,
-    ...(process.env.NODE_ENV !== 'production' && { stack: error.stack })
+    ...(!server.isProduction && { stack: error.stack })
   };
 };
 
@@ -168,10 +169,10 @@ export const errorHandler = (err, req, res, next) => {
 
   // Default error response
   res.status(err.status || 500).json({
-    error: process.env.NODE_ENV === 'production' 
-      ? 'Internal Server Error' 
+    error: server.isProduction
+      ? 'Internal Server Error'
       : err.message,
-    ...(process.env.NODE_ENV !== 'production' && { stack: err.stack })
+    ...(!server.isProduction && { stack: err.stack })
   });
 };
 

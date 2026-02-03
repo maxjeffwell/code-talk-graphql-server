@@ -14,10 +14,11 @@
 
 import crypto from 'crypto';
 import logger from './logger.js';
+import { server, csrf } from '../config/index.js';
 
-const CSRF_COOKIE_NAME = 'csrf-token';
-const CSRF_HEADER_NAME = 'x-csrf-token';
-const TOKEN_LENGTH = 32;
+const CSRF_COOKIE_NAME = csrf.cookieName;
+const CSRF_HEADER_NAME = csrf.headerName;
+const TOKEN_LENGTH = csrf.tokenLength;
 
 // Generate a secure random token
 const generateToken = () => {
@@ -27,10 +28,10 @@ const generateToken = () => {
 // Cookie options for the CSRF token
 const getCookieOptions = () => ({
   httpOnly: false, // Must be false so client JS can read it
-  secure: process.env.NODE_ENV === 'production',
+  secure: server.isProduction,
   sameSite: 'strict',
   path: '/',
-  maxAge: 24 * 60 * 60 * 1000, // 24 hours
+  maxAge: csrf.maxAge,
 });
 
 /**
@@ -54,12 +55,12 @@ export const csrfCookieMiddleware = (req, res, next) => {
  */
 export const validateCsrfToken = (req) => {
   // Skip validation in test environment
-  if (process.env.NODE_ENV === 'test') {
+  if (server.isTest) {
     return { valid: true };
   }
 
   // Skip validation in development if configured
-  if (process.env.NODE_ENV === 'development' && process.env.CSRF_SKIP_VALIDATION === 'true') {
+  if (server.isDevelopment && csrf.skipValidation) {
     return { valid: true };
   }
 

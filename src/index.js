@@ -1,12 +1,12 @@
-import dotenv from 'dotenv';
-dotenv.config();
+// Load configuration first (handles dotenv and validation)
+import { server as serverConfig, security, graphql as graphqlConfig } from './config/index.js';
+
 import compression from 'compression';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import { bodyParserGraphQL } from 'body-parser-graphql';
 import morgan from 'morgan';
 import http from 'http';
-import jwt from 'jsonwebtoken';
 import DataLoader from 'dataloader';
 import express from 'express';
 import rateLimit from 'express-rate-limit';
@@ -97,9 +97,7 @@ app.use(serverTimingMiddleware());
 // Enhanced CORS configuration with security best practices - MUST BE FIRST
 app.use(
   cors({
-    origin: process.env.ALLOWED_ORIGINS
-      ? process.env.ALLOWED_ORIGINS.split(',')
-      : ['http://localhost:3000', 'http://localhost:3001'],
+    origin: security.corsOrigins,
     credentials: true, // Allow cookies and authentication headers
     methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE', 'OPTIONS'],
     allowedHeaders: [
@@ -190,7 +188,7 @@ const executableSchema = makeExecutableSchema({
 
 // SECURITY: Disable schema introspection and playground in production
 // These expose the entire API structure to potential attackers
-const isProduction = process.env.NODE_ENV === 'production';
+const isProduction = serverConfig.isProduction;
 
 // Query complexity configuration
 // Prevents DoS attacks via expensive nested queries
@@ -371,7 +369,7 @@ const startServer = async () => {
   });
 
   const httpServer = http.createServer(app);
-  const port = process.env.PORT || 8000;
+  const port = serverConfig.port;
 
   // Create WebSocket server for subscriptions
   const wsServer = new WebSocketServer({
@@ -487,16 +485,91 @@ const startServer = async () => {
   }
 
   httpServer.listen({ port }, () => {
-    console.log(
-      `Apollo Server is running on http://localhost:${port}/graphql`,
-    );
-    console.log(
-      `WebSocket subscriptions ready at ws://localhost:${port}/graphql`,
-    );
+    logger.info(`Apollo Server is running on http://localhost:${port}/graphql`);
+    logger.info(`WebSocket subscriptions ready at ws://localhost:${port}/graphql`);
+  });
+
+  // =========================================================================
+  // GRACEFUL SHUTDOWN HANDLING
+  // Ensures WebSocket connections have time to close properly during pod
+  // termination in Kubernetes. This is essential for sticky session support.
+  // =========================================================================
+  const SHUTDOWN_TIMEOUT = 30000; // 30 seconds to allow connections to close
+  let isShuttingDown = false;
+
+  const gracefulShutdown = async (signal) => {
+    if (isShuttingDown) {
+      logger.warn(`Received ${signal} during shutdown, ignoring`);
+      return;
+    }
+    isShuttingDown = true;
+    logger.info(`Received ${signal}, starting graceful shutdown...`);
+
+    // Stop accepting new connections
+    httpServer.close(() => {
+      logger.info('HTTP server closed, no longer accepting new connections');
+    });
+
+    // Close WebSocket server (will close all WebSocket connections)
+    try {
+      await new Promise((resolve, reject) => {
+        const closeTimeout = setTimeout(() => {
+          logger.warn('WebSocket server close timed out, forcing shutdown');
+          resolve();
+        }, SHUTDOWN_TIMEOUT);
+
+        wsServer.close(() => {
+          clearTimeout(closeTimeout);
+          logger.info('WebSocket server closed');
+          resolve();
+        });
+      });
+
+      // Clean up GraphQL WS server
+      await serverCleanup.dispose();
+      logger.info('GraphQL WebSocket server cleaned up');
+    } catch (error) {
+      logger.error('Error during WebSocket cleanup', { error: error.message });
+    }
+
+    // Close Apollo Server
+    try {
+      await server.stop();
+      logger.info('Apollo Server stopped');
+    } catch (error) {
+      logger.error('Error stopping Apollo Server', { error: error.message });
+    }
+
+    // Close database connection
+    try {
+      await sequelize.close();
+      logger.info('Database connection closed');
+    } catch (error) {
+      logger.error('Error closing database connection', { error: error.message });
+    }
+
+    logger.info('Graceful shutdown complete');
+    process.exit(0);
+  };
+
+  // Handle termination signals
+  process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+  process.on('SIGINT', () => gracefulShutdown('SIGINT'));
+
+  // Handle uncaught errors during shutdown
+  process.on('uncaughtException', (error) => {
+    logger.error('Uncaught exception', { error: error.message, stack: error.stack });
+    if (!isShuttingDown) {
+      gracefulShutdown('uncaughtException');
+    }
+  });
+
+  process.on('unhandledRejection', (reason, promise) => {
+    logger.error('Unhandled rejection', { reason: reason?.toString() });
   });
 };
 
 startServer().catch((error) => {
-  console.error('Error starting server:', error);
+  logger.error('Error starting server', { error: error.message, stack: error.stack });
   process.exit(1);
 });

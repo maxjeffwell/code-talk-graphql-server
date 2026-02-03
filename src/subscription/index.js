@@ -1,19 +1,24 @@
 import { RedisPubSub } from 'graphql-redis-subscriptions';
 import Redis from 'ioredis';
+import logger from '../utils/logger.js';
+import { redis } from '../config/index.js';
 
 import * as MESSAGE_EVENTS from './message';
 import * as EDITOR_EVENTS from './editor';
 import * as ROOM_EVENTS from './room';
 
+// Get Redis URL from environment (checked separately for connection string mode)
+const REDIS_URL = process.env.REDIS_URL;
+
 const getRedisOptions = () => {
-  if (process.env.REDIS_URL) {
-    const useTls = process.env.REDIS_URL.startsWith('rediss://');
+  if (REDIS_URL) {
+    const useTls = REDIS_URL.startsWith('rediss://');
     const options = {
       lazyConnect: true,
       maxRetriesPerRequest: null,
       retryStrategy(times) {
         const delay = Math.min(times * 100, 3000);
-        console.log(`Redis connection attempt ${times}, retrying in ${delay}ms...`);
+        logger.info(`Redis connection attempt ${times}, retrying in ${delay}ms...`);
         return delay;
       },
     };
@@ -26,14 +31,16 @@ const getRedisOptions = () => {
   }
 
   return {
-    host: process.env.REDIS_HOST || '127.0.0.1',
-    user: process.env.REDIS_USER,
-    password: process.env.REDIS_PASSWORD,
-    port: process.env.REDIS_PORT || 6379,
+    host: redis.host,
+    user: redis.user,
+    password: redis.password,
+    port: redis.port,
+    db: redis.db,
     maxRetriesPerRequest: null,
+    tls: redis.tls,
     retryStrategy(times) {
       const delay = Math.min(times * 100, 3000);
-      console.log(`Redis connection attempt ${times}, retrying in ${delay}ms...`);
+      logger.info(`Redis connection attempt ${times}, retrying in ${delay}ms...`);
       return delay;
     },
   };
@@ -42,8 +49,8 @@ const getRedisOptions = () => {
 const redisOptions = getRedisOptions();
 
 const createRedisConnection = () => {
-  if (process.env.REDIS_URL) {
-    return new Redis(process.env.REDIS_URL, redisOptions);
+  if (REDIS_URL) {
+    return new Redis(REDIS_URL, redisOptions);
   }
   return new Redis(redisOptions);
 };

@@ -119,6 +119,38 @@ export const features = {
   enableFileUploads: process.env.ENABLE_FILE_UPLOADS === 'true',
 };
 
+// AI Gateway configuration
+export const ai = {
+  gatewayUrl: process.env.AI_GATEWAY_URL || 'http://shared-ai-gateway:8002',
+  timeout: parseInt(process.env.AI_TIMEOUT_MS, 10) || 30000,
+  maxRetries: parseInt(process.env.AI_MAX_RETRIES, 10) || 2,
+};
+
+// Upstash Redis configuration (for distributed rate limiting)
+export const upstash = {
+  url: process.env.UPSTASH_REDIS_REST_URL,
+  token: process.env.UPSTASH_REDIS_REST_TOKEN,
+  enabled: !!(process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN),
+};
+
+// Cloudflare configuration (for cache purging)
+export const cloudflare = {
+  apiToken: process.env.CLOUDFLARE_API_TOKEN,
+  zoneId: process.env.CLOUDFLARE_ZONE_ID,
+  enabled: !!(process.env.CLOUDFLARE_API_TOKEN && process.env.CLOUDFLARE_ZONE_ID),
+  publicUrl: process.env.PUBLIC_URL || 'https://code-talk-k8s.el-jefe.me',
+};
+
+// CSRF configuration
+export const csrf = {
+  enabled: process.env.CSRF_ENABLED !== 'false',
+  skipValidation: process.env.CSRF_SKIP_VALIDATION === 'true',
+  cookieName: 'csrf-token',
+  headerName: 'x-csrf-token',
+  tokenLength: 32,
+  maxAge: 24 * 60 * 60 * 1000, // 24 hours
+};
+
 // Export all configurations
 export default {
   server,
@@ -129,4 +161,8 @@ export default {
   logging,
   security,
   features,
+  ai,
+  upstash,
+  cloudflare,
+  csrf,
 };

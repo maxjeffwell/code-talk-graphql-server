@@ -176,30 +176,57 @@ export const securityHeaders = (req, res, next) => {
 
 // Environment variable validation
 export const validateEnvironment = () => {
+  const isProduction = process.env.NODE_ENV === 'production';
+  const isTest = process.env.NODE_ENV === 'test';
+
+  // Required in all environments
   const required = [
     'DATABASE_URL',
     'JWT_SECRET',
   ];
-  
+
+  // Required in production only
+  if (isProduction) {
+    required.push('JWT_REFRESH_SECRET');
+  }
+
   const missing = required.filter(key => !process.env[key]);
-  
-  // Check for Redis configuration - either REDIS_URL or REDIS_HOST
-  if (!process.env.REDIS_URL && !process.env.REDIS_HOST) {
+
+  // Check for Redis configuration - either REDIS_URL or REDIS_HOST (not required in test)
+  if (!isTest && !process.env.REDIS_URL && !process.env.REDIS_HOST) {
     missing.push('REDIS_URL or REDIS_HOST');
   }
-  
+
   if (missing.length > 0) {
     throw new Error(`Missing required environment variables: ${missing.join(', ')}`);
   }
-  
+
   // Validate JWT secret strength
-  if (process.env.JWT_SECRET.length < 32) {
+  if (process.env.JWT_SECRET && process.env.JWT_SECRET.length < 32) {
     throw new Error('JWT_SECRET must be at least 32 characters long');
   }
-  
+
+  // Validate JWT refresh secret strength in production
+  if (isProduction && process.env.JWT_REFRESH_SECRET && process.env.JWT_REFRESH_SECRET.length < 32) {
+    throw new Error('JWT_REFRESH_SECRET must be at least 32 characters long');
+  }
+
   // Warn about security in development
   if (process.env.NODE_ENV === 'development') {
     console.warn('⚠️  Running in development mode. Security features may be relaxed.');
+  }
+
+  // Log configuration summary (non-sensitive)
+  if (!isTest) {
+    console.log('✓ Environment validated:', {
+      env: process.env.NODE_ENV || 'development',
+      port: process.env.PORT || 8000,
+      database: process.env.DATABASE_URL ? '✓ configured' : '✗ missing',
+      redis: process.env.REDIS_URL || process.env.REDIS_HOST ? '✓ configured' : '✗ missing',
+      upstash: process.env.UPSTASH_REDIS_REST_URL ? '✓ configured' : '○ optional',
+      cloudflare: process.env.CLOUDFLARE_API_TOKEN ? '✓ configured' : '○ optional',
+      aiGateway: process.env.AI_GATEWAY_URL || 'default',
+    });
   }
 };
 

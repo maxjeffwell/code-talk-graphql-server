@@ -7,8 +7,9 @@ import {
   generateDocumentationSchema,
   generateCodeQuizSchema,
 } from '../utils/validation.js';
+import { ai } from '../config/index.js';
 
-const AI_GATEWAY_URL = process.env.AI_GATEWAY_URL || 'http://shared-ai-gateway:8002';
+const AI_GATEWAY_URL = ai.gatewayUrl;
 
 // Note: fetch is a global in Node 18+, we use it directly without assignment
 
