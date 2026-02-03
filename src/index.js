@@ -38,6 +38,7 @@ import logger from './utils/logger.js';
 import { formatError, errorHandler } from './utils/errors.js';
 import { getUserFromRequest, verifyToken } from './utils/auth.js';
 import { serverTimingMiddleware, createTiming } from './utils/timing.js';
+import { csrfCookieMiddleware, validateCsrfToken, CSRF_HEADER_NAME } from './utils/csrf.js';
 import pubsub from './subscription';
 
 // Prometheus metrics setup
@@ -109,7 +110,9 @@ app.use(
       'Authorization',
       'X-Token', // Custom token header
       'x-token', // Lowercase variant
-      'X-Apollo-Tracing' // Apollo GraphQL tracing
+      'X-Apollo-Tracing', // Apollo GraphQL tracing
+      'X-CSRF-Token', // CSRF protection header
+      'x-csrf-token' // Lowercase variant
     ],
     exposedHeaders: [
       'X-Total-Count',
@@ -145,6 +148,9 @@ app.use(bodyParserGraphQL());
 
 // Cookie parser for httpOnly cookie authentication
 app.use(cookieParser());
+
+// CSRF protection - set token cookie on GET requests
+app.use(csrfCookieMiddleware);
 
 // Enhanced logging with Winston
 app.use(morgan('combined', {
@@ -195,6 +201,27 @@ const COMPLEXITY_CONFIG = {
   listFactor: 10,     // Lists multiply the child cost by 10
 };
 
+// CSRF validation plugin for GraphQL mutations
+const csrfValidationPlugin = {
+  async requestDidStart() {
+    return {
+      async didResolveOperation({ operation, context }) {
+        // Only validate mutations (not queries or subscriptions)
+        if (operation?.operation === 'mutation') {
+          // Skip for WebSocket connections (no cookies auto-sent)
+          if (!context.req) return;
+
+          const result = validateCsrfToken(context.req);
+          if (!result.valid) {
+            throw new AuthenticationError(result.error);
+          }
+          logger.debug('CSRF token validated for mutation');
+        }
+      },
+    };
+  },
+};
+
 const server = new ApolloServer({
   introspection: !isProduction,
   playground: !isProduction,
@@ -205,6 +232,8 @@ const server = new ApolloServer({
     depthLimit(10) // Limit query depth to 10 levels
   ],
   plugins: [
+    // CSRF validation for mutations
+    csrfValidationPlugin,
     // Query complexity limiting plugin
     {
       requestDidStart: () => ({
@@ -304,6 +333,7 @@ const server = new ApolloServer({
       return {
         models,
         me,
+        req, // Pass request object for CSRF validation
         res, // Pass response object for setting httpOnly cookies
         pubsub,
         timing,

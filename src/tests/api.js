@@ -13,12 +13,21 @@ const api = axios.create({
 
 // Store cookies between requests (for test environment)
 let cookies = '';
+let csrfToken = '';
 
-// Interceptor to handle cookies
+// Helper to extract CSRF token from cookie string
+const extractCsrfToken = (cookieStr) => {
+  const match = cookieStr.match(/csrf-token=([^;]+)/);
+  return match ? match[1] : '';
+};
+
+// Interceptor to handle cookies and extract CSRF token
 api.interceptors.response.use((response) => {
   const setCookie = response.headers['set-cookie'];
   if (setCookie) {
     cookies = setCookie.map(c => c.split(';')[0]).join('; ');
+    // Extract CSRF token from cookies
+    csrfToken = extractCsrfToken(cookies);
   }
   return response;
 });
@@ -27,12 +36,33 @@ api.interceptors.request.use((config) => {
   if (cookies) {
     config.headers.Cookie = cookies;
   }
+  // Add CSRF token header for mutations
+  if (csrfToken) {
+    config.headers['x-csrf-token'] = csrfToken;
+  }
   return config;
 });
 
 // Clear cookies (for logout or between tests)
 export const clearCookies = () => {
   cookies = '';
+  csrfToken = '';
+};
+
+// Fetch CSRF token by making a GET request (server sets cookie on GET)
+export const fetchCsrfToken = async () => {
+  // Make a GET request to trigger CSRF cookie setting
+  await axios.get(API_URL.replace('/graphql', '/health'), {
+    withCredentials: true,
+  }).then(response => {
+    const setCookie = response.headers['set-cookie'];
+    if (setCookie) {
+      cookies = setCookie.map(c => c.split(';')[0]).join('; ');
+      csrfToken = extractCsrfToken(cookies);
+    }
+  }).catch(() => {
+    // Health endpoint might not exist in test, that's okay
+  });
 };
 
 // Authentication mutations (httpOnly cookie-based)
