@@ -77,8 +77,8 @@ app.use((req, res, next) => {
 });
 
 // Trust proxy headers when behind reverse proxy (Kubernetes Ingress/Traefik)
-// This allows Express to correctly read X-Forwarded-For and other proxy headers
-app.set('trust proxy', true);
+// Use 1 to trust only the first proxy hop (more secure than 'true')
+app.set('trust proxy', 1);
 
 // Response compression - reduces bandwidth and improves response times
 // Only compress responses > 1KB, skip if client requests no compression
@@ -202,14 +202,27 @@ const COMPLEXITY_CONFIG = {
 };
 
 // CSRF validation plugin for GraphQL mutations
+// Auth mutations (signIn, signUp) are exempt - user doesn't have CSRF token yet
+const CSRF_EXEMPT_MUTATIONS = ['signIn', 'signUp'];
+
 const csrfValidationPlugin = {
   async requestDidStart() {
     return {
-      async didResolveOperation({ operation, context }) {
+      async didResolveOperation({ operation, context, document }) {
         // Only validate mutations (not queries or subscriptions)
         if (operation?.operation === 'mutation') {
           // Skip for WebSocket connections (no cookies auto-sent)
           if (!context.req) return;
+
+          // Check if this is an exempt mutation (auth mutations)
+          const selections = operation.selectionSet?.selections || [];
+          const mutationNames = selections.map(s => s.name?.value).filter(Boolean);
+          const isExempt = mutationNames.some(name => CSRF_EXEMPT_MUTATIONS.includes(name));
+
+          if (isExempt) {
+            logger.debug('CSRF validation skipped for auth mutation', { mutations: mutationNames });
+            return;
+          }
 
           const result = validateCsrfToken(context.req);
           if (!result.valid) {
