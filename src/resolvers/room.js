@@ -4,6 +4,8 @@ import { combineResolvers } from 'graphql-resolvers';
 import PubSub, { EVENTS } from '../subscription';
 import { isAuthenticated } from './authorization';
 import { purgeCodeTalkCache } from '../utils/cloudflare.js';
+import { validate, createRoomSchema, roomIdSchema, joinLeaveRoomSchema } from '../utils/validation.js';
+import DOMPurify from 'isomorphic-dompurify';
 
 const toCursorHash = string => Buffer.from(string).toString('base64');
 
@@ -64,9 +66,14 @@ export default {
   Mutation: {
     createRoom: combineResolvers(
       isAuthenticated,
-      async (parent, { title }, { models, me }) => {
+      async (parent, args, { models, me }) => {
+        // Validate inputs
+        const { title } = validate(createRoomSchema, args, 'createRoom');
+
+        // Sanitize title
+        const sanitizedTitle = DOMPurify.sanitize(title);
         const room = await models.Room.create({
-          title,
+          title: sanitizedTitle,
         });
 
         await room.addUser(me.id);
@@ -83,7 +90,9 @@ export default {
 
     deleteRoom: combineResolvers(
       isAuthenticated,
-      async (parent, { id }, { models, me }) => {
+      async (parent, args, { models, me }) => {
+        // Validate inputs
+        const { id } = validate(roomIdSchema, args, 'deleteRoom');
         const room = await models.Room.findByPk(id);
 
         if (!room) {
@@ -105,7 +114,9 @@ export default {
     
     joinRoom: combineResolvers(
       isAuthenticated,
-      async (parent, { roomId }, { models, me }) => {
+      async (parent, args, { models, me }) => {
+        // Validate inputs
+        const { roomId } = validate(joinLeaveRoomSchema, args, 'joinRoom');
         const room = await models.Room.findByPk(roomId);
         
         if (!room) {
@@ -137,7 +148,9 @@ export default {
     
     leaveRoom: combineResolvers(
       isAuthenticated,
-      async (parent, { roomId }, { models, me }) => {
+      async (parent, args, { models, me }) => {
+        // Validate inputs
+        const { roomId } = validate(joinLeaveRoomSchema, args, 'leaveRoom');
         const room = await models.Room.findByPk(roomId);
         
         if (!room) {

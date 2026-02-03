@@ -13,6 +13,7 @@ import {
 } from '../utils/auth.js';
 import { handleDatabaseError } from '../utils/errors.js';
 import logger from '../utils/logger.js';
+import { validate, signUpSchema, signInSchema } from '../utils/validation.js';
 
 export default {
   Query: {
@@ -45,13 +46,12 @@ export default {
   Mutation: {
     signUp: async (
       parent,
-      { username, email, password },
+      args,
       { models, res }
     ) => {
       try {
-        // Sanitize inputs
-        username = sanitizeAuthInput(username);
-        email = sanitizeAuthInput(email);
+        // Validate and sanitize inputs
+        const { username, email, password } = validate(signUpSchema, args, 'signUp');
 
         // Validate password strength
         const passwordValidation = validatePassword(password);
@@ -99,12 +99,12 @@ export default {
 
     signIn: async (
       parent,
-      { login, password },
+      args,
       { models, res, timing }
     ) => {
       try {
-        // Sanitize input
-        login = sanitizeAuthInput(login);
+        // Validate and sanitize inputs
+        const { login, password } = validate(signInSchema, args, 'signIn');
 
         // Check rate limiting (distributed via Upstash when configured)
         await checkAuthRateLimit(login);

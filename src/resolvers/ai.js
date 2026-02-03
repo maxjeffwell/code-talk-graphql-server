@@ -1,5 +1,12 @@
 import { combineResolvers } from 'graphql-resolvers';
 import { isAuthenticated } from './authorization';
+import {
+  validate,
+  sendAIMessageSchema,
+  explainCodeSchema,
+  generateDocumentationSchema,
+  generateCodeQuizSchema,
+} from '../utils/validation.js';
 
 const AI_GATEWAY_URL = process.env.AI_GATEWAY_URL || 'http://shared-ai-gateway:8002';
 
@@ -34,8 +41,11 @@ export default {
   Mutation: {
     sendAIMessage: combineResolvers(
       isAuthenticated,
-      async (parent, { content, conversationHistory = [] }) => {
+      async (parent, args) => {
       try {
+        // Validate inputs
+        const { content, conversationHistory } = validate(sendAIMessageSchema, args, 'sendAIMessage');
+
         // Build messages array with history
         const messages = [
           ...conversationHistory.map(m => ({ role: m.role, content: m.content })),
@@ -78,8 +88,11 @@ export default {
 
     explainCode: combineResolvers(
       isAuthenticated,
-      async (parent, { code, language = 'unknown' }) => {
+      async (parent, args) => {
       try {
+        // Validate inputs
+        const { code, language } = validate(explainCodeSchema, args, 'explainCode');
+
         const response = await fetch(`${AI_GATEWAY_URL}/api/ai/explain-code`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -108,8 +121,11 @@ export default {
 
     generateDocumentation: combineResolvers(
       isAuthenticated,
-      async (parent, { code, language, style = 'jsdoc' }) => {
+      async (parent, args) => {
       try {
+        // Validate inputs
+        const { code, language, style } = validate(generateDocumentationSchema, args, 'generateDocumentation');
+
         const prompt = `Generate ${style} documentation for this ${language} code:
 
 \`\`\`${language}
@@ -153,8 +169,11 @@ Documentation:`;
 
     generateCodeQuiz: combineResolvers(
       isAuthenticated,
-      async (parent, { topic, difficulty = 'medium', count = 3 }) => {
+      async (parent, args) => {
       try {
+        // Validate inputs
+        const { topic, difficulty, count } = validate(generateCodeQuizSchema, args, 'generateCodeQuiz');
+
         const response = await fetch(`${AI_GATEWAY_URL}/api/ai/quiz`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },

@@ -5,6 +5,7 @@ import DOMPurify from 'isomorphic-dompurify';
 import PubSub, { EVENTS } from '../subscription';
 import { isAuthenticated, isMessageOwner } from './authorization';
 import { purgeCodeTalkCache } from '../utils/cloudflare.js';
+import { validate, createMessageSchema, deleteMessageSchema } from '../utils/validation.js';
 
 const toCursorHash = string => Buffer.from(string).toString('base64');
 
@@ -63,17 +64,17 @@ export default {
   Mutation: {
     createMessage: combineResolvers(
       isAuthenticated,
-      async (parent, { text, roomId }, { models, me }) => {
+      async (parent, args, { models, me }) => {
+        // Validate inputs
+        const { text, roomId } = validate(createMessageSchema, args, 'createMessage');
+
+        // Sanitize HTML in text
         const sanitizedText = DOMPurify.sanitize(text);
         const message = await models.Message.create({
           text: sanitizedText,
           userId: me.id,
           // roomId is optional and can be null for global messages
-          ...(roomId !== undefined && { 
-            roomId: roomId === null ? null : (
-              Number.isInteger(Number(roomId)) ? parseInt(roomId, 10) : null
-            )
-          }),
+          ...(roomId !== undefined && { roomId }),
         });
 
         PubSub.publish(EVENTS.MESSAGE.CREATED, {
@@ -90,8 +91,10 @@ export default {
     deleteMessage: combineResolvers(
       isAuthenticated,
       isMessageOwner,
-      async (parent, { id }, { models }) => {
-        const messageId = parseInt(id, 10);
+      async (parent, args, { models }) => {
+        // Validate inputs
+        const { id } = validate(deleteMessageSchema, args, 'deleteMessage');
+        const messageId = id;
         
         // Get the message before deleting to return it
         const message = await models.Message.findByPk(messageId);
