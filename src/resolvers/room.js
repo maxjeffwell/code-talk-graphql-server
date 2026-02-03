@@ -1,215 +1,83 @@
-import { Sequelize } from 'sequelize';
+/**
+ * Room Resolvers
+ *
+ * GraphQL resolvers for room operations.
+ * Business logic is delegated to RoomService.
+ */
+
 import { combineResolvers } from 'graphql-resolvers';
 
 import PubSub, { EVENTS } from '../subscription';
 import { isAuthenticated } from './authorization';
-import { purgeCodeTalkCache } from '../utils/cloudflare.js';
 import { validate, createRoomSchema, roomIdSchema, joinLeaveRoomSchema } from '../utils/validation.js';
-import DOMPurify from 'isomorphic-dompurify';
-
-const toCursorHash = string => Buffer.from(string).toString('base64');
-
-const fromCursorHash = string => Buffer.from(string, 'base64').toString('ascii');
+import * as RoomService from '../services/RoomService.js';
+import * as MessageService from '../services/MessageService.js';
 
 export default {
   Query: {
     rooms: combineResolvers(
       isAuthenticated,
-      async (parent, { cursor, limit = 5 }, { models, me, timing }) => {
-        const cursorOptions = cursor ? {
-            where: {
-              createdAt: {
-                [Sequelize.Op.lt]: fromCursorHash(cursor),
-              },
-            },
-          }
-          : {};
-
-        const rooms = await timing.time('db-rooms', 'PostgreSQL rooms query', () =>
-          models.Room.findAll({
-            order: [['createdAt', 'DESC']],
-            limit: limit + 1,
-            // Remove user filter to show all rooms to all authenticated users
-            ...cursorOptions,
-          })
+      async (parent, { cursor, limit = 5 }, { models, timing }) => {
+        return timing.time('db-rooms', 'PostgreSQL rooms query', () =>
+          RoomService.getRooms(models, { cursor, limit })
         );
-
-        const hasNextPage = rooms.length > limit;
-        const edges = hasNextPage ? rooms.slice(0, -1) : rooms;
-
-        return {
-          edges,
-          pageInfo: {
-            hasNextPage,
-            endCursor: edges.length > 0 ? toCursorHash(
-              edges[edges.length - 1].createdAt.toString(),
-            ) : null,
-          },
-        };
-      }),
+      }
+    ),
 
     room: combineResolvers(
       isAuthenticated,
-      async (parent, { id }, { models, me, timing }) => {
-        const room = await timing.time('db-room', 'PostgreSQL room lookup', () =>
-          models.Room.findByPk(id)
+      async (parent, { id }, { models, timing }) => {
+        return timing.time('db-room', 'PostgreSQL room lookup', () =>
+          RoomService.getRoomById(models, id)
         );
-
-        if (!room) {
-          throw new Error('Room not found');
-        }
-
-        return room;
-      }),
+      }
+    ),
   },
 
   Mutation: {
     createRoom: combineResolvers(
       isAuthenticated,
       async (parent, args, { models, me }) => {
-        // Validate inputs
         const { title } = validate(createRoomSchema, args, 'createRoom');
-
-        // Sanitize title
-        const sanitizedTitle = DOMPurify.sanitize(title);
-        const room = await models.Room.create({
-          title: sanitizedTitle,
+        return RoomService.createRoom(models, {
+          title,
+          userId: me.id,
         });
-
-        await room.addUser(me.id);
-
-        await PubSub.publish(EVENTS.ROOM.CREATED, {
-          roomCreated: { room },
-        });
-
-        purgeCodeTalkCache();
-
-        return room;
-      },
+      }
     ),
 
     deleteRoom: combineResolvers(
       isAuthenticated,
-      async (parent, args, { models, me }) => {
-        // Validate inputs
+      async (parent, args, { models }) => {
         const { id } = validate(roomIdSchema, args, 'deleteRoom');
-        const room = await models.Room.findByPk(id);
-
-        if (!room) {
-          throw new Error('Room not found');
-        }
-
-        const result = await models.Room.destroy({ where: { id } });
-
-        // Publish room deleted event
-        await PubSub.publish(EVENTS.ROOM.DELETED, {
-          roomDeleted: { id },
-        });
-
-        purgeCodeTalkCache();
-
-        return result;
-      },
+        return RoomService.deleteRoom(models, id);
+      }
     ),
-    
+
     joinRoom: combineResolvers(
       isAuthenticated,
       async (parent, args, { models, me }) => {
-        // Validate inputs
         const { roomId } = validate(joinLeaveRoomSchema, args, 'joinRoom');
-        const room = await models.Room.findByPk(roomId);
-        
-        if (!room) {
-          throw new Error('Room not found');
-        }
-        
-        await room.addUser(me.id);
-        
-        // Fetch the room with the user included
-        const roomWithUser = await models.Room.findByPk(roomId, {
-          include: [{
-            model: models.User,
-            where: { id: me.id },
-            through: { attributes: [] }
-          }]
-        });
-        
-        // Publish room user joined event
-        await PubSub.publish(EVENTS.ROOM.USER_JOINED, {
-          roomUserJoined: { 
-            room: roomWithUser,
-            user: me 
-          },
-        });
-        
-        return roomWithUser;
-      },
+        return RoomService.joinRoom(models, { roomId, user: me });
+      }
     ),
-    
+
     leaveRoom: combineResolvers(
       isAuthenticated,
       async (parent, args, { models, me }) => {
-        // Validate inputs
         const { roomId } = validate(joinLeaveRoomSchema, args, 'leaveRoom');
-        const room = await models.Room.findByPk(roomId);
-        
-        if (!room) {
-          throw new Error('Room not found');
-        }
-        
-        await room.removeUser(me.id);
-        
-        // Publish room user left event
-        await PubSub.publish(EVENTS.ROOM.USER_LEFT, {
-          roomUserLeft: { 
-            roomId,
-            userId: me.id 
-          },
-        });
-        
-        return true;
-      },
+        return RoomService.leaveRoom(models, { roomId, userId: me.id });
+      }
     ),
   },
 
   Room: {
     messages: async (room, { cursor, limit = 5 }, { models }) => {
-      const cursorOptions = cursor ? {
-          where: {
-            roomId: room.id,
-            createdAt: {
-              [Sequelize.Op.lt]: fromCursorHash(cursor),
-            },
-          },
-        }
-        : {
-          where: {
-            roomId: room.id
-          }
-        };
-
-      const messages = await models.Message.findAll({
-        order: [['createdAt', 'DESC']],
-        limit: limit + 1,
-        ...cursorOptions,
-      });
-
-      const hasNextPage = messages.length > limit;
-      const edges = hasNextPage ? messages.slice(0, -1) : messages;
-
-      return {
-        edges,
-        pageInfo: {
-          hasNextPage,
-          endCursor: edges.length > 0 ? toCursorHash(
-            edges[edges.length - 1].createdAt.toString(),
-          ) : null,
-        },
-      };
+      return MessageService.getMessagesByRoom(models, room.id, { cursor, limit });
     },
-    
-    users: async (room, args, { models }) => {
-      return await room.getUsers();
+
+    users: async (room) => {
+      return RoomService.getRoomUsers(room);
     },
   },
 
@@ -226,5 +94,5 @@ export default {
     roomUserLeft: {
       subscribe: () => PubSub.asyncIterator(EVENTS.ROOM.USER_LEFT),
     },
-  }
+  },
 };

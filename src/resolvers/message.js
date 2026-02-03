@@ -1,61 +1,33 @@
-import { Sequelize } from 'sequelize';
+/**
+ * Message Resolvers
+ *
+ * GraphQL resolvers for message operations.
+ * Business logic is delegated to MessageService.
+ */
+
 import { combineResolvers } from 'graphql-resolvers';
-import DOMPurify from 'isomorphic-dompurify';
 
 import PubSub, { EVENTS } from '../subscription';
 import { isAuthenticated, isMessageOwner } from './authorization';
-import { purgeCodeTalkCache } from '../utils/cloudflare.js';
 import { validate, createMessageSchema, deleteMessageSchema } from '../utils/validation.js';
-
-const toCursorHash = string => Buffer.from(string).toString('base64');
-
-const fromCursorHash = string =>
-  Buffer.from(string, 'base64').toString('ascii');
+import * as MessageService from '../services/MessageService.js';
 
 export default {
   Query: {
     messages: combineResolvers(
       isAuthenticated,
       async (parent, { cursor, limit = 10, roomId }, { models, timing }) => {
-      const whereClause = {
-        ...(cursor && {
-          createdAt: {
-            [Sequelize.Op.lt]: fromCursorHash(cursor),
-          },
-        }),
-        ...(roomId !== undefined && {
-          roomId: roomId === null ? null : (
-            Number.isInteger(Number(roomId)) ? parseInt(roomId, 10) : null
-          )
-        }),
-      };
+        return timing.time('db-messages', 'PostgreSQL messages query', () =>
+          MessageService.getMessages(models, { cursor, limit, roomId })
+        );
+      }
+    ),
 
-      const messages = await timing.time('db-messages', 'PostgreSQL messages query', () =>
-        models.Message.findAll({
-          order: [['createdAt', 'DESC']],
-          limit: limit + 1,
-          where: whereClause,
-        })
-      );
-
-      const hasNextPage = messages.length > limit;
-      const edges = hasNextPage ? messages.slice(0, -1) : messages;
-
-      return {
-        edges,
-        pageInfo: {
-          hasNextPage,
-          endCursor: edges.length > 0 ? toCursorHash(
-            edges[edges.length - 1].createdAt.toString(),
-          ) : '',
-        },
-      };
-    }),
     message: combineResolvers(
       isAuthenticated,
       async (parent, { id }, { models, timing }) => {
-        return await timing.time('db-message', 'PostgreSQL message lookup', () =>
-          models.Message.findByPk(id)
+        return timing.time('db-message', 'PostgreSQL message lookup', () =>
+          MessageService.getMessageById(models, id)
         );
       }
     ),
@@ -65,66 +37,31 @@ export default {
     createMessage: combineResolvers(
       isAuthenticated,
       async (parent, args, { models, me }) => {
-        // Validate inputs
         const { text, roomId } = validate(createMessageSchema, args, 'createMessage');
-
-        // Sanitize HTML in text
-        const sanitizedText = DOMPurify.sanitize(text);
-        const message = await models.Message.create({
-          text: sanitizedText,
+        return MessageService.createMessage(models, {
+          text,
           userId: me.id,
-          // roomId is optional and can be null for global messages
-          ...(roomId !== undefined && { roomId }),
+          roomId,
         });
-
-        PubSub.publish(EVENTS.MESSAGE.CREATED, {
-          messageCreated: { message },
-        });
-
-        // Purge Cloudflare cache on message create
-        purgeCodeTalkCache();
-
-        return message;
-      },
+      }
     ),
 
     deleteMessage: combineResolvers(
       isAuthenticated,
       isMessageOwner,
       async (parent, args, { models }) => {
-        // Validate inputs
         const { id } = validate(deleteMessageSchema, args, 'deleteMessage');
-        const messageId = id;
-        
-        // Get the message before deleting to return it
-        const message = await models.Message.findByPk(messageId);
-        
-        if (!message) {
-          throw new Error('Message not found');
-        }
-        
-        const deletedCount = await models.Message.destroy({ where: { id: messageId } });
-        
-        if (deletedCount === 0) {
-          throw new Error('Message could not be deleted');
-        }
-        
-        PubSub.publish(EVENTS.MESSAGE.DELETED, { messageDeleted: message });
-
-        // Purge Cloudflare cache on message delete
-        purgeCodeTalkCache();
-
-        return message;
-      },
+        return MessageService.deleteMessage(models, id);
+      }
     ),
   },
 
   Message: {
     user: async (message, args, { loaders }) => {
-      return await loaders.user.load(message.userId);
+      return loaders.user.load(message.userId);
     },
     room: async (message, args, { loaders }) => {
-      return message.roomId ? await loaders.room.load(message.roomId) : null;
+      return message.roomId ? loaders.room.load(message.roomId) : null;
     },
   },
 
@@ -139,11 +76,11 @@ export default {
       resolve: (payload, { roomId }) => {
         if (roomId !== undefined) {
           const messageRoomId = payload.messageCreated.message.roomId;
-          
+
           // For global chat subscription (roomId === null)
           // Only show messages without a roomId
           if (roomId === null && messageRoomId !== null) return null;
-          
+
           // For room-specific subscription (roomId !== null)
           // Only show messages for that specific room
           if (roomId !== null) {
@@ -163,4 +100,4 @@ export default {
       ),
     },
   },
-  };
+};
