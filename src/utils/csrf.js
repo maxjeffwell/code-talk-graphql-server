@@ -37,8 +37,9 @@ const getCookieOptions = () => ({
  * Middleware to set CSRF token cookie if not present
  */
 export const csrfCookieMiddleware = (req, res, next) => {
-  // Only set on GET requests (when user first loads the app)
-  if (req.method === 'GET' && !req.cookies[CSRF_COOKIE_NAME]) {
+  // Set CSRF cookie on any request if not present
+  // This ensures the cookie is set even when client only makes POST requests
+  if (!req.cookies[CSRF_COOKIE_NAME]) {
     const token = generateToken();
     res.cookie(CSRF_COOKIE_NAME, token, getCookieOptions());
     logger.debug('CSRF token cookie set');
