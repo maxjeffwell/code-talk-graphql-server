@@ -19,6 +19,53 @@ jobs:
       matrix:
         node-version: [18.x, 20.x]
 
+    # Service containers to run alongside the job
+    services:
+      # PostgreSQL service container
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: test
+          POSTGRES_PASSWORD: testpassword
+          POSTGRES_DB: codetalk_test
+        # Health checks to wait until postgres is ready
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+      # Redis service container
+      redis:
+        image: redis:7
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
+
+    env:
+      # Database configuration for tests
+      DATABASE_URL: postgres://test:testpassword@localhost:5432/codetalk_test
+      TEST_DATABASE_URL: postgres://test:testpassword@localhost:5432/codetalk_test
+      # JWT configuration (test values)
+      JWT_SECRET: test-jwt-secret-that-is-at-least-32-characters-long
+      JWT_REFRESH_SECRET: test-jwt-refresh-secret-that-is-at-least-32-characters-long
+      # Redis configuration
+      REDIS_HOST: localhost
+      REDIS_PORT: 6379
+      # Test environment
+      NODE_ENV: test
+      PORT: 8000
+      # Disable SSL for test database
+      DB_SSL: false
+      # Test API URL
+      TEST_API_URL: http://localhost:8000/graphql
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -32,10 +79,52 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Wait for PostgreSQL to be ready
+        run: |
+          until pg_isready -h localhost -p 5432 -U test; do
+            echo "Waiting for postgres..."
+            sleep 2
+          done
+          echo "PostgreSQL is ready!"
+
+      - name: Wait for Redis to be ready
+        run: |
+          until redis-cli -h localhost -p 6379 ping; do
+            echo "Waiting for redis..."
+            sleep 2
+          done
+          echo "Redis is ready!"
+
+      - name: Seed test database
+        run: npm run seed:force
+
+      - name: Start server in background
+        run: |
+          npm start &
+          echo $! > server.pid
+          # Wait for server to start
+          echo "Waiting for server to start..."
+          for i in {1..30}; do
+            if curl -s http://localhost:8000/health > /dev/null 2>&1; then
+              echo "Server is ready!"
+              break
+            fi
+            echo "Attempt $i: Server not ready yet..."
+            sleep 2
+          done
+          # Final health check
+          curl -f http://localhost:8000/health || (echo "Server failed to start" && exit 1)
+
       - name: Run tests
         run: npm test
-        env:
-          CI: true
+
+      - name: Stop server
+        if: always()
+        run: |
+          if [ -f server.pid ]; then
+            kill $(cat server.pid) 2>/dev/null || true
+            rm server.pid
+          fi
 
       - name: Build Docker image (without push)
         uses: docker/build-push-action@v5

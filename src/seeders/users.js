@@ -2,6 +2,13 @@ import models from '../models/index.js';
 
 export const seedUsers = async () => {
   const users = [
+    // Test user expected by integration tests
+    {
+      username: 'jeff',
+      email: 'jeff@test.example',
+      password: 'username5',
+      role: 'USER',
+    },
     {
       username: 'demo',
       email: 'demo@example.com',
