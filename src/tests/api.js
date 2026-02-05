@@ -213,7 +213,10 @@ export const deleteMessage = async (variables) => {
   return api.post('', {
     query: `
       mutation ($id: ID!) {
-        deleteMessage(id: $id)
+        deleteMessage(id: $id) {
+          id
+          text
+        }
       }
     `,
     variables,

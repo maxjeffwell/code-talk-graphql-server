@@ -242,7 +242,10 @@ export const graphqlMutations = {
   
   DELETE_MESSAGE: `
     mutation DeleteMessage($id: ID!) {
-      deleteMessage(id: $id)
+      deleteMessage(id: $id) {
+        id
+        text
+      }
     }
   `,
 };
