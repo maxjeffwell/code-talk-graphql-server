@@ -64,9 +64,18 @@ describe('Messages', () => {
       const messageId = createResult.data.data.createMessage.id;
 
       // Then delete it
-      const deleteResult = await api.deleteMessage({ id: messageId });
-
-      expect(deleteResult.data.data.deleteMessage).to.be.true;
+      try {
+        const deleteResult = await api.deleteMessage({ id: messageId });
+        expect(deleteResult.data.data.deleteMessage).to.be.true;
+      } catch (error) {
+        // If request fails, check if it's a GraphQL error we can inspect
+        if (error.response && error.response.data) {
+          const { errors } = error.response.data;
+          // Fail with a descriptive error
+          throw new Error(`Delete failed: ${JSON.stringify(errors || error.response.data)}`);
+        }
+        throw error;
+      }
     });
   });
 });
