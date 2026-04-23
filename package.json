@@ -89,7 +89,7 @@
     "prom-client": "^15.1.0",
     "sequelize": "^6.37.7",
     "subscriptions-transport-ws": "^0.11.0",
-    "uuid": "^11.1.0",
+    "uuid": "^14.0.0",
     "winston": "^3.17.0",
     "winston-daily-rotate-file": "^5.0.0",
     "ws": "^8.14.2"
