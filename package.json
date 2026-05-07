@@ -37,7 +37,7 @@
   "license": "GNU GPLv3",
   "devDependencies": {
     "@babel/register": "^7.27.1",
-    "axios": "^1.7.9",
+    "axios": "^1.15.2",
     "babel-eslint": "^10.1.0",
     "chai": "^4.3.0",
     "eslint": "^7.32.0",
