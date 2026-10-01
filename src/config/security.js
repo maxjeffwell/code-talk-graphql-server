@@ -223,7 +223,6 @@ export const validateEnvironment = () => {
       port: process.env.PORT || 8000,
       database: process.env.DATABASE_URL ? '✓ configured' : '✗ missing',
       redis: process.env.REDIS_URL || process.env.REDIS_HOST ? '✓ configured' : '✗ missing',
-      upstash: process.env.UPSTASH_REDIS_REST_URL ? '✓ configured' : '○ optional',
       cloudflare: process.env.CLOUDFLARE_API_TOKEN ? '✓ configured' : '○ optional',
       aiGateway: process.env.AI_GATEWAY_URL || 'default',
     });

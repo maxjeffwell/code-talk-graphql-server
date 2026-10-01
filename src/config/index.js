@@ -126,13 +126,6 @@ export const ai = {
   maxRetries: parseInt(process.env.AI_MAX_RETRIES, 10) || 2,
 };
 
-// Upstash Redis configuration (for distributed rate limiting)
-export const upstash = {
-  url: process.env.UPSTASH_REDIS_REST_URL,
-  token: process.env.UPSTASH_REDIS_REST_TOKEN,
-  enabled: !!(process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN),
-};
-
 // Cloudflare configuration (for cache purging)
 export const cloudflare = {
   apiToken: process.env.CLOUDFLARE_API_TOKEN,
@@ -162,7 +155,6 @@ export default {
   security,
   features,
   ai,
-  upstash,
   cloudflare,
   csrf,
 };

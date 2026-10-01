@@ -153,13 +153,13 @@ export const validatePassword = (password) => {
 };
 
 // ============================================================================
-// RATE LIMITING - Uses Upstash for distributed rate limiting
-// Falls back to in-memory if Upstash is not configured
+// RATE LIMITING - Uses the in-cluster Redis for distributed rate limiting
+// Falls back to in-memory if Redis is unavailable
 // ============================================================================
 
 /**
  * Check authentication rate limit (5 attempts per 15 minutes)
- * Uses Upstash Redis for distributed rate limiting when available
+ * Uses the in-cluster Redis for distributed rate limiting when available
  * @param {string} identifier - User identifier (email, IP, etc.)
  * @throws {AuthenticationError} If rate limit exceeded
  */
