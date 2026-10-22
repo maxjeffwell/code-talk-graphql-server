@@ -192,18 +192,20 @@ export const handleDatabaseError = (error, operation) => {
   });
 
   switch (error.name) {
-    case 'SequelizeValidationError':
+    case 'SequelizeValidationError': {
       const validationMessages = error.errors
         .map((e) => e.message)
         .join(', ');
       throw new ValidationError(
         validationMessages || 'Validation failed',
       );
-    case 'SequelizeUniqueConstraintError':
+    }
+    case 'SequelizeUniqueConstraintError': {
       const field = error.errors[0]?.path || 'field';
       throw new ValidationError(
         `The ${field} is already taken. Please choose a different one.`,
       );
+    }
     case 'SequelizeForeignKeyConstraintError':
       throw new ValidationError('Invalid reference');
     case 'SequelizeConnectionError':

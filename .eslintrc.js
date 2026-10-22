@@ -21,13 +21,32 @@ module.exports = {
     'consistent-return': 'off',
     // Sequelize hooks and axios interceptors mutate the object they are given.
     'no-param-reassign': ['error', { props: false }],
+    // Style preferences from airbnb that add churn without catching bugs here:
+    // small modules with one named export, i++ in loops, `function` expressions
+    // on Sequelize prototypes (need `this`), one module holding the error classes.
+    'import/prefer-default-export': 'off',
+    'no-plusplus': 'off',
+    'func-names': 'off',
+    'max-classes-per-file': 'off',
   },
   overrides: [
     {
+      files: ['src/tests/**/*.js', 'scripts/**/*.js'],
+      rules: {
+        'import/no-extraneous-dependencies': [
+          'error',
+          { devDependencies: true },
+        ],
+      },
+    },
+    {
       files: ['src/tests/**/*.js'],
       env: { mocha: true },
-      // chai: expect(x).to.be.true
-      rules: { 'no-unused-expressions': 'off' },
+      rules: {
+        // chai: expect(x).to.be.true
+        'no-unused-expressions': 'off',
+        'global-require': 'off',
+      },
     },
   ],
 };

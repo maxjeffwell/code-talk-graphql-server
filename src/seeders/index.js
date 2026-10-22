@@ -1,4 +1,4 @@
-import models, { sequelize } from '../models/index.js';
+import { sequelize } from '../models/index.js';
 import { seedUsers } from './users.js';
 import { seedMessages } from './messages.js';
 

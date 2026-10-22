@@ -73,12 +73,13 @@ export const getMessages = async (
   if (roomId !== undefined) {
     // roomId === null means global messages (no room)
     // roomId === number means specific room
-    where.roomId =
-      roomId === null
-        ? null
-        : Number.isInteger(Number(roomId))
-          ? parseInt(roomId, 10)
-          : null;
+    if (roomId === null) {
+      where.roomId = null;
+    } else {
+      where.roomId = Number.isInteger(Number(roomId))
+        ? parseInt(roomId, 10)
+        : null;
+    }
   }
 
   return paginatedQuery(models.Message, {

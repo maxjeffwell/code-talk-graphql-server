@@ -45,7 +45,7 @@ const SANITIZATION_CONFIGS = {
     ],
     ALLOWED_ATTR: ['href', 'src', 'alt', 'title', 'target'],
     ALLOWED_URI_REGEXP:
-      /^(?:(?:(?:f|ht)tps?|mailto|tel|callto|cid|xmpp):|[^a-z]|[a-z+.\-]+(?:[^a-z+.\-:]|$))/i,
+      /^(?:(?:(?:f|ht)tps?|mailto|tel|callto|cid|xmpp):|[^a-z]|[a-z+.-]+(?:[^a-z+.:-]|$))/i,
     KEEP_CONTENT: true,
   },
 };
@@ -161,7 +161,7 @@ export const sanitizeFilePath = (path) => {
   // Remove any path traversal attempts
   return path
     .replace(/\.\./g, '')
-    .replace(/[\/\\]/g, '_')
+    .replace(/[/\\]/g, '_')
     .substring(0, 255);
 };
 

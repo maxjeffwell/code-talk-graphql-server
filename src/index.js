@@ -25,11 +25,7 @@ import {
   simpleEstimator,
   fieldExtensionsEstimator,
 } from 'graphql-query-complexity';
-import {
-  server as serverConfig,
-  security,
-  graphql as graphqlConfig,
-} from './config/index.js';
+import { server as serverConfig, security } from './config/index.js';
 
 import schema from './schema';
 import resolvers from './resolvers';
@@ -45,7 +41,6 @@ import {
 import {
   csrfCookieMiddleware,
   validateCsrfToken,
-  CSRF_HEADER_NAME,
 } from './utils/csrf.js';
 import pubsub from './subscription';
 
