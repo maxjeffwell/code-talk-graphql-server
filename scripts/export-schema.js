@@ -1,34 +1,27 @@
 /**
  * Export GraphQL schema to SDL file for documentation generation
- * Run with: npx babel-node scripts/export-schema.js
+ * Run with: npx babel-node scripts/export-schema.js  (or: npm run docs:schema)
+ *
+ * Builds the schema from the type definitions plus the Date scalar (so the
+ * SDL names it DateTime, as the running server does). Importing the full
+ * resolver tree would drag in the models and the Redis client, which keep
+ * the event loop alive after the file is written and the process never
+ * exits.
  */
 import { printSchema } from 'graphql';
 import { makeExecutableSchema } from '@graphql-tools/schema';
+import { DateTimeResolver } from 'graphql-scalars';
 import fs from 'fs';
 import path from 'path';
-import { fileURLToPath } from 'url';
-
-// Prevent config from trying to validate env vars
-process.env.JWT_SECRET = process.env.JWT_SECRET || 'dummy-secret-for-schema-export-only-32chars';
-process.env.JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || 'dummy-refresh-secret-for-schema-export32';
-process.env.DATABASE_URL = process.env.DATABASE_URL || 'postgres://localhost/dummy';
-process.env.REDIS_HOST = process.env.REDIS_HOST || 'localhost';
-process.env.NODE_ENV = 'development';
 
 import typeDefs from '../src/schema/index.js';
-import resolvers from '../src/resolvers/index.js';
 
-// Create executable schema
 const schema = makeExecutableSchema({
   typeDefs,
-  resolvers,
+  resolvers: { Date: DateTimeResolver },
 });
 
-// Export to SDL
-const sdl = printSchema(schema);
-
-// Write to file
 const outputPath = path.join(process.cwd(), 'schema.graphql');
-fs.writeFileSync(outputPath, sdl);
+fs.writeFileSync(outputPath, printSchema(schema));
 
-console.log('Schema exported to schema.graphql');
+console.log(`Schema exported to ${outputPath}`);
