@@ -23,7 +23,7 @@ export default gql`
 
     type PageInfo {
         hasNextPage: Boolean!
-        endCursor: String!
+        endCursor: String
     }
 
     type Message {

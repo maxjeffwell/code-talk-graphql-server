@@ -51,7 +51,7 @@ type Mutation {
 
 type PageInfo {
   hasNextPage: Boolean!
-  endCursor: String!
+  endCursor: String
 }
 
 type Query {
