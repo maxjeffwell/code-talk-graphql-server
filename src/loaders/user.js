@@ -7,14 +7,21 @@ export const batchUsers = async (keys, models) => {
         [Op.in]: keys,
       },
     },
-    attributes: ['id', 'username', 'email', 'role', 'createdAt', 'updatedAt']
+    attributes: [
+      'id',
+      'username',
+      'email',
+      'role',
+      'createdAt',
+      'updatedAt',
+    ],
   });
 
   // Create a map for efficient lookup
-  const userMap = new Map(users.map(user => [user.id, user]));
-  
+  const userMap = new Map(users.map((user) => [user.id, user]));
+
   // Return users in the same order as keys, null for missing users
-  return keys.map(key => userMap.get(key) || null);
+  return keys.map((key) => userMap.get(key) || null);
 };
 
 export const batchUsersByEmail = async (emails, models) => {
@@ -24,9 +31,16 @@ export const batchUsersByEmail = async (emails, models) => {
         [Op.in]: emails,
       },
     },
-    attributes: ['id', 'username', 'email', 'role', 'createdAt', 'updatedAt']
+    attributes: [
+      'id',
+      'username',
+      'email',
+      'role',
+      'createdAt',
+      'updatedAt',
+    ],
   });
 
-  const userMap = new Map(users.map(user => [user.email, user]));
-  return emails.map(email => userMap.get(email) || null);
+  const userMap = new Map(users.map((user) => [user.email, user]));
+  return emails.map((email) => userMap.get(email) || null);
 };

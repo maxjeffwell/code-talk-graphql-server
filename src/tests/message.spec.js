@@ -34,18 +34,28 @@ describe('Messages', () => {
     it('supports pagination with cursor', async () => {
       const firstPage = await api.messages({ limit: 1 });
 
-      expect(firstPage.data.data.messages.pageInfo).to.have.property('endCursor');
-      expect(firstPage.data.data.messages.pageInfo).to.have.property('hasNextPage');
+      expect(firstPage.data.data.messages.pageInfo).to.have.property(
+        'endCursor',
+      );
+      expect(firstPage.data.data.messages.pageInfo).to.have.property(
+        'hasNextPage',
+      );
     });
   });
 
   describe('createMessage(text: String!)', () => {
     it('creates a new message', async () => {
-      const result = await api.createMessage({ text: 'Test message from spec' });
+      const result = await api.createMessage({
+        text: 'Test message from spec',
+      });
 
       expect(result.data.data.createMessage).to.have.property('id');
-      expect(result.data.data.createMessage.text).to.equal('Test message from spec');
-      expect(result.data.data.createMessage.user).to.have.property('username');
+      expect(result.data.data.createMessage.text).to.equal(
+        'Test message from spec',
+      );
+      expect(result.data.data.createMessage.user).to.have.property(
+        'username',
+      );
     });
 
     it('returns error when not authenticated', async () => {
@@ -60,14 +70,21 @@ describe('Messages', () => {
   describe('deleteMessage(id: ID!)', () => {
     it('deletes a message owned by user', async () => {
       // First create a message
-      const createResult = await api.createMessage({ text: 'Message to delete' });
+      const createResult = await api.createMessage({
+        text: 'Message to delete',
+      });
       const messageId = createResult.data.data.createMessage.id;
 
       // Then delete it (returns the deleted message)
       const deleteResult = await api.deleteMessage({ id: messageId });
 
-      expect(deleteResult.data.data.deleteMessage).to.have.property('id', messageId);
-      expect(deleteResult.data.data.deleteMessage.text).to.equal('Message to delete');
+      expect(deleteResult.data.data.deleteMessage).to.have.property(
+        'id',
+        messageId,
+      );
+      expect(deleteResult.data.data.deleteMessage.text).to.equal(
+        'Message to delete',
+      );
     });
   });
 });

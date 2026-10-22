@@ -1,5 +1,4 @@
 // Load configuration first (handles dotenv and validation)
-import { server as serverConfig, security, graphql as graphqlConfig } from './config/index.js';
 
 import compression from 'compression';
 import cors from 'cors';
@@ -26,20 +25,32 @@ import {
   simpleEstimator,
   fieldExtensionsEstimator,
 } from 'graphql-query-complexity';
+import {
+  server as serverConfig,
+  security,
+  graphql as graphqlConfig,
+} from './config/index.js';
 
 import schema from './schema';
 import resolvers from './resolvers';
 import models, { sequelize } from './models';
-
-// Log AI routes registration
-console.log('AI routes registered successfully');
 import loaders from './loaders';
 import logger from './utils/logger.js';
 import { formatError, errorHandler } from './utils/errors.js';
 import { getUserFromRequest, verifyToken } from './utils/auth.js';
-import { serverTimingMiddleware, createTiming } from './utils/timing.js';
-import { csrfCookieMiddleware, validateCsrfToken, CSRF_HEADER_NAME } from './utils/csrf.js';
+import {
+  serverTimingMiddleware,
+  createTiming,
+} from './utils/timing.js';
+import {
+  csrfCookieMiddleware,
+  validateCsrfToken,
+  CSRF_HEADER_NAME,
+} from './utils/csrf.js';
 import pubsub from './subscription';
+
+// Log AI routes registration
+console.log('AI routes registered successfully');
 
 // Prometheus metrics setup
 const register = new client.Registry();
@@ -49,27 +60,34 @@ const httpRequestsTotal = new client.Counter({
   name: 'http_requests_total',
   help: 'Total number of HTTP requests',
   labelNames: ['method', 'route', 'status'],
-  registers: [register]
+  registers: [register],
 });
 
 const httpRequestDuration = new client.Histogram({
   name: 'http_request_duration_seconds',
   help: 'Duration of HTTP requests in seconds',
   labelNames: ['method', 'route', 'status'],
-  buckets: [0.001, 0.005, 0.015, 0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 1, 2, 5],
-  registers: [register]
+  buckets: [
+    0.001, 0.005, 0.015, 0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 1, 2, 5,
+  ],
+  registers: [register],
 });
 
 const app = express();
 
 // Metrics middleware (before other middleware)
 app.use((req, res, next) => {
-  if (req.path === '/metrics' || req.path === '/health') return next();
+  if (req.path === '/metrics' || req.path === '/health')
+    return next();
   const start = process.hrtime.bigint();
   res.on('finish', () => {
     const duration = Number(process.hrtime.bigint() - start) / 1e9;
     const route = req.route?.path || req.path || 'unknown';
-    const labels = { method: req.method, route, status: res.statusCode.toString() };
+    const labels = {
+      method: req.method,
+      route,
+      status: res.statusCode.toString(),
+    };
     httpRequestsTotal.inc(labels);
     httpRequestDuration.observe(labels, duration);
   });
@@ -82,14 +100,16 @@ app.set('trust proxy', 1);
 
 // Response compression - reduces bandwidth and improves response times
 // Only compress responses > 1KB, skip if client requests no compression
-app.use(compression({
-  filter: (req, res) => {
-    if (req.headers['x-no-compression']) return false;
-    return compression.filter(req, res);
-  },
-  threshold: 1024, // Only compress responses larger than 1KB
-  level: 6, // Compression level (1-9), 6 is a good balance of speed vs size
-}));
+app.use(
+  compression({
+    filter: (req, res) => {
+      if (req.headers['x-no-compression']) return false;
+      return compression.filter(req, res);
+    },
+    threshold: 1024, // Only compress responses larger than 1KB
+    level: 6, // Compression level (1-9), 6 is a good balance of speed vs size
+  }),
+);
 
 // Server-Timing middleware - tracks request timing for performance monitoring
 app.use(serverTimingMiddleware());
@@ -99,7 +119,15 @@ app.use(
   cors({
     origin: security.corsOrigins,
     credentials: true, // Allow cookies and authentication headers
-    methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE', 'OPTIONS'],
+    methods: [
+      'GET',
+      'HEAD',
+      'PUT',
+      'PATCH',
+      'POST',
+      'DELETE',
+      'OPTIONS',
+    ],
     allowedHeaders: [
       'Origin',
       'X-Requested-With',
@@ -110,18 +138,18 @@ app.use(
       'x-token', // Lowercase variant
       'X-Apollo-Tracing', // Apollo GraphQL tracing
       'X-CSRF-Token', // CSRF protection header
-      'x-csrf-token' // Lowercase variant
+      'x-csrf-token', // Lowercase variant
     ],
     exposedHeaders: [
       'X-Total-Count',
       'X-RateLimit-Limit',
       'X-RateLimit-Remaining',
       'X-RateLimit-Reset',
-      'Server-Timing'
+      'Server-Timing',
     ],
     maxAge: 86400, // 24 hours preflight cache
     optionsSuccessStatus: 200, // For legacy browser support
-    preflightContinue: false // Handle preflight internally
+    preflightContinue: false, // Handle preflight internally
   }),
 );
 
@@ -151,18 +179,22 @@ app.use(cookieParser());
 app.use(csrfCookieMiddleware);
 
 // Enhanced logging with Winston
-app.use(morgan('combined', {
-  stream: {
-    write: (message) => logger.info(message.trim())
-  }
-}));
+app.use(
+  morgan('combined', {
+    stream: {
+      write: (message) => logger.info(message.trim()),
+    },
+  }),
+);
 
 // Add error handling middleware
 app.use(errorHandler);
 
 // Health check endpoint
 app.get('/health', (req, res) => {
-  res.status(200).json({ status: 'OK', timestamp: new Date().toISOString() });
+  res
+    .status(200)
+    .json({ status: 'OK', timestamp: new Date().toISOString() });
 });
 
 // Prometheus metrics endpoint
@@ -171,7 +203,7 @@ app.get('/metrics', async (req, res) => {
   res.end(await register.metrics());
 });
 
-const getMe = async req => {
+const getMe = async (req) => {
   try {
     return await getUserFromRequest(req);
   } catch (error) {
@@ -188,15 +220,15 @@ const executableSchema = makeExecutableSchema({
 
 // SECURITY: Disable schema introspection and playground in production
 // These expose the entire API structure to potential attackers
-const isProduction = serverConfig.isProduction;
+const { isProduction } = serverConfig;
 
 // Query complexity configuration
 // Prevents DoS attacks via expensive nested queries
 const MAX_QUERY_COMPLEXITY = 1000;
 const COMPLEXITY_CONFIG = {
-  scalarCost: 1,      // Each scalar field costs 1
-  objectCost: 2,      // Each object field costs 2
-  listFactor: 10,     // Lists multiply the child cost by 10
+  scalarCost: 1, // Each scalar field costs 1
+  objectCost: 2, // Each object field costs 2
+  listFactor: 10, // Lists multiply the child cost by 10
 };
 
 // CSRF validation plugin for GraphQL mutations
@@ -214,11 +246,18 @@ const csrfValidationPlugin = {
 
           // Check if this is an exempt mutation (auth mutations)
           const selections = operation.selectionSet?.selections || [];
-          const mutationNames = selections.map(s => s.name?.value).filter(Boolean);
-          const isExempt = mutationNames.some(name => CSRF_EXEMPT_MUTATIONS.includes(name));
+          const mutationNames = selections
+            .map((s) => s.name?.value)
+            .filter(Boolean);
+          const isExempt = mutationNames.some((name) =>
+            CSRF_EXEMPT_MUTATIONS.includes(name),
+          );
 
           if (isExempt) {
-            logger.debug('CSRF validation skipped for auth mutation', { mutations: mutationNames });
+            logger.debug(
+              'CSRF validation skipped for auth mutation',
+              { mutations: mutationNames },
+            );
             return;
           }
 
@@ -240,7 +279,7 @@ const server = new ApolloServer({
   schema: executableSchema,
   formatError,
   validationRules: [
-    depthLimit(10) // Limit query depth to 10 levels
+    depthLimit(10), // Limit query depth to 10 levels
   ],
   plugins: [
     // CSRF validation for mutations
@@ -280,7 +319,7 @@ const server = new ApolloServer({
               maxAllowed: MAX_QUERY_COMPLEXITY,
             });
             throw new Error(
-              `Query too complex: ${complexity}. Maximum allowed complexity: ${MAX_QUERY_COMPLEXITY}`
+              `Query too complex: ${complexity}. Maximum allowed complexity: ${MAX_QUERY_COMPLEXITY}`,
             );
           }
         },
@@ -291,32 +330,32 @@ const server = new ApolloServer({
       requestDidStart() {
         return {
           didResolveOperation({ request, document }) {
-            const operationName = request.operationName;
-            const query = request.query;
+            const { operationName } = request;
+            const { query } = request;
             logger.info('GraphQL Operation Started', {
               operationName,
-              query: query?.replace(/\s+/g, ' ').trim()
+              query: query?.replace(/\s+/g, ' ').trim(),
             });
           },
           didEncounterErrors({ errors }) {
-            errors.forEach(error => {
+            errors.forEach((error) => {
               logger.error('GraphQL Error Encountered', {
                 message: error.message,
                 path: error.path,
-                locations: error.locations
+                locations: error.locations,
               });
             });
           },
           willSendResponse({ response }) {
             if (response.errors) {
               logger.warn('GraphQL Response with errors', {
-                errorCount: response.errors.length
+                errorCount: response.errors.length,
               });
             }
-          }
+          },
         };
-      }
-    }
+      },
+    },
   ],
   context: async ({ req, res, connection }) => {
     // Get timing from request (created by serverTimingMiddleware)
@@ -328,18 +367,30 @@ const server = new ApolloServer({
         pubsub,
         timing,
         loaders: {
-          message: new DataLoader(keys => loaders.message.batchMessages(keys, models)),
-          messagesByUser: new DataLoader(keys => loaders.message.batchMessagesByUser(keys, models)),
-          room: new DataLoader(keys => loaders.room.batchRooms(keys, models)),
-          user: new DataLoader(keys => loaders.user.batchUsers(keys, models)),
-          usersByEmail: new DataLoader(keys => loaders.user.batchUsersByEmail(keys, models)),
+          message: new DataLoader((keys) =>
+            loaders.message.batchMessages(keys, models),
+          ),
+          messagesByUser: new DataLoader((keys) =>
+            loaders.message.batchMessagesByUser(keys, models),
+          ),
+          room: new DataLoader((keys) =>
+            loaders.room.batchRooms(keys, models),
+          ),
+          user: new DataLoader((keys) =>
+            loaders.user.batchUsers(keys, models),
+          ),
+          usersByEmail: new DataLoader((keys) =>
+            loaders.user.batchUsersByEmail(keys, models),
+          ),
         },
       };
     }
 
     if (req) {
       // Time the authentication check
-      const me = await timing.time('auth', 'JWT verification', () => getMe(req));
+      const me = await timing.time('auth', 'JWT verification', () =>
+        getMe(req),
+      );
 
       return {
         models,
@@ -349,11 +400,21 @@ const server = new ApolloServer({
         pubsub,
         timing,
         loaders: {
-          message: new DataLoader(keys => loaders.message.batchMessages(keys, models)),
-          messagesByUser: new DataLoader(keys => loaders.message.batchMessagesByUser(keys, models)),
-          room: new DataLoader(keys => loaders.room.batchRooms(keys, models)),
-          user: new DataLoader(keys => loaders.user.batchUsers(keys, models)),
-          usersByEmail: new DataLoader(keys => loaders.user.batchUsersByEmail(keys, models)),
+          message: new DataLoader((keys) =>
+            loaders.message.batchMessages(keys, models),
+          ),
+          messagesByUser: new DataLoader((keys) =>
+            loaders.message.batchMessagesByUser(keys, models),
+          ),
+          room: new DataLoader((keys) =>
+            loaders.room.batchRooms(keys, models),
+          ),
+          user: new DataLoader((keys) =>
+            loaders.user.batchUsers(keys, models),
+          ),
+          usersByEmail: new DataLoader((keys) =>
+            loaders.user.batchUsersByEmail(keys, models),
+          ),
         },
       };
     }
@@ -365,11 +426,11 @@ const startServer = async () => {
   server.applyMiddleware({
     app,
     path: '/graphql',
-    cors: false // Use our custom CORS middleware instead
+    cors: false, // Use our custom CORS middleware instead
   });
 
   const httpServer = http.createServer(app);
-  const port = serverConfig.port;
+  const { port } = serverConfig;
 
   // Create WebSocket server for subscriptions
   const wsServer = new WebSocketServer({
@@ -381,7 +442,7 @@ const startServer = async () => {
   const parseCookies = (cookieHeader) => {
     const cookies = {};
     if (cookieHeader) {
-      cookieHeader.split(';').forEach(cookie => {
+      cookieHeader.split(';').forEach((cookie) => {
         const parts = cookie.split('=');
         const key = parts[0]?.trim();
         const value = parts.slice(1).join('=')?.trim();
@@ -419,10 +480,14 @@ const startServer = async () => {
         // Fallback: try connection params (for backwards compatibility)
         if (!token) {
           const connectionParams = ctx.connectionParams || {};
-          token = connectionParams['x-token'] || connectionParams['authorization']?.replace('Bearer ', '');
+          token =
+            connectionParams['x-token'] ||
+            connectionParams.authorization?.replace('Bearer ', '');
 
           if (token) {
-            logger.info('WebSocket: Found token in connection params');
+            logger.info(
+              'WebSocket: Found token in connection params',
+            );
           }
         }
 
@@ -432,12 +497,12 @@ const startServer = async () => {
             me = verifyToken(token);
             logger.info('WebSocket user authenticated', {
               userId: me.id,
-              username: me.username
+              username: me.username,
             });
           } catch (error) {
             logger.warn('WebSocket authentication failed', {
               error: error.message,
-              token: token.substring(0, 10) + '...'
+              token: `${token.substring(0, 10)}...`,
             });
           }
         } else {
@@ -449,10 +514,18 @@ const startServer = async () => {
           models,
           pubsub,
           loaders: {
-            message: new DataLoader(keys => loaders.message.batchMessages(keys, models)),
-            messagesByUser: new DataLoader(keys => loaders.message.batchMessagesByUser(keys, models)),
-            user: new DataLoader(keys => loaders.user.batchUsers(keys, models)),
-            usersByEmail: new DataLoader(keys => loaders.user.batchUsersByEmail(keys, models)),
+            message: new DataLoader((keys) =>
+              loaders.message.batchMessages(keys, models),
+            ),
+            messagesByUser: new DataLoader((keys) =>
+              loaders.message.batchMessagesByUser(keys, models),
+            ),
+            user: new DataLoader((keys) =>
+              loaders.user.batchUsers(keys, models),
+            ),
+            usersByEmail: new DataLoader((keys) =>
+              loaders.user.batchUsersByEmail(keys, models),
+            ),
           },
         };
       },
@@ -463,7 +536,7 @@ const startServer = async () => {
         logger.info('Client disconnected', { code, reason });
       },
     },
-    wsServer
+    wsServer,
   );
 
   // Database initialization
@@ -485,8 +558,12 @@ const startServer = async () => {
   }
 
   httpServer.listen({ port }, () => {
-    logger.info(`Apollo Server is running on http://localhost:${port}/graphql`);
-    logger.info(`WebSocket subscriptions ready at ws://localhost:${port}/graphql`);
+    logger.info(
+      `Apollo Server is running on http://localhost:${port}/graphql`,
+    );
+    logger.info(
+      `WebSocket subscriptions ready at ws://localhost:${port}/graphql`,
+    );
   });
 
   // =========================================================================
@@ -507,14 +584,18 @@ const startServer = async () => {
 
     // Stop accepting new connections
     httpServer.close(() => {
-      logger.info('HTTP server closed, no longer accepting new connections');
+      logger.info(
+        'HTTP server closed, no longer accepting new connections',
+      );
     });
 
     // Close WebSocket server (will close all WebSocket connections)
     try {
       await new Promise((resolve, reject) => {
         const closeTimeout = setTimeout(() => {
-          logger.warn('WebSocket server close timed out, forcing shutdown');
+          logger.warn(
+            'WebSocket server close timed out, forcing shutdown',
+          );
           resolve();
         }, SHUTDOWN_TIMEOUT);
 
@@ -529,7 +610,9 @@ const startServer = async () => {
       await serverCleanup.dispose();
       logger.info('GraphQL WebSocket server cleaned up');
     } catch (error) {
-      logger.error('Error during WebSocket cleanup', { error: error.message });
+      logger.error('Error during WebSocket cleanup', {
+        error: error.message,
+      });
     }
 
     // Close Apollo Server
@@ -537,7 +620,9 @@ const startServer = async () => {
       await server.stop();
       logger.info('Apollo Server stopped');
     } catch (error) {
-      logger.error('Error stopping Apollo Server', { error: error.message });
+      logger.error('Error stopping Apollo Server', {
+        error: error.message,
+      });
     }
 
     // Close database connection
@@ -545,7 +630,9 @@ const startServer = async () => {
       await sequelize.close();
       logger.info('Database connection closed');
     } catch (error) {
-      logger.error('Error closing database connection', { error: error.message });
+      logger.error('Error closing database connection', {
+        error: error.message,
+      });
     }
 
     logger.info('Graceful shutdown complete');
@@ -558,18 +645,26 @@ const startServer = async () => {
 
   // Handle uncaught errors during shutdown
   process.on('uncaughtException', (error) => {
-    logger.error('Uncaught exception', { error: error.message, stack: error.stack });
+    logger.error('Uncaught exception', {
+      error: error.message,
+      stack: error.stack,
+    });
     if (!isShuttingDown) {
       gracefulShutdown('uncaughtException');
     }
   });
 
   process.on('unhandledRejection', (reason, promise) => {
-    logger.error('Unhandled rejection', { reason: reason?.toString() });
+    logger.error('Unhandled rejection', {
+      reason: reason?.toString(),
+    });
   });
 };
 
 startServer().catch((error) => {
-  logger.error('Error starting server', { error: error.message, stack: error.stack });
+  logger.error('Error starting server', {
+    error: error.message,
+    stack: error.stack,
+  });
   process.exit(1);
 });

@@ -14,7 +14,10 @@ import logger from './logger.js';
 // ============================================
 
 const idSchema = Joi.number().integer().positive().required();
-const optionalIdSchema = Joi.number().integer().positive().allow(null);
+const optionalIdSchema = Joi.number()
+  .integer()
+  .positive()
+  .allow(null);
 
 // ============================================
 // User Schemas
@@ -27,42 +30,28 @@ export const signUpSchema = Joi.object({
     .max(30)
     .required()
     .messages({
-      'string.alphanum': 'Username must only contain letters and numbers',
+      'string.alphanum':
+        'Username must only contain letters and numbers',
       'string.min': 'Username must be at least 3 characters',
       'string.max': 'Username must be at most 30 characters',
     }),
-  email: Joi.string()
-    .email()
-    .required()
-    .messages({
-      'string.email': 'Please provide a valid email address',
-    }),
-  password: Joi.string()
-    .min(8)
-    .max(128)
-    .required()
-    .messages({
-      'string.min': 'Password must be at least 8 characters',
-      'string.max': 'Password must be at most 128 characters',
-    }),
+  email: Joi.string().email().required().messages({
+    'string.email': 'Please provide a valid email address',
+  }),
+  password: Joi.string().min(8).max(128).required().messages({
+    'string.min': 'Password must be at least 8 characters',
+    'string.max': 'Password must be at most 128 characters',
+  }),
 });
 
 export const signInSchema = Joi.object({
-  login: Joi.string()
-    .min(1)
-    .max(100)
-    .required()
-    .messages({
-      'string.empty': 'Login is required',
-      'string.max': 'Login must be at most 100 characters',
-    }),
-  password: Joi.string()
-    .min(1)
-    .max(128)
-    .required()
-    .messages({
-      'string.empty': 'Password is required',
-    }),
+  login: Joi.string().min(1).max(100).required().messages({
+    'string.empty': 'Login is required',
+    'string.max': 'Login must be at most 100 characters',
+  }),
+  password: Joi.string().min(1).max(128).required().messages({
+    'string.empty': 'Password is required',
+  }),
 });
 
 // ============================================
@@ -70,14 +59,10 @@ export const signInSchema = Joi.object({
 // ============================================
 
 export const createMessageSchema = Joi.object({
-  text: Joi.string()
-    .min(1)
-    .max(5000)
-    .required()
-    .messages({
-      'string.empty': 'Message cannot be empty',
-      'string.max': 'Message must be at most 5000 characters',
-    }),
+  text: Joi.string().min(1).max(5000).required().messages({
+    'string.empty': 'Message cannot be empty',
+    'string.max': 'Message must be at most 5000 characters',
+  }),
   roomId: optionalIdSchema,
 });
 
@@ -93,15 +78,10 @@ export const deleteMessageSchema = Joi.object({
 // ============================================
 
 export const createRoomSchema = Joi.object({
-  title: Joi.string()
-    .min(1)
-    .max(100)
-    .required()
-    .trim()
-    .messages({
-      'string.empty': 'Room title is required',
-      'string.max': 'Room title must be at most 100 characters',
-    }),
+  title: Joi.string().min(1).max(100).required().trim().messages({
+    'string.empty': 'Room title is required',
+    'string.max': 'Room title must be at most 100 characters',
+  }),
 });
 
 export const roomIdSchema = Joi.object({
@@ -128,14 +108,10 @@ const chatMessageSchema = Joi.object({
 });
 
 export const sendAIMessageSchema = Joi.object({
-  content: Joi.string()
-    .min(1)
-    .max(10000)
-    .required()
-    .messages({
-      'string.empty': 'Message content is required',
-      'string.max': 'Message must be at most 10000 characters',
-    }),
+  content: Joi.string().min(1).max(10000).required().messages({
+    'string.empty': 'Message content is required',
+    'string.max': 'Message must be at most 10000 characters',
+  }),
   conversationHistory: Joi.array()
     .items(chatMessageSchema)
     .max(50)
@@ -146,53 +122,33 @@ export const sendAIMessageSchema = Joi.object({
 });
 
 export const explainCodeSchema = Joi.object({
-  code: Joi.string()
-    .min(1)
-    .max(50000)
-    .required()
-    .messages({
-      'string.empty': 'Code is required',
-      'string.max': 'Code must be at most 50000 characters',
-    }),
-  language: Joi.string()
-    .max(50)
-    .default('unknown'),
+  code: Joi.string().min(1).max(50000).required().messages({
+    'string.empty': 'Code is required',
+    'string.max': 'Code must be at most 50000 characters',
+  }),
+  language: Joi.string().max(50).default('unknown'),
 });
 
 export const generateDocumentationSchema = Joi.object({
-  code: Joi.string()
-    .min(1)
-    .max(50000)
-    .required()
-    .messages({
-      'string.empty': 'Code is required',
-      'string.max': 'Code must be at most 50000 characters',
-    }),
-  language: Joi.string()
-    .max(50)
-    .required(),
+  code: Joi.string().min(1).max(50000).required().messages({
+    'string.empty': 'Code is required',
+    'string.max': 'Code must be at most 50000 characters',
+  }),
+  language: Joi.string().max(50).required(),
   style: Joi.string()
     .valid('jsdoc', 'docstring', 'javadoc', 'markdown')
     .default('jsdoc'),
 });
 
 export const generateCodeQuizSchema = Joi.object({
-  topic: Joi.string()
-    .min(1)
-    .max(200)
-    .required()
-    .messages({
-      'string.empty': 'Topic is required',
-      'string.max': 'Topic must be at most 200 characters',
-    }),
+  topic: Joi.string().min(1).max(200).required().messages({
+    'string.empty': 'Topic is required',
+    'string.max': 'Topic must be at most 200 characters',
+  }),
   difficulty: Joi.string()
     .valid('easy', 'medium', 'hard')
     .default('medium'),
-  count: Joi.number()
-    .integer()
-    .min(1)
-    .max(10)
-    .default(3),
+  count: Joi.number().integer().min(1).max(10).default(3),
 });
 
 // ============================================
@@ -207,14 +163,18 @@ export const generateCodeQuizSchema = Joi.object({
  * @returns {object} Validated and sanitized input
  * @throws {UserInputError} If validation fails
  */
-export const validate = (schema, input, operationName = 'operation') => {
+export const validate = (
+  schema,
+  input,
+  operationName = 'operation',
+) => {
   const { error, value } = schema.validate(input, {
     abortEarly: false,
     stripUnknown: true,
   });
 
   if (error) {
-    const errors = error.details.map(detail => ({
+    const errors = error.details.map((detail) => ({
       field: detail.path.join('.'),
       message: detail.message,
     }));
@@ -237,14 +197,11 @@ export const validate = (schema, input, operationName = 'operation') => {
  * @param {object} schema - Joi schema to validate against
  * @returns {Function} Resolver middleware function
  */
-export const withValidation = (schema) => {
-  return (resolver) => {
-    return async (parent, args, context, info) => {
-      const validatedArgs = validate(schema, args, info.fieldName);
-      return resolver(parent, validatedArgs, context, info);
-    };
+export const withValidation =
+  (schema) => (resolver) => async (parent, args, context, info) => {
+    const validatedArgs = validate(schema, args, info.fieldName);
+    return resolver(parent, validatedArgs, context, info);
   };
-};
 
 export default {
   // Schemas

@@ -18,9 +18,13 @@ export const publishMessageCreated = async (message) => {
     await PubSub.publish(EVENTS.MESSAGE.CREATED, {
       messageCreated: { message },
     });
-    logger.debug('Published MESSAGE.CREATED event', { messageId: message.id });
+    logger.debug('Published MESSAGE.CREATED event', {
+      messageId: message.id,
+    });
   } catch (error) {
-    logger.error('Failed to publish MESSAGE.CREATED event', { error: error.message });
+    logger.error('Failed to publish MESSAGE.CREATED event', {
+      error: error.message,
+    });
     throw error;
   }
 };
@@ -34,9 +38,13 @@ export const publishMessageDeleted = async (message) => {
     await PubSub.publish(EVENTS.MESSAGE.DELETED, {
       messageDeleted: message,
     });
-    logger.debug('Published MESSAGE.DELETED event', { messageId: message.id });
+    logger.debug('Published MESSAGE.DELETED event', {
+      messageId: message.id,
+    });
   } catch (error) {
-    logger.error('Failed to publish MESSAGE.DELETED event', { error: error.message });
+    logger.error('Failed to publish MESSAGE.DELETED event', {
+      error: error.message,
+    });
     throw error;
   }
 };
@@ -52,7 +60,9 @@ export const publishRoomCreated = async (room) => {
     });
     logger.debug('Published ROOM.CREATED event', { roomId: room.id });
   } catch (error) {
-    logger.error('Failed to publish ROOM.CREATED event', { error: error.message });
+    logger.error('Failed to publish ROOM.CREATED event', {
+      error: error.message,
+    });
     throw error;
   }
 };
@@ -68,7 +78,9 @@ export const publishRoomDeleted = async (roomId) => {
     });
     logger.debug('Published ROOM.DELETED event', { roomId });
   } catch (error) {
-    logger.error('Failed to publish ROOM.DELETED event', { error: error.message });
+    logger.error('Failed to publish ROOM.DELETED event', {
+      error: error.message,
+    });
     throw error;
   }
 };
@@ -83,9 +95,14 @@ export const publishRoomUserJoined = async (room, user) => {
     await PubSub.publish(EVENTS.ROOM.USER_JOINED, {
       roomUserJoined: { room, user },
     });
-    logger.debug('Published ROOM.USER_JOINED event', { roomId: room.id, userId: user.id });
+    logger.debug('Published ROOM.USER_JOINED event', {
+      roomId: room.id,
+      userId: user.id,
+    });
   } catch (error) {
-    logger.error('Failed to publish ROOM.USER_JOINED event', { error: error.message });
+    logger.error('Failed to publish ROOM.USER_JOINED event', {
+      error: error.message,
+    });
     throw error;
   }
 };
@@ -100,9 +117,14 @@ export const publishRoomUserLeft = async (roomId, userId) => {
     await PubSub.publish(EVENTS.ROOM.USER_LEFT, {
       roomUserLeft: { roomId, userId },
     });
-    logger.debug('Published ROOM.USER_LEFT event', { roomId, userId });
+    logger.debug('Published ROOM.USER_LEFT event', {
+      roomId,
+      userId,
+    });
   } catch (error) {
-    logger.error('Failed to publish ROOM.USER_LEFT event', { error: error.message });
+    logger.error('Failed to publish ROOM.USER_LEFT event', {
+      error: error.message,
+    });
     throw error;
   }
 };
@@ -118,7 +140,9 @@ export const publishEditorChanged = async (codeData) => {
     });
     logger.debug('Published EDITOR.CHANGED event');
   } catch (error) {
-    logger.error('Failed to publish EDITOR.CHANGED event', { error: error.message });
+    logger.error('Failed to publish EDITOR.CHANGED event', {
+      error: error.message,
+    });
     throw error;
   }
 };

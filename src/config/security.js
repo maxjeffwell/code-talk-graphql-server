@@ -8,7 +8,8 @@ export const rateLimiters = {
   general: rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
     max: 100, // limit each IP to 100 requests per windowMs
-    message: 'Too many requests from this IP, please try again later.',
+    message:
+      'Too many requests from this IP, please try again later.',
     standardHeaders: true,
     legacyHeaders: false,
   }),
@@ -17,7 +18,8 @@ export const rateLimiters = {
   auth: rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
     max: 5, // limit each IP to 5 requests per windowMs
-    message: 'Too many authentication attempts, please try again later.',
+    message:
+      'Too many authentication attempts, please try again later.',
     standardHeaders: true,
     legacyHeaders: false,
     skipSuccessfulRequests: true, // Don't count successful requests
@@ -39,14 +41,21 @@ export const helmetConfig = helmet({
     directives: {
       defaultSrc: ["'self'"],
       styleSrc: ["'self'", "'unsafe-inline'"], // Required for GraphQL Playground
-      scriptSrc: ["'self'", "https:", "'unsafe-inline'"], // Required for GraphQL Playground
-      imgSrc: ["'self'", "data:", "apollo-server-landing-page.cdn.apollographql.com"],
+      scriptSrc: ["'self'", 'https:', "'unsafe-inline'"], // Required for GraphQL Playground
+      imgSrc: [
+        "'self'",
+        'data:',
+        'apollo-server-landing-page.cdn.apollographql.com',
+      ],
       connectSrc: ["'self'"],
-      fontSrc: ["'self'", "https:", "data:"],
+      fontSrc: ["'self'", 'https:', 'data:'],
       objectSrc: ["'none'"],
       mediaSrc: ["'self'"],
-      frameSrc: ["'self'", "sandbox.embed.apollographql.com"], // For GraphQL Playground
-      manifestSrc: ["'self'", "apollo-server-landing-page.cdn.apollographql.com"],
+      frameSrc: ["'self'", 'sandbox.embed.apollographql.com'], // For GraphQL Playground
+      manifestSrc: [
+        "'self'",
+        'apollo-server-landing-page.cdn.apollographql.com',
+      ],
       upgradeInsecureRequests: [],
     },
   },
@@ -61,31 +70,41 @@ export const helmetConfig = helmet({
 // CORS configuration based on environment
 export const getCorsConfig = () => {
   const isDevelopment = process.env.NODE_ENV === 'development';
-  
+
   // Parse allowed origins from environment variable
   const allowedOrigins = process.env.ALLOWED_ORIGINS
-    ? process.env.ALLOWED_ORIGINS.split(',').map(origin => origin.trim())
+    ? process.env.ALLOWED_ORIGINS.split(',').map((origin) =>
+        origin.trim(),
+      )
     : ['http://localhost:3000'];
 
   return {
     origin: (origin, callback) => {
       // Allow requests with no origin (like mobile apps or curl)
       if (!origin) return callback(null, true);
-      
+
       if (isDevelopment) {
         // In development, allow all origins
         return callback(null, true);
       }
-      
+
       // In production, check against allowed origins
       if (allowedOrigins.includes(origin)) {
         return callback(null, true);
       }
-      
+
       return callback(new Error('Not allowed by CORS'));
     },
     credentials: true,
-    methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE', 'OPTIONS'],
+    methods: [
+      'GET',
+      'HEAD',
+      'PUT',
+      'PATCH',
+      'POST',
+      'DELETE',
+      'OPTIONS',
+    ],
     allowedHeaders: [
       'Origin',
       'X-Requested-With',
@@ -110,13 +129,13 @@ export const getCorsConfig = () => {
 // Input sanitization middleware
 export const sanitizeInput = (input) => {
   if (typeof input !== 'string') return input;
-  
+
   // Use DOMPurify for HTML sanitization
   const cleaned = DOMPurify.sanitize(input, {
     ALLOWED_TAGS: [], // No HTML tags allowed
     ALLOWED_ATTR: [],
   });
-  
+
   // Additional sanitization
   return cleaned
     .trim()
@@ -127,7 +146,7 @@ export const sanitizeInput = (input) => {
 // SQL injection prevention helper
 export const sanitizeSQLInput = (input) => {
   if (typeof input !== 'string') return input;
-  
+
   // Remove or escape potentially dangerous SQL characters
   return input
     .replace(/['";\\]/g, '') // Remove quotes, semicolons, and backslashes
@@ -142,11 +161,11 @@ export const sanitizeOutput = (data) => {
   if (typeof data === 'string') {
     return DOMPurify.sanitize(data);
   }
-  
+
   if (Array.isArray(data)) {
     return data.map(sanitizeOutput);
   }
-  
+
   if (data && typeof data === 'object') {
     const sanitized = {};
     for (const [key, value] of Object.entries(data)) {
@@ -154,7 +173,7 @@ export const sanitizeOutput = (data) => {
     }
     return sanitized;
   }
-  
+
   return data;
 };
 
@@ -165,12 +184,15 @@ export const securityHeaders = (req, res, next) => {
   res.setHeader('X-Frame-Options', 'DENY');
   res.setHeader('X-XSS-Protection', '1; mode=block');
   res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
-  res.setHeader('Permissions-Policy', 'geolocation=(), microphone=(), camera=()');
-  
+  res.setHeader(
+    'Permissions-Policy',
+    'geolocation=(), microphone=(), camera=()',
+  );
+
   // Remove sensitive headers
   res.removeHeader('X-Powered-By');
   res.removeHeader('Server');
-  
+
   next();
 };
 
@@ -180,17 +202,14 @@ export const validateEnvironment = () => {
   const isTest = process.env.NODE_ENV === 'test';
 
   // Required in all environments
-  const required = [
-    'DATABASE_URL',
-    'JWT_SECRET',
-  ];
+  const required = ['DATABASE_URL', 'JWT_SECRET'];
 
   // Required in production only
   if (isProduction) {
     required.push('JWT_REFRESH_SECRET');
   }
 
-  const missing = required.filter(key => !process.env[key]);
+  const missing = required.filter((key) => !process.env[key]);
 
   // Check for Redis configuration - either REDIS_URL or REDIS_HOST (not required in test)
   if (!isTest && !process.env.REDIS_URL && !process.env.REDIS_HOST) {
@@ -198,7 +217,9 @@ export const validateEnvironment = () => {
   }
 
   if (missing.length > 0) {
-    throw new Error(`Missing required environment variables: ${missing.join(', ')}`);
+    throw new Error(
+      `Missing required environment variables: ${missing.join(', ')}`,
+    );
   }
 
   // Validate JWT secret strength
@@ -207,13 +228,21 @@ export const validateEnvironment = () => {
   }
 
   // Validate JWT refresh secret strength in production
-  if (isProduction && process.env.JWT_REFRESH_SECRET && process.env.JWT_REFRESH_SECRET.length < 32) {
-    throw new Error('JWT_REFRESH_SECRET must be at least 32 characters long');
+  if (
+    isProduction &&
+    process.env.JWT_REFRESH_SECRET &&
+    process.env.JWT_REFRESH_SECRET.length < 32
+  ) {
+    throw new Error(
+      'JWT_REFRESH_SECRET must be at least 32 characters long',
+    );
   }
 
   // Warn about security in development
   if (process.env.NODE_ENV === 'development') {
-    console.warn('⚠️  Running in development mode. Security features may be relaxed.');
+    console.warn(
+      '⚠️  Running in development mode. Security features may be relaxed.',
+    );
   }
 
   // Log configuration summary (non-sensitive)
@@ -221,9 +250,16 @@ export const validateEnvironment = () => {
     console.log('✓ Environment validated:', {
       env: process.env.NODE_ENV || 'development',
       port: process.env.PORT || 8000,
-      database: process.env.DATABASE_URL ? '✓ configured' : '✗ missing',
-      redis: process.env.REDIS_URL || process.env.REDIS_HOST ? '✓ configured' : '✗ missing',
-      cloudflare: process.env.CLOUDFLARE_API_TOKEN ? '✓ configured' : '○ optional',
+      database: process.env.DATABASE_URL
+        ? '✓ configured'
+        : '✗ missing',
+      redis:
+        process.env.REDIS_URL || process.env.REDIS_HOST
+          ? '✓ configured'
+          : '✗ missing',
+      cloudflare: process.env.CLOUDFLARE_API_TOKEN
+        ? '✓ configured'
+        : '○ optional',
       aiGateway: process.env.AI_GATEWAY_URL || 'default',
     });
   }

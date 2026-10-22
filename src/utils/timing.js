@@ -21,7 +21,12 @@ class ServerTiming {
     try {
       const result = await fn();
       const duration = Number(process.hrtime.bigint() - start) / 1e6; // Convert to ms
-      this.timings.push({ name, description, duration, error: false });
+      this.timings.push({
+        name,
+        description,
+        duration,
+        error: false,
+      });
       return result;
     } catch (err) {
       const duration = Number(process.hrtime.bigint() - start) / 1e6;
@@ -42,7 +47,12 @@ class ServerTiming {
     try {
       const result = fn();
       const duration = Number(process.hrtime.bigint() - start) / 1e6;
-      this.timings.push({ name, description, duration, error: false });
+      this.timings.push({
+        name,
+        description,
+        duration,
+        error: false,
+      });
       return result;
     } catch (err) {
       const duration = Number(process.hrtime.bigint() - start) / 1e6;
@@ -87,7 +97,7 @@ class ServerTiming {
    * @returns {string} - Formatted Server-Timing header
    */
   toString() {
-    const parts = this.timings.map(t => {
+    const parts = this.timings.map((t) => {
       if (t.duration === 0) {
         // Status marker without duration
         return `${t.name};desc="${t.description}"`;
@@ -96,7 +106,9 @@ class ServerTiming {
     });
 
     // Add total time
-    parts.push(`total;dur=${this.total().toFixed(2)};desc="Total request time"`);
+    parts.push(
+      `total;dur=${this.total().toFixed(2)};desc="Total request time"`,
+    );
 
     return parts.join(', ');
   }
@@ -107,7 +119,7 @@ class ServerTiming {
    */
   toJSON() {
     return {
-      timings: this.timings.map(t => ({
+      timings: this.timings.map((t) => ({
         name: t.name,
         description: t.description,
         duration: Math.round(t.duration * 100) / 100,
@@ -151,7 +163,7 @@ export function serverTimingMiddleware() {
 
     // Override res.end to inject Server-Timing header before sending
     const originalEnd = res.end.bind(res);
-    res.end = function(chunk, encoding) {
+    res.end = function (chunk, encoding) {
       // Set Server-Timing header if timing exists and headers not sent
       if (req.timing && !res.headersSent) {
         res.setHeader('Server-Timing', req.timing.toString());

@@ -1,6 +1,5 @@
 import { expect } from 'chai';
-import { sequelize } from '../models';
-import models from '../models';
+import models, { sequelize } from '../models';
 
 // Test configuration
 export const testConfig = {
@@ -23,11 +22,11 @@ export const setupDatabase = async () => {
   try {
     // Force sync database (drop and recreate tables)
     await sequelize.sync({ force: true });
-    
+
     // Create test users
     const user = await models.User.create(testConfig.testUser);
     const admin = await models.User.create(testConfig.testAdmin);
-    
+
     return { user, admin };
   } catch (error) {
     console.error('Database setup failed:', error);
@@ -47,22 +46,22 @@ export const teardownDatabase = async () => {
 };
 
 // Helper to create authenticated context
-export const createTestContext = (user = null) => {
-  return {
-    models,
-    me: user,
-    loaders: {
-      user: {
-        load: async (id) => models.User.findByPk(id),
-        loadMany: async (ids) => models.User.findAll({ where: { id: ids } }),
-      },
-      message: {
-        load: async (id) => models.Message.findByPk(id),
-        loadMany: async (ids) => models.Message.findAll({ where: { id: ids } }),
-      },
+export const createTestContext = (user = null) => ({
+  models,
+  me: user,
+  loaders: {
+    user: {
+      load: async (id) => models.User.findByPk(id),
+      loadMany: async (ids) =>
+        models.User.findAll({ where: { id: ids } }),
     },
-  };
-};
+    message: {
+      load: async (id) => models.Message.findByPk(id),
+      loadMany: async (ids) =>
+        models.Message.findAll({ where: { id: ids } }),
+    },
+  },
+});
 
 // Helper to generate JWT token for testing
 export const generateTestToken = (user) => {
@@ -75,7 +74,7 @@ export const generateTestToken = (user) => {
       role: user.role,
     },
     process.env.JWT_SECRET || 'test-secret',
-    { expiresIn: '1h' }
+    { expiresIn: '1h' },
   );
 };
 
@@ -89,36 +88,42 @@ export const customAssertions = {
       expect(result.errors[0].message).to.include(expectedMessage);
     }
   },
-  
+
   assertGraphQLSuccess: (result) => {
     expect(result).to.not.have.property('errors');
     expect(result).to.have.property('data');
   },
-  
+
   assertAuthenticationError: (result) => {
     customAssertions.assertGraphQLError(result);
-    expect(result.errors[0].extensions.code).to.equal('UNAUTHENTICATED');
+    expect(result.errors[0].extensions.code).to.equal(
+      'UNAUTHENTICATED',
+    );
   },
-  
+
   assertValidationError: (result) => {
     customAssertions.assertGraphQLError(result);
-    expect(result.errors[0].extensions.code).to.equal('BAD_USER_INPUT');
+    expect(result.errors[0].extensions.code).to.equal(
+      'BAD_USER_INPUT',
+    );
   },
 };
 
 // Mock data generators
 export const mockData = {
-  randomUsername: () => `user_${Math.random().toString(36).substr(2, 9)}`,
-  randomEmail: () => `${Math.random().toString(36).substr(2, 9)}@test.com`,
+  randomUsername: () =>
+    `user_${Math.random().toString(36).substr(2, 9)}`,
+  randomEmail: () =>
+    `${Math.random().toString(36).substr(2, 9)}@test.com`,
   randomMessage: () => `Test message ${Date.now()}`,
-  
+
   createMockUser: (overrides = {}) => ({
     username: mockData.randomUsername(),
     email: mockData.randomEmail(),
     password: 'MockPassword123!',
     ...overrides,
   }),
-  
+
   createMockMessage: (userId, overrides = {}) => ({
     text: mockData.randomMessage(),
     userId,
@@ -139,7 +144,7 @@ export const graphqlQueries = {
       }
     }
   `,
-  
+
   USERS: `
     query Users {
       users {
@@ -150,7 +155,7 @@ export const graphqlQueries = {
       }
     }
   `,
-  
+
   USER: `
     query User($id: ID!) {
       user(id: $id) {
@@ -166,7 +171,7 @@ export const graphqlQueries = {
       }
     }
   `,
-  
+
   // Message queries
   MESSAGES: `
     query Messages($cursor: String, $limit: Int) {
@@ -224,7 +229,7 @@ export const graphqlMutations = {
       signOut
     }
   `,
-  
+
   // Message mutations
   CREATE_MESSAGE: `
     mutation CreateMessage($text: String!) {
@@ -239,7 +244,7 @@ export const graphqlMutations = {
       }
     }
   `,
-  
+
   DELETE_MESSAGE: `
     mutation DeleteMessage($id: ID!) {
       deleteMessage(id: $id) {

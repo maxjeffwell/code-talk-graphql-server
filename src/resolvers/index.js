@@ -1,10 +1,10 @@
 import { DateTimeResolver } from 'graphql-scalars';
 
-import userResolvers from '../resolvers/user';
-import messageResolvers from '../resolvers/message';
-import roomResolvers from '../resolvers/room';
-import editorResolvers from '../resolvers/editor-minimal';
-import aiResolvers from '../resolvers/ai';
+import userResolvers from './user';
+import messageResolvers from './message';
+import roomResolvers from './room';
+import editorResolvers from './editor-minimal';
+import aiResolvers from './ai';
 
 const customScalarResolver = {
   Date: DateTimeResolver,

@@ -49,7 +49,9 @@ describe('messages connection for an empty room', () => {
       variableValues: { limit: 10, roomId: '42' },
     });
 
-    expect(result.errors, JSON.stringify(result.errors)).to.equal(undefined);
+    expect(result.errors, JSON.stringify(result.errors)).to.equal(
+      undefined,
+    );
     expect(result.data.messages.edges).to.deep.equal([]);
     expect(result.data.messages.pageInfo).to.deep.equal({
       hasNextPage: false,

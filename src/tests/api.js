@@ -1,6 +1,7 @@
 import axios from 'axios';
 
-const API_URL = process.env.TEST_API_URL || 'http://localhost:8000/graphql';
+const API_URL =
+  process.env.TEST_API_URL || 'http://localhost:8000/graphql';
 
 // Create axios instance with cookie support
 const api = axios.create({
@@ -25,7 +26,7 @@ const extractCsrfToken = (cookieStr) => {
 api.interceptors.response.use((response) => {
   const setCookie = response.headers['set-cookie'];
   if (setCookie) {
-    cookies = setCookie.map(c => c.split(';')[0]).join('; ');
+    cookies = setCookie.map((c) => c.split(';')[0]).join('; ');
     // Extract CSRF token from cookies
     csrfToken = extractCsrfToken(cookies);
   }
@@ -52,17 +53,20 @@ export const clearCookies = () => {
 // Fetch CSRF token by making a GET request (server sets cookie on GET)
 export const fetchCsrfToken = async () => {
   // Make a GET request to trigger CSRF cookie setting
-  await axios.get(API_URL.replace('/graphql', '/health'), {
-    withCredentials: true,
-  }).then(response => {
-    const setCookie = response.headers['set-cookie'];
-    if (setCookie) {
-      cookies = setCookie.map(c => c.split(';')[0]).join('; ');
-      csrfToken = extractCsrfToken(cookies);
-    }
-  }).catch(() => {
-    // Health endpoint might not exist in test, that's okay
-  });
+  await axios
+    .get(API_URL.replace('/graphql', '/health'), {
+      withCredentials: true,
+    })
+    .then((response) => {
+      const setCookie = response.headers['set-cookie'];
+      if (setCookie) {
+        cookies = setCookie.map((c) => c.split(';')[0]).join('; ');
+        csrfToken = extractCsrfToken(cookies);
+      }
+    })
+    .catch(() => {
+      // Health endpoint might not exist in test, that's okay
+    });
 };
 
 // Authentication mutations (httpOnly cookie-based)
@@ -119,8 +123,8 @@ export const signOut = async () => {
 };
 
 // User queries
-export const me = async () => {
-  return api.post('', {
+export const me = async () =>
+  api.post('', {
     query: `
       {
         me {
@@ -131,10 +135,9 @@ export const me = async () => {
       }
     `,
   });
-};
 
-export const user = async (variables) => {
-  return api.post('', {
+export const user = async (variables) =>
+  api.post('', {
     query: `
       query ($id: ID!) {
         user(id: $id) {
@@ -147,10 +150,9 @@ export const user = async (variables) => {
     `,
     variables,
   });
-};
 
-export const users = async () => {
-  return api.post('', {
+export const users = async () =>
+  api.post('', {
     query: `
       {
         users {
@@ -162,11 +164,10 @@ export const users = async () => {
       }
     `,
   });
-};
 
 // Message queries
-export const messages = async (variables = {}) => {
-  return api.post('', {
+export const messages = async (variables = {}) =>
+  api.post('', {
     query: `
       query ($limit: Int, $cursor: String) {
         messages(limit: $limit, cursor: $cursor) {
@@ -188,10 +189,9 @@ export const messages = async (variables = {}) => {
     `,
     variables,
   });
-};
 
-export const createMessage = async (variables) => {
-  return api.post('', {
+export const createMessage = async (variables) =>
+  api.post('', {
     query: `
       mutation ($text: String!, $roomId: ID) {
         createMessage(text: $text, roomId: $roomId) {
@@ -207,10 +207,9 @@ export const createMessage = async (variables) => {
     `,
     variables,
   });
-};
 
-export const deleteMessage = async (variables) => {
-  return api.post('', {
+export const deleteMessage = async (variables) =>
+  api.post('', {
     query: `
       mutation ($id: ID!) {
         deleteMessage(id: $id) {
@@ -221,11 +220,10 @@ export const deleteMessage = async (variables) => {
     `,
     variables,
   });
-};
 
 // Room queries and mutations
-export const rooms = async () => {
-  return api.post('', {
+export const rooms = async () =>
+  api.post('', {
     query: `
       {
         rooms {
@@ -235,10 +233,9 @@ export const rooms = async () => {
       }
     `,
   });
-};
 
-export const room = async (variables) => {
-  return api.post('', {
+export const room = async (variables) =>
+  api.post('', {
     query: `
       query ($id: ID!) {
         room(id: $id) {
@@ -257,10 +254,9 @@ export const room = async (variables) => {
     `,
     variables,
   });
-};
 
-export const createRoom = async (variables) => {
-  return api.post('', {
+export const createRoom = async (variables) =>
+  api.post('', {
     query: `
       mutation ($title: String!) {
         createRoom(title: $title) {
@@ -271,7 +267,6 @@ export const createRoom = async (variables) => {
     `,
     variables,
   });
-};
 
 export default {
   signIn,

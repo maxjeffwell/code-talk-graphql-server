@@ -20,10 +20,7 @@ export default gql`
     """
     Explain a code snippet
     """
-    explainCode(
-      code: String!
-      language: String
-    ): CodeExplanation!
+    explainCode(code: String!, language: String): CodeExplanation!
 
     """
     Generate documentation for code

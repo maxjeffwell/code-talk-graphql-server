@@ -64,8 +64,11 @@ export const seedUsers = async () => {
       returning: true,
       individualHooks: true, // This ensures password hashing hooks run
     });
-    
-    console.log('📄 Created users:', createdUsers.map(u => u.username).join(', '));
+
+    console.log(
+      '📄 Created users:',
+      createdUsers.map((u) => u.username).join(', '),
+    );
     return createdUsers;
   } catch (error) {
     console.error('❌ Error seeding users:', error);

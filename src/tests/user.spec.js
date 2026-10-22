@@ -116,7 +116,9 @@ describe('users', () => {
       });
 
       expect(result.data.errors).to.be.an('array');
-      expect(result.data.errors[0].message).to.include('Invalid credentials');
+      expect(result.data.errors[0].message).to.include(
+        'Invalid credentials',
+      );
     });
 
     it('returns an error when user is not found', async () => {
@@ -126,7 +128,9 @@ describe('users', () => {
       });
 
       expect(result.data.errors).to.be.an('array');
-      expect(result.data.errors[0].message).to.include('Invalid credentials');
+      expect(result.data.errors[0].message).to.include(
+        'Invalid credentials',
+      );
     });
   });
 

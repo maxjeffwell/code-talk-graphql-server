@@ -9,5 +9,5 @@ export const batchRooms = async (keys, models) => {
     },
   });
 
-  return keys.map(key => rooms.find(room => room.id === key));
+  return keys.map((key) => rooms.find((room) => room.id === key));
 };

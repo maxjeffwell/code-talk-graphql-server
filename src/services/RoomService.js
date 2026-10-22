@@ -61,12 +61,14 @@ export const createRoom = async (models, { title, userId }) => {
  * @param {number} options.limit - Page size
  * @returns {Promise<Object>} Paginated rooms with edges and pageInfo
  */
-export const getRooms = async (models, { cursor = null, limit = 5 } = {}) => {
-  return paginatedQuery(models.Room, {
+export const getRooms = async (
+  models,
+  { cursor = null, limit = 5 } = {},
+) =>
+  paginatedQuery(models.Room, {
     cursor,
     limit,
   });
-};
 
 /**
  * Get a single room by ID
@@ -131,11 +133,13 @@ export const joinRoom = async (models, { roomId, user }) => {
 
   // Fetch room with the user included for the response
   const roomWithUser = await models.Room.findByPk(roomId, {
-    include: [{
-      model: models.User,
-      where: { id: user.id },
-      through: { attributes: [] },
-    }],
+    include: [
+      {
+        model: models.User,
+        where: { id: user.id },
+        through: { attributes: [] },
+      },
+    ],
   });
 
   logger.info('User joined room', {
@@ -181,9 +185,7 @@ export const leaveRoom = async (models, { roomId, userId }) => {
  * @param {Object} room - Room instance
  * @returns {Promise<Array>} Array of users
  */
-export const getRoomUsers = async (room) => {
-  return room.getUsers();
-};
+export const getRoomUsers = async (room) => room.getUsers();
 
 export default {
   createRoom,

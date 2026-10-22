@@ -2,7 +2,7 @@ import {
   AuthenticationError,
   ForbiddenError,
   UserInputError,
-  ApolloError
+  ApolloError,
 } from 'apollo-server-express';
 import logger from './logger.js';
 import { server } from '../config/index.js';
@@ -45,7 +45,7 @@ export const ERROR_CODES = {
   DATABASE_ERROR: 'Database error',
   RATE_LIMIT_EXCEEDED: 'Rate limit exceeded',
   TOKEN_EXPIRED: 'Token has expired',
-  INTERNAL_ERROR: 'Internal server error'
+  INTERNAL_ERROR: 'Internal server error',
 };
 
 // Enhanced error formatter for Apollo Server
@@ -56,7 +56,7 @@ export const formatError = (error) => {
     code: error.extensions?.code,
     path: error.path,
     stack: error.stack,
-    locations: error.locations
+    locations: error.locations,
   });
 
   // Remove sensitive information from error messages
@@ -67,17 +67,19 @@ export const formatError = (error) => {
 
   // Format validation errors
   if (error.originalError?.name === 'SequelizeValidationError') {
-    const validationErrors = error.originalError.errors.map(err => ({
-      field: err.path,
-      message: err.message
-    }));
-    
+    const validationErrors = error.originalError.errors.map(
+      (err) => ({
+        field: err.path,
+        message: err.message,
+      }),
+    );
+
     return {
       message: 'Validation failed',
       code: 'VALIDATION_ERROR',
       validationErrors,
       path: error.path,
-      locations: error.locations
+      locations: error.locations,
     };
   }
 
@@ -87,7 +89,7 @@ export const formatError = (error) => {
       message: 'Database connection failed',
       code: 'DATABASE_ERROR',
       path: error.path,
-      locations: error.locations
+      locations: error.locations,
     };
   }
 
@@ -97,7 +99,7 @@ export const formatError = (error) => {
       message: error.message,
       code: 'AUTHENTICATION_REQUIRED',
       path: error.path,
-      locations: error.locations
+      locations: error.locations,
     };
   }
 
@@ -107,7 +109,7 @@ export const formatError = (error) => {
       message: error.message,
       code: 'FORBIDDEN',
       path: error.path,
-      locations: error.locations
+      locations: error.locations,
     };
   }
 
@@ -117,7 +119,7 @@ export const formatError = (error) => {
       message: error.message,
       code: 'RATE_LIMIT_EXCEEDED',
       path: error.path,
-      locations: error.locations
+      locations: error.locations,
     };
   }
 
@@ -129,7 +131,7 @@ export const formatError = (error) => {
     code: error.extensions?.code || 'INTERNAL_ERROR',
     path: error.path,
     locations: error.locations,
-    ...(!server.isProduction && { stack: error.stack })
+    ...(!server.isProduction && { stack: error.stack }),
   };
 };
 
@@ -141,7 +143,7 @@ export const errorHandler = (err, req, res, next) => {
     url: req.url,
     method: req.method,
     ip: req.ip,
-    userAgent: req.get('User-Agent')
+    userAgent: req.get('User-Agent'),
   });
 
   // Handle specific error types
@@ -149,21 +151,21 @@ export const errorHandler = (err, req, res, next) => {
     return res.status(400).json({
       error: 'Validation Error',
       message: err.message,
-      details: err.errors
+      details: err.errors,
     });
   }
 
   if (err.name === 'UnauthorizedError') {
     return res.status(401).json({
       error: 'Unauthorized',
-      message: 'Invalid token'
+      message: 'Invalid token',
     });
   }
 
   if (err.name === 'CastError') {
     return res.status(400).json({
       error: 'Invalid ID',
-      message: 'Invalid resource ID'
+      message: 'Invalid resource ID',
     });
   }
 
@@ -172,7 +174,7 @@ export const errorHandler = (err, req, res, next) => {
     error: server.isProduction
       ? 'Internal Server Error'
       : err.message,
-    ...(!server.isProduction && { stack: err.stack })
+    ...(!server.isProduction && { stack: err.stack }),
   });
 };
 
@@ -186,16 +188,22 @@ export const handleDatabaseError = (error, operation) => {
   logger.error('Database Error', {
     operation,
     error: error.message,
-    stack: error.stack
+    stack: error.stack,
   });
 
   switch (error.name) {
     case 'SequelizeValidationError':
-      const validationMessages = error.errors.map(e => e.message).join(', ');
-      throw new ValidationError(validationMessages || 'Validation failed');
+      const validationMessages = error.errors
+        .map((e) => e.message)
+        .join(', ');
+      throw new ValidationError(
+        validationMessages || 'Validation failed',
+      );
     case 'SequelizeUniqueConstraintError':
       const field = error.errors[0]?.path || 'field';
-      throw new ValidationError(`The ${field} is already taken. Please choose a different one.`);
+      throw new ValidationError(
+        `The ${field} is already taken. Please choose a different one.`,
+      );
     case 'SequelizeForeignKeyConstraintError':
       throw new ValidationError('Invalid reference');
     case 'SequelizeConnectionError':
@@ -213,5 +221,5 @@ export default {
   ValidationError,
   DatabaseError,
   RateLimitError,
-  TokenExpiredError
+  TokenExpiredError,
 };

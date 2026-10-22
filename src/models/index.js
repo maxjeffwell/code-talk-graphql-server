@@ -6,7 +6,7 @@ import Room from './room.js';
 
 const sequelize = new Sequelize(
   database.url || database.testUrl,
-  database.options
+  database.options,
 );
 
 const models = {
@@ -15,7 +15,7 @@ const models = {
   Room: Room(sequelize, Sequelize.DataTypes),
 };
 
-Object.keys(models).forEach(key => {
+Object.keys(models).forEach((key) => {
   if ('associate' in models[key]) {
     models[key].associate(models);
   }

@@ -9,27 +9,37 @@ import { combineResolvers } from 'graphql-resolvers';
 
 import PubSub, { EVENTS } from '../subscription';
 import { isAuthenticated, isMessageOwner } from './authorization';
-import { validate, createMessageSchema, deleteMessageSchema } from '../utils/validation.js';
+import {
+  validate,
+  createMessageSchema,
+  deleteMessageSchema,
+} from '../utils/validation.js';
 import * as MessageService from '../services/MessageService.js';
 
 export default {
   Query: {
     messages: combineResolvers(
       isAuthenticated,
-      async (parent, { cursor, limit = 10, roomId }, { models, timing }) => {
-        return timing.time('db-messages', 'PostgreSQL messages query', () =>
-          MessageService.getMessages(models, { cursor, limit, roomId })
-        );
-      }
+      async (
+        parent,
+        { cursor, limit = 10, roomId },
+        { models, timing },
+      ) =>
+        timing.time('db-messages', 'PostgreSQL messages query', () =>
+          MessageService.getMessages(models, {
+            cursor,
+            limit,
+            roomId,
+          }),
+        ),
     ),
 
     message: combineResolvers(
       isAuthenticated,
-      async (parent, { id }, { models, timing }) => {
-        return timing.time('db-message', 'PostgreSQL message lookup', () =>
-          MessageService.getMessageById(models, id)
-        );
-      }
+      async (parent, { id }, { models, timing }) =>
+        timing.time('db-message', 'PostgreSQL message lookup', () =>
+          MessageService.getMessageById(models, id),
+        ),
     ),
   },
 
@@ -37,41 +47,46 @@ export default {
     createMessage: combineResolvers(
       isAuthenticated,
       async (parent, args, { models, me }) => {
-        const { text, roomId } = validate(createMessageSchema, args, 'createMessage');
+        const { text, roomId } = validate(
+          createMessageSchema,
+          args,
+          'createMessage',
+        );
         return MessageService.createMessage(models, {
           text,
           userId: me.id,
           roomId,
         });
-      }
+      },
     ),
 
     deleteMessage: combineResolvers(
       isAuthenticated,
       isMessageOwner,
       async (parent, args, { models }) => {
-        const { id } = validate(deleteMessageSchema, args, 'deleteMessage');
+        const { id } = validate(
+          deleteMessageSchema,
+          args,
+          'deleteMessage',
+        );
         return MessageService.deleteMessage(models, id);
-      }
+      },
     ),
   },
 
   Message: {
-    user: async (message, args, { loaders }) => {
-      return loaders.user.load(message.userId);
-    },
-    room: async (message, args, { loaders }) => {
-      return message.roomId ? loaders.room.load(message.roomId) : null;
-    },
+    user: async (message, args, { loaders }) =>
+      loaders.user.load(message.userId),
+    room: async (message, args, { loaders }) =>
+      message.roomId ? loaders.room.load(message.roomId) : null,
   },
 
   Subscription: {
     messageCreated: {
       subscribe: combineResolvers(
         isAuthenticated,
-        (parent, { roomId }, { me }) => {
-          return PubSub.asyncIterator(EVENTS.MESSAGE.CREATED);
-        }
+        (parent, { roomId }, { me }) =>
+          PubSub.asyncIterator(EVENTS.MESSAGE.CREATED),
       ),
       resolve: (payload, { roomId }) => {
         if (roomId !== undefined) {
@@ -94,9 +109,8 @@ export default {
       },
     },
     messageDeleted: {
-      subscribe: combineResolvers(
-        isAuthenticated,
-        () => PubSub.asyncIterator(EVENTS.MESSAGE.DELETED)
+      subscribe: combineResolvers(isAuthenticated, () =>
+        PubSub.asyncIterator(EVENTS.MESSAGE.DELETED),
       ),
     },
   },

@@ -23,13 +23,13 @@ export const generateTokens = async (user) => {
     id: user.id,
     username: user.username,
     email: user.email,
-    role: user.role
+    role: user.role,
   };
 
   const accessToken = jwtLib.sign(payload, JWT_SECRET, {
     expiresIn: JWT_EXPIRES_IN,
     issuer: JWT_ISSUER,
-    audience: JWT_AUDIENCE
+    audience: JWT_AUDIENCE,
   });
 
   const refreshToken = jwtLib.sign(
@@ -38,8 +38,8 @@ export const generateTokens = async (user) => {
     {
       expiresIn: JWT_REFRESH_EXPIRES_IN,
       issuer: JWT_ISSUER,
-      audience: JWT_AUDIENCE
-    }
+      audience: JWT_AUDIENCE,
+    },
   );
 
   return { accessToken, refreshToken };
@@ -51,19 +51,19 @@ export const verifyToken = (token, isRefresh = false) => {
     const secret = isRefresh ? JWT_REFRESH_SECRET : JWT_SECRET;
     return jwtLib.verify(token, secret, {
       issuer: JWT_ISSUER,
-      audience: JWT_AUDIENCE
+      audience: JWT_AUDIENCE,
     });
   } catch (error) {
     logger.error('Token verification failed', {
       error: error.message,
       isRefresh,
-      tokenType: isRefresh ? 'refresh' : 'access'
+      tokenType: isRefresh ? 'refresh' : 'access',
     });
 
     if (error.name === 'TokenExpiredError') {
       throw new TokenExpiredError();
     }
-    
+
     throw new AuthenticationError('Invalid token');
   }
 };
@@ -71,9 +71,10 @@ export const verifyToken = (token, isRefresh = false) => {
 // Extract user from request
 export const getUserFromRequest = async (req) => {
   // Check for token in various locations
-  let token = req.headers['x-token'] || 
-              req.headers['authorization']?.replace('Bearer ', '') ||
-              req.cookies?.token;
+  const token =
+    req.headers['x-token'] ||
+    req.headers.authorization?.replace('Bearer ', '') ||
+    req.cookies?.token;
 
   if (!token) {
     return null;
@@ -81,13 +82,13 @@ export const getUserFromRequest = async (req) => {
 
   try {
     const decoded = verifyToken(token);
-    
+
     // Log successful authentication
     logger.info('User authenticated', {
       userId: decoded.id,
       username: decoded.username,
       ip: req.ip,
-      userAgent: req.get('User-Agent')
+      userAgent: req.get('User-Agent'),
     });
 
     return decoded;
@@ -97,7 +98,7 @@ export const getUserFromRequest = async (req) => {
       error: error.message,
       ip: req.ip,
       userAgent: req.get('User-Agent'),
-      token: token.substring(0, 10) + '...' // Log partial token for debugging
+      token: `${token.substring(0, 10)}...`, // Log partial token for debugging
     });
 
     throw error;
@@ -108,7 +109,7 @@ export const getUserFromRequest = async (req) => {
 export const refreshTokens = async (refreshToken, models) => {
   try {
     const decoded = verifyToken(refreshToken, true);
-    
+
     // Find user in database
     const user = await models.User.findByPk(decoded.id);
     if (!user) {
@@ -117,16 +118,16 @@ export const refreshTokens = async (refreshToken, models) => {
 
     // Generate new tokens
     const tokens = await generateTokens(user);
-    
+
     logger.info('Tokens refreshed', {
       userId: user.id,
-      username: user.username
+      username: user.username,
     });
 
     return tokens;
   } catch (error) {
     logger.error('Token refresh failed', {
-      error: error.message
+      error: error.message,
     });
     throw error;
   }
@@ -139,16 +140,20 @@ export const validatePassword = (password) => {
   const errors = [];
 
   if (password.length < minLength) {
-    errors.push(`Password must be at least ${minLength} characters long`);
+    errors.push(
+      `Password must be at least ${minLength} characters long`,
+    );
   }
 
   if (password.length > maxLength) {
-    errors.push(`Password must be no more than ${maxLength} characters long`);
+    errors.push(
+      `Password must be no more than ${maxLength} characters long`,
+    );
   }
 
   return {
     isValid: errors.length === 0,
-    errors
+    errors,
   };
 };
 
@@ -169,10 +174,13 @@ export const checkAuthRateLimit = async (identifier) => {
   if (!result.success) {
     const now = Date.now();
     const timeLeftMs = result.reset - now;
-    const timeLeftMinutes = Math.max(1, Math.ceil(timeLeftMs / 1000 / 60));
+    const timeLeftMinutes = Math.max(
+      1,
+      Math.ceil(timeLeftMs / 1000 / 60),
+    );
 
     throw new AuthenticationError(
-      `Too many authentication attempts. Please try again in ${timeLeftMinutes} minutes.`
+      `Too many authentication attempts. Please try again in ${timeLeftMinutes} minutes.`,
     );
   }
 
@@ -214,11 +222,16 @@ const parseDuration = (duration) => {
   const unit = match[2];
 
   switch (unit) {
-    case 's': return value * 1000;
-    case 'm': return value * 60 * 1000;
-    case 'h': return value * 60 * 60 * 1000;
-    case 'd': return value * 24 * 60 * 60 * 1000;
-    default: return 15 * 60 * 1000;
+    case 's':
+      return value * 1000;
+    case 'm':
+      return value * 60 * 1000;
+    case 'h':
+      return value * 60 * 60 * 1000;
+    case 'd':
+      return value * 24 * 60 * 60 * 1000;
+    default:
+      return 15 * 60 * 1000;
   }
 };
 

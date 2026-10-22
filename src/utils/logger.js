@@ -6,28 +6,32 @@ const logDir = process.env.LOG_DIR || 'logs';
 
 const logFormat = winston.format.combine(
   winston.format.timestamp({
-    format: 'YYYY-MM-DD HH:mm:ss'
+    format: 'YYYY-MM-DD HH:mm:ss',
   }),
   winston.format.errors({ stack: true }),
-  winston.format.json()
+  winston.format.json(),
 );
 
 const consoleFormat = winston.format.combine(
   winston.format.colorize(),
   winston.format.timestamp({
-    format: 'YYYY-MM-DD HH:mm:ss'
+    format: 'YYYY-MM-DD HH:mm:ss',
   }),
-  winston.format.printf(({ timestamp, level, message, stack, ...meta }) => {
-    const metaString = Object.keys(meta).length ? JSON.stringify(meta) : '';
-    return `${timestamp} [${level}]: ${message} ${stack || ''} ${metaString}`;
-  })
+  winston.format.printf(
+    ({ timestamp, level, message, stack, ...meta }) => {
+      const metaString = Object.keys(meta).length
+        ? JSON.stringify(meta)
+        : '';
+      return `${timestamp} [${level}]: ${message} ${stack || ''} ${metaString}`;
+    },
+  ),
 );
 
 const transports = [
   new winston.transports.Console({
     format: consoleFormat,
-    level: logLevel
-  })
+    level: logLevel,
+  }),
 ];
 
 // Add file transports only in production
@@ -39,15 +43,15 @@ if (process.env.NODE_ENV === 'production') {
       level: 'error',
       format: logFormat,
       maxFiles: '14d',
-      maxSize: '20m'
+      maxSize: '20m',
     }),
     new DailyRotateFile({
       filename: `${logDir}/combined-%DATE%.log`,
       datePattern: 'YYYY-MM-DD',
       format: logFormat,
       maxFiles: '14d',
-      maxSize: '20m'
-    })
+      maxSize: '20m',
+    }),
   );
 }
 
@@ -55,7 +59,7 @@ const logger = winston.createLogger({
   level: logLevel,
   format: logFormat,
   transports,
-  exitOnError: false
+  exitOnError: false,
 });
 
 // Request logging helper
@@ -67,11 +71,15 @@ export const logRequest = (req, res, responseTime, error = null) => {
     ip: req.ip,
     responseTime: `${responseTime}ms`,
     statusCode: res.statusCode,
-    userId: req.user?.id || null
+    userId: req.user?.id || null,
   };
 
   if (error) {
-    logger.error('Request failed', { ...logData, error: error.message, stack: error.stack });
+    logger.error('Request failed', {
+      ...logData,
+      error: error.message,
+      stack: error.stack,
+    });
   } else if (res.statusCode >= 400) {
     logger.warn('Request completed with error', logData);
   } else {
@@ -80,17 +88,28 @@ export const logRequest = (req, res, responseTime, error = null) => {
 };
 
 // GraphQL operation logging
-export const logGraphQLOperation = (operationName, query, variables, user, responseTime, error = null) => {
+export const logGraphQLOperation = (
+  operationName,
+  query,
+  variables,
+  user,
+  responseTime,
+  error = null,
+) => {
   const logData = {
     operationName,
     query: query?.replace(/\s+/g, ' ').trim(),
     variables,
     userId: user?.id || null,
-    responseTime: `${responseTime}ms`
+    responseTime: `${responseTime}ms`,
   };
 
   if (error) {
-    logger.error('GraphQL operation failed', { ...logData, error: error.message, stack: error.stack });
+    logger.error('GraphQL operation failed', {
+      ...logData,
+      error: error.message,
+      stack: error.stack,
+    });
   } else {
     logger.info('GraphQL operation completed', logData);
   }

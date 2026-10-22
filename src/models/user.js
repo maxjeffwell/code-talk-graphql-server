@@ -15,8 +15,7 @@ const user = (sequelize, DataTypes) => {
         },
         len: {
           args: [3, 25],
-          msg:
-            'Your username must be between 3 and 25 characters long',
+          msg: 'Your username must be between 3 and 25 characters long',
         },
       },
     },
@@ -41,8 +40,7 @@ const user = (sequelize, DataTypes) => {
         notEmpty: true,
         len: {
           args: [7, 42],
-          msg:
-            'Your password must be between 7 and 42 characters long',
+          msg: 'Your password must be between 7 and 42 characters long',
         },
       },
     },
@@ -53,18 +51,18 @@ const user = (sequelize, DataTypes) => {
     },
   });
 
-  User.associate = models => {
+  User.associate = (models) => {
     User.hasMany(models.Message, {
       onDelete: 'CASCADE',
     });
     User.belongsToMany(models.Room, {
       through: 'user_rooms',
       foreignKey: 'userId',
-      otherKey: 'roomId'
+      otherKey: 'roomId',
     });
   };
 
-  User.findByLogin = async login => {
+  User.findByLogin = async (login) => {
     let user = await User.findOne({
       where: { username: login },
     });
@@ -78,16 +76,16 @@ const user = (sequelize, DataTypes) => {
     return user;
   };
 
-  User.beforeCreate(async user => {
+  User.beforeCreate(async (user) => {
     user.password = await user.generatePasswordHash();
   });
 
-  User.prototype.generatePasswordHash = async function() {
+  User.prototype.generatePasswordHash = async function () {
     const saltRounds = 10;
     return await bcryptjs.hash(this.password, saltRounds);
   };
 
-  User.prototype.validatePassword = async function(password) {
+  User.prototype.validatePassword = async function (password) {
     return await bcryptjs.compare(password, this.password);
   };
 

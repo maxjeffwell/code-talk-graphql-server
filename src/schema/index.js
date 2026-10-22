@@ -7,17 +7,24 @@ import editorSchema from './editor';
 import aiSchema from './ai';
 
 const linkSchema = gql`
-    scalar Date
+  scalar Date
 
-    type Query {
-        _: Boolean
-    }
-    type Mutation {
-        _: Boolean
-    }
-    type Subscription {
-        _: Boolean
-    }
+  type Query {
+    _: Boolean
+  }
+  type Mutation {
+    _: Boolean
+  }
+  type Subscription {
+    _: Boolean
+  }
 `;
 
-export default [linkSchema, userSchema, messageSchema, roomSchema, editorSchema, aiSchema];
+export default [
+  linkSchema,
+  userSchema,
+  messageSchema,
+  roomSchema,
+  editorSchema,
+  aiSchema,
+];

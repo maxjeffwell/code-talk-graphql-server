@@ -8,7 +8,10 @@
  * - Token management
  */
 
-import { AuthenticationError, UserInputError } from 'apollo-server-express';
+import {
+  AuthenticationError,
+  UserInputError,
+} from 'apollo-server-express';
 import {
   generateTokens,
   checkAuthRateLimit,
@@ -27,7 +30,10 @@ import logger from '../utils/logger.js';
  * @param {string} params.password - Plain text password
  * @returns {Promise<Object>} Object with user and tokens
  */
-export const createUser = async (models, { username, email, password }) => {
+export const createUser = async (
+  models,
+  { username, email, password },
+) => {
   // User model handles password hashing via beforeCreate hook
   const user = await models.User.create({
     username,
@@ -56,7 +62,10 @@ export const createUser = async (models, { username, email, password }) => {
  * @returns {Promise<Object>} Object with user and tokens
  * @throws {AuthenticationError} If credentials are invalid
  */
-export const authenticateUser = async (models, { login, password }) => {
+export const authenticateUser = async (
+  models,
+  { login, password },
+) => {
   // Check rate limit before authentication attempt
   await checkAuthRateLimit(login);
 
@@ -117,18 +126,15 @@ export const clearUserAuthCookies = (res) => {
  * @param {number} id - User ID
  * @returns {Promise<Object|null>} User or null if not found
  */
-export const getUserById = async (models, id) => {
-  return models.User.findByPk(id);
-};
+export const getUserById = async (models, id) =>
+  models.User.findByPk(id);
 
 /**
  * Get all users
  * @param {Object} models - Sequelize models
  * @returns {Promise<Array>} Array of users
  */
-export const getAllUsers = async (models) => {
-  return models.User.findAll();
-};
+export const getAllUsers = async (models) => models.User.findAll();
 
 /**
  * Find user by login (username or email)
@@ -136,9 +142,8 @@ export const getAllUsers = async (models) => {
  * @param {string} login - Username or email
  * @returns {Promise<Object|null>} User or null if not found
  */
-export const findUserByLogin = async (models, login) => {
-  return models.User.findByLogin(login);
-};
+export const findUserByLogin = async (models, login) =>
+  models.User.findByLogin(login);
 
 /**
  * Update a user
@@ -191,9 +196,7 @@ export const deleteUser = async (models, id) => {
  * @param {Object} user - User instance
  * @returns {Promise<Array>} Array of messages
  */
-export const getUserMessages = async (user) => {
-  return user.getMessages();
-};
+export const getUserMessages = async (user) => user.getMessages();
 
 export default {
   createUser,

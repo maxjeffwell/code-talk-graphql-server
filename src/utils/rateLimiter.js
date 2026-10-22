@@ -10,7 +10,7 @@ import Redis from 'ioredis';
 import logger from './logger.js';
 import { redis as redisConfig } from '../config/index.js';
 
-const REDIS_URL = process.env.REDIS_URL;
+const { REDIS_URL } = process.env;
 
 // App-specific prefix so keys never collide with other apps on the shared Redis
 const APP_PREFIX = 'codetalk:ratelimit:';
@@ -49,7 +49,9 @@ const createRedisClient = () => {
       });
     }
   } catch (error) {
-    logger.error('Failed to create rate-limit Redis client', { error: error.message });
+    logger.error('Failed to create rate-limit Redis client', {
+      error: error.message,
+    });
   }
   return null;
 };
@@ -63,9 +65,12 @@ if (redisClient) {
     const now = Date.now();
     if (now - lastErrorLog > 60000) {
       lastErrorLog = now;
-      logger.warn('Rate-limit Redis connection error (using in-memory fallback)', {
-        error: error.message,
-      });
+      logger.warn(
+        'Rate-limit Redis connection error (using in-memory fallback)',
+        {
+          error: error.message,
+        },
+      );
     }
   });
 }
@@ -94,21 +99,30 @@ return { allowed, count, oldestTs }
 `;
 
 if (redisClient) {
-  redisClient.defineCommand('slidingWindowLimit', { numberOfKeys: 1, lua: SLIDING_WINDOW_LUA });
+  redisClient.defineCommand('slidingWindowLimit', {
+    numberOfKeys: 1,
+    lua: SLIDING_WINDOW_LUA,
+  });
 }
 
 let memberSeq = 0;
 
-const redisRateLimit = async (scope, identifier, maxAttempts, windowMs) => {
+const redisRateLimit = async (
+  scope,
+  identifier,
+  maxAttempts,
+  windowMs,
+) => {
   const now = Date.now();
   const member = `${now}-${process.pid}-${memberSeq++}`;
-  const [allowed, count, oldestTs] = await redisClient.slidingWindowLimit(
-    `${APP_PREFIX}${scope}:${identifier}`,
-    now,
-    windowMs,
-    maxAttempts,
-    member
-  );
+  const [allowed, count, oldestTs] =
+    await redisClient.slidingWindowLimit(
+      `${APP_PREFIX}${scope}:${identifier}`,
+      now,
+      windowMs,
+      maxAttempts,
+      member,
+    );
   return {
     success: allowed === 1,
     remaining: Math.max(0, maxAttempts - count),
@@ -117,7 +131,8 @@ const redisRateLimit = async (scope, identifier, maxAttempts, windowMs) => {
   };
 };
 
-const isRedisReady = () => !!redisClient && redisClient.status === 'ready';
+const isRedisReady = () =>
+  !!redisClient && redisClient.status === 'ready';
 
 // ============================================================================
 // Fallback in-memory rate limiter (used only when Redis is unavailable)
@@ -134,7 +149,9 @@ const inMemoryRateLimit = (identifier, maxAttempts, windowMs) => {
   }
 
   const attempts = inMemoryStore.get(key);
-  const validAttempts = attempts.filter(timestamp => now - timestamp < windowMs);
+  const validAttempts = attempts.filter(
+    (timestamp) => now - timestamp < windowMs,
+  );
   inMemoryStore.set(key, validAttempts);
 
   if (validAttempts.length >= maxAttempts) {
@@ -163,17 +180,34 @@ const clearInMemoryAttempts = (identifier) => {
   inMemoryStore.delete(identifier);
 };
 
-const limitWithFallback = async (scope, identifier, maxAttempts, windowMs) => {
+const limitWithFallback = async (
+  scope,
+  identifier,
+  maxAttempts,
+  windowMs,
+) => {
   if (isRedisReady()) {
     try {
-      return await redisRateLimit(scope, identifier, maxAttempts, windowMs);
+      return await redisRateLimit(
+        scope,
+        identifier,
+        maxAttempts,
+        windowMs,
+      );
     } catch (error) {
-      logger.error(`Redis ${scope} rate limit error, falling back to in-memory`, {
-        error: error.message,
-      });
+      logger.error(
+        `Redis ${scope} rate limit error, falling back to in-memory`,
+        {
+          error: error.message,
+        },
+      );
     }
   }
-  return inMemoryRateLimit(`${scope}:${identifier}`, maxAttempts, windowMs);
+  return inMemoryRateLimit(
+    `${scope}:${identifier}`,
+    maxAttempts,
+    windowMs,
+  );
 };
 
 // ============================================================================
@@ -186,7 +220,12 @@ const limitWithFallback = async (scope, identifier, maxAttempts, windowMs) => {
  * @returns {Promise<{success: boolean, remaining: number, reset: number}>}
  */
 export const checkAuthRateLimit = async (identifier) => {
-  const result = await limitWithFallback('auth', identifier, 5, 15 * 60 * 1000);
+  const result = await limitWithFallback(
+    'auth',
+    identifier,
+    5,
+    15 * 60 * 1000,
+  );
 
   if (!result.success) {
     logger.warn('Auth rate limit exceeded', {
@@ -228,7 +267,9 @@ export const clearAuthAttempts = async (identifier) => {
       logger.info('Auth rate limit cleared (Redis)', { identifier });
       return;
     } catch (error) {
-      logger.error('Failed to clear Redis auth rate limit', { error: error.message });
+      logger.error('Failed to clear Redis auth rate limit', {
+        error: error.message,
+      });
     }
   }
   logger.info('Auth rate limit cleared (in-memory)', { identifier });

@@ -18,7 +18,7 @@ const createDatabase = async () => {
     console.log('✅ Database synced successfully');
 
     console.log('🌱 Starting database seeding...');
-    
+
     // Seed users first (messages depend on users)
     const users = await seedUsers();
     console.log(`✅ Seeded ${users.length} users`);

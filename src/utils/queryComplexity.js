@@ -1,4 +1,8 @@
-import { getComplexity, simpleEstimator, fieldExtensionsEstimator } from 'graphql-query-complexity';
+import {
+  getComplexity,
+  simpleEstimator,
+  fieldExtensionsEstimator,
+} from 'graphql-query-complexity';
 import logger from './logger.js';
 
 // Default complexity configuration
@@ -22,7 +26,7 @@ export const createComplexityEstimator = (options = {}) => {
     scalarCost,
     objectCost,
     listFactor,
-    depthCost: (depth) => Math.pow(depthFactor, depth),
+    depthCost: (depth) => depthFactor ** depth,
   });
 };
 
@@ -39,19 +43,19 @@ export const complexityRules = {
       return limit * 1.5; // Each user costs 1.5 complexity points
     },
   },
-  
+
   // Nested field complexities
   Message: {
     user: () => 2, // Fetching user for a message
   },
-  
+
   User: {
     messages: ({ args }) => {
       const limit = args.limit || 50;
       return limit * 2; // Fetching messages for a user
     },
   },
-  
+
   // Subscription complexities
   Subscription: {
     messageCreated: () => 5, // Base cost for subscription
@@ -60,64 +64,68 @@ export const complexityRules = {
 };
 
 // Create complexity plugin for Apollo Server
-export const createComplexityPlugin = (maxComplexity = DEFAULT_MAX_COMPLEXITY) => {
-  return {
-    requestDidStart() {
-      return {
-        didResolveOperation({ request, document, operationName }) {
-          try {
-            // Calculate query complexity
-            const complexity = getComplexity({
-              schema: request.schema,
-              query: document,
-              variables: request.variables,
-              estimators: [
-                fieldExtensionsEstimator(),
-                createComplexityEstimator(),
-              ],
-            });
+export const createComplexityPlugin = (
+  maxComplexity = DEFAULT_MAX_COMPLEXITY,
+) => ({
+  requestDidStart() {
+    return {
+      didResolveOperation({ request, document, operationName }) {
+        try {
+          // Calculate query complexity
+          const complexity = getComplexity({
+            schema: request.schema,
+            query: document,
+            variables: request.variables,
+            estimators: [
+              fieldExtensionsEstimator(),
+              createComplexityEstimator(),
+            ],
+          });
 
-            // Log the complexity
-            logger.info('Query complexity calculated', {
+          // Log the complexity
+          logger.info('Query complexity calculated', {
+            operationName,
+            complexity,
+            maxComplexity,
+            variables: request.variables,
+          });
+
+          // Check if complexity exceeds the limit
+          if (complexity > maxComplexity) {
+            logger.warn('Query complexity exceeded', {
               operationName,
               complexity,
               maxComplexity,
-              variables: request.variables,
+              query: request.query,
             });
 
-            // Check if complexity exceeds the limit
-            if (complexity > maxComplexity) {
-              logger.warn('Query complexity exceeded', {
-                operationName,
-                complexity,
-                maxComplexity,
-                query: request.query,
-              });
-              
-              throw new Error(
-                `Query complexity ${complexity} exceeds maximum allowed complexity of ${maxComplexity}`
-              );
-            }
-          } catch (error) {
-            // If it's already a complexity error, re-throw it
-            if (error.message.includes('Query complexity')) {
-              throw error;
-            }
-            
-            // Log other errors but don't block the request
-            logger.error('Error calculating query complexity', {
-              error: error.message,
-              operationName,
-            });
+            throw new Error(
+              `Query complexity ${complexity} exceeds maximum allowed complexity of ${maxComplexity}`,
+            );
           }
-        },
-      };
-    },
-  };
-};
+        } catch (error) {
+          // If it's already a complexity error, re-throw it
+          if (error.message.includes('Query complexity')) {
+            throw error;
+          }
+
+          // Log other errors but don't block the request
+          logger.error('Error calculating query complexity', {
+            error: error.message,
+            operationName,
+          });
+        }
+      },
+    };
+  },
+});
 
 // Complexity analysis utilities
-export const analyzeQueryComplexity = (schema, query, variables = {}) => {
+export const analyzeQueryComplexity = (
+  schema,
+  query,
+  variables = {},
+) => {
   try {
     const complexity = getComplexity({
       schema,
@@ -128,7 +136,7 @@ export const analyzeQueryComplexity = (schema, query, variables = {}) => {
         createComplexityEstimator(),
       ],
     });
-    
+
     return {
       complexity,
       isValid: complexity <= DEFAULT_MAX_COMPLEXITY,
@@ -138,7 +146,7 @@ export const analyzeQueryComplexity = (schema, query, variables = {}) => {
     logger.error('Failed to analyze query complexity', {
       error: error.message,
     });
-    
+
     return {
       complexity: 0,
       isValid: false,
@@ -148,28 +156,23 @@ export const analyzeQueryComplexity = (schema, query, variables = {}) => {
 };
 
 // Middleware to add complexity to field resolvers
-export const addComplexityToSchema = (schema) => {
+export const addComplexityToSchema = (schema) =>
   // This would be implemented to add complexity annotations to schema
   // For now, we rely on the estimators and custom rules
-  return schema;
-};
+  schema;
 
 // Helper to estimate complexity for common patterns
 export const complexityHelpers = {
   // Estimate complexity for pagination
-  paginationComplexity: (limit = 50, defaultCost = 2) => {
-    return Math.min(limit, 100) * defaultCost;
-  },
-  
+  paginationComplexity: (limit = 50, defaultCost = 2) =>
+    Math.min(limit, 100) * defaultCost,
+
   // Estimate complexity for nested queries
-  nestedComplexity: (depth, baseCost = 1) => {
-    return baseCost * Math.pow(1.5, depth);
-  },
-  
+  nestedComplexity: (depth, baseCost = 1) => baseCost * 1.5 ** depth,
+
   // Estimate complexity for search queries
-  searchComplexity: (searchFields = 1, limit = 50) => {
-    return searchFields * limit * 3; // Search is more expensive
-  },
+  searchComplexity: (searchFields = 1, limit = 50) =>
+    searchFields * limit * 3, // Search is more expensive
 };
 
 // Rate limiting based on complexity
@@ -178,30 +181,30 @@ export const createComplexityRateLimiter = (options = {}) => {
     windowMs = 60000, // 1 minute
     maxComplexity = 10000, // Total complexity allowed per window
   } = options;
-  
+
   const complexityMap = new Map();
-  
+
   return (req, complexity) => {
     const key = req.ip;
     const now = Date.now();
-    
+
     if (!complexityMap.has(key)) {
       complexityMap.set(key, []);
     }
-    
+
     const userComplexity = complexityMap.get(key);
-    
+
     // Remove old entries
     const validComplexity = userComplexity.filter(
-      entry => now - entry.timestamp < windowMs
+      (entry) => now - entry.timestamp < windowMs,
     );
-    
+
     // Calculate total complexity in window
     const totalComplexity = validComplexity.reduce(
       (sum, entry) => sum + entry.complexity,
-      0
+      0,
     );
-    
+
     if (totalComplexity + complexity > maxComplexity) {
       logger.warn('Complexity rate limit exceeded', {
         ip: key,
@@ -209,14 +212,14 @@ export const createComplexityRateLimiter = (options = {}) => {
         newComplexity: complexity,
         maxComplexity,
       });
-      
+
       return false; // Rate limit exceeded
     }
-    
+
     // Add new complexity
     validComplexity.push({ timestamp: now, complexity });
     complexityMap.set(key, validComplexity);
-    
+
     return true; // Request allowed
   };
 };

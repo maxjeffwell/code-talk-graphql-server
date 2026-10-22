@@ -1,5 +1,3 @@
-'use strict';
-
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
@@ -161,6 +159,8 @@ module.exports = {
     await queryInterface.dropTable('users');
 
     // Drop ENUM type
-    await queryInterface.sequelize.query('DROP TYPE IF EXISTS "enum_users_role";');
+    await queryInterface.sequelize.query(
+      'DROP TYPE IF EXISTS "enum_users_role";',
+    );
   },
 };

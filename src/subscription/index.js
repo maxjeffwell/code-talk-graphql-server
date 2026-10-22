@@ -8,7 +8,7 @@ import * as EDITOR_EVENTS from './editor';
 import * as ROOM_EVENTS from './room';
 
 // Get Redis URL from environment (checked separately for connection string mode)
-const REDIS_URL = process.env.REDIS_URL;
+const { REDIS_URL } = process.env;
 
 const getRedisOptions = () => {
   if (REDIS_URL) {
@@ -18,7 +18,9 @@ const getRedisOptions = () => {
       maxRetriesPerRequest: null,
       retryStrategy(times) {
         const delay = Math.min(times * 100, 3000);
-        logger.info(`Redis connection attempt ${times}, retrying in ${delay}ms...`);
+        logger.info(
+          `Redis connection attempt ${times}, retrying in ${delay}ms...`,
+        );
         return delay;
       },
     };
@@ -40,7 +42,9 @@ const getRedisOptions = () => {
     tls: redis.tls,
     retryStrategy(times) {
       const delay = Math.min(times * 100, 3000);
-      logger.info(`Redis connection attempt ${times}, retrying in ${delay}ms...`);
+      logger.info(
+        `Redis connection attempt ${times}, retrying in ${delay}ms...`,
+      );
       return delay;
     },
   };

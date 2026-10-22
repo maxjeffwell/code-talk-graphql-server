@@ -7,11 +7,13 @@ export const batchMessages = async (keys, models) => {
         [Op.in]: keys,
       },
     },
-    order: [['createdAt', 'DESC']]
+    order: [['createdAt', 'DESC']],
   });
 
-  const messageMap = new Map(messages.map(message => [message.id, message]));
-  return keys.map(key => messageMap.get(key) || null);
+  const messageMap = new Map(
+    messages.map((message) => [message.id, message]),
+  );
+  return keys.map((key) => messageMap.get(key) || null);
 };
 
 export const batchMessagesByUser = async (userIds, models) => {
@@ -22,17 +24,17 @@ export const batchMessagesByUser = async (userIds, models) => {
       },
     },
     order: [['createdAt', 'DESC']],
-    limit: 100 // Prevent loading too many messages at once
+    limit: 100, // Prevent loading too many messages at once
   });
 
   // Group messages by userId
   const messagesByUser = new Map();
-  messages.forEach(message => {
+  messages.forEach((message) => {
     if (!messagesByUser.has(message.userId)) {
       messagesByUser.set(message.userId, []);
     }
     messagesByUser.get(message.userId).push(message);
   });
 
-  return userIds.map(userId => messagesByUser.get(userId) || []);
+  return userIds.map((userId) => messagesByUser.get(userId) || []);
 };

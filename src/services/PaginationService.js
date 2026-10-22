@@ -12,18 +12,16 @@ import { Sequelize } from 'sequelize';
  * @param {string} value - Value to encode
  * @returns {string} Base64 encoded cursor
  */
-export const toCursorHash = (value) => {
-  return Buffer.from(String(value)).toString('base64');
-};
+export const toCursorHash = (value) =>
+  Buffer.from(String(value)).toString('base64');
 
 /**
  * Decode a cursor hash back to original value
  * @param {string} hash - Base64 encoded cursor
  * @returns {string} Decoded value
  */
-export const fromCursorHash = (hash) => {
-  return Buffer.from(hash, 'base64').toString('ascii');
-};
+export const fromCursorHash = (hash) =>
+  Buffer.from(hash, 'base64').toString('ascii');
 
 /**
  * Build cursor-based where clause for Sequelize queries
@@ -52,7 +50,11 @@ export const buildCursorQuery = (cursor, field = 'createdAt') => {
  * @param {string} cursorField - Field to use for cursor (default: 'createdAt')
  * @returns {Object} Connection with edges and pageInfo
  */
-export const formatPaginatedResponse = (items, limit, cursorField = 'createdAt') => {
+export const formatPaginatedResponse = (
+  items,
+  limit,
+  cursorField = 'createdAt',
+) => {
   const hasNextPage = items.length > limit;
   const edges = hasNextPage ? items.slice(0, -1) : items;
 
@@ -60,9 +62,10 @@ export const formatPaginatedResponse = (items, limit, cursorField = 'createdAt')
     edges,
     pageInfo: {
       hasNextPage,
-      endCursor: edges.length > 0
-        ? toCursorHash(String(edges[edges.length - 1][cursorField]))
-        : null,
+      endCursor:
+        edges.length > 0
+          ? toCursorHash(String(edges[edges.length - 1][cursorField]))
+          : null,
     },
   };
 };

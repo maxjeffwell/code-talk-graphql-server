@@ -21,9 +21,8 @@ const CSRF_HEADER_NAME = csrf.headerName;
 const TOKEN_LENGTH = csrf.tokenLength;
 
 // Generate a secure random token
-const generateToken = () => {
-  return crypto.randomBytes(TOKEN_LENGTH).toString('hex');
-};
+const generateToken = () =>
+  crypto.randomBytes(TOKEN_LENGTH).toString('hex');
 
 // Cookie options for the CSRF token
 const getCookieOptions = () => ({
@@ -85,7 +84,12 @@ export const validateCsrfToken = (req) => {
   }
 
   // Tokens must match (constant-time comparison to prevent timing attacks)
-  if (!crypto.timingSafeEqual(Buffer.from(cookieToken), Buffer.from(headerToken))) {
+  if (
+    !crypto.timingSafeEqual(
+      Buffer.from(cookieToken),
+      Buffer.from(headerToken),
+    )
+  ) {
     logger.warn('CSRF validation failed: token mismatch', {
       ip: req.ip,
       path: req.path,

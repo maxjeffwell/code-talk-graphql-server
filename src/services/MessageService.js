@@ -10,7 +10,10 @@
 
 import DOMPurify from 'isomorphic-dompurify';
 import { paginatedQuery } from './PaginationService.js';
-import { publishMessageCreated, publishMessageDeleted } from './EventService.js';
+import {
+  publishMessageCreated,
+  publishMessageDeleted,
+} from './EventService.js';
 import { purgeCodeTalkCache } from '../utils/cloudflare.js';
 import logger from '../utils/logger.js';
 
@@ -23,7 +26,10 @@ import logger from '../utils/logger.js';
  * @param {number|null} params.roomId - Optional room ID (null for global chat)
  * @returns {Promise<Object>} Created message
  */
-export const createMessage = async (models, { text, userId, roomId = null }) => {
+export const createMessage = async (
+  models,
+  { text, userId, roomId = null },
+) => {
   // Sanitize HTML in message text
   const sanitizedText = DOMPurify.sanitize(text);
 
@@ -57,16 +63,22 @@ export const createMessage = async (models, { text, userId, roomId = null }) => 
  * @param {number|null} options.roomId - Filter by room (null for global, undefined for all)
  * @returns {Promise<Object>} Paginated messages with edges and pageInfo
  */
-export const getMessages = async (models, { cursor = null, limit = 10, roomId } = {}) => {
+export const getMessages = async (
+  models,
+  { cursor = null, limit = 10, roomId } = {},
+) => {
   const where = {};
 
   // Handle room filtering
   if (roomId !== undefined) {
     // roomId === null means global messages (no room)
     // roomId === number means specific room
-    where.roomId = roomId === null ? null : (
-      Number.isInteger(Number(roomId)) ? parseInt(roomId, 10) : null
-    );
+    where.roomId =
+      roomId === null
+        ? null
+        : Number.isInteger(Number(roomId))
+          ? parseInt(roomId, 10)
+          : null;
   }
 
   return paginatedQuery(models.Message, {
@@ -82,9 +94,8 @@ export const getMessages = async (models, { cursor = null, limit = 10, roomId } 
  * @param {number} id - Message ID
  * @returns {Promise<Object|null>} Message or null if not found
  */
-export const getMessageById = async (models, id) => {
-  return models.Message.findByPk(id);
-};
+export const getMessageById = async (models, id) =>
+  models.Message.findByPk(id);
 
 /**
  * Delete a message
@@ -100,7 +111,9 @@ export const deleteMessage = async (models, id) => {
     throw new Error('Message not found');
   }
 
-  const deletedCount = await models.Message.destroy({ where: { id } });
+  const deletedCount = await models.Message.destroy({
+    where: { id },
+  });
 
   if (deletedCount === 0) {
     throw new Error('Message could not be deleted');
@@ -136,13 +149,16 @@ export const isMessageOwner = async (models, messageId, userId) => {
  * @param {Object} options - Pagination options
  * @returns {Promise<Object>} Paginated messages
  */
-export const getMessagesByRoom = async (models, roomId, { cursor = null, limit = 5 } = {}) => {
-  return paginatedQuery(models.Message, {
+export const getMessagesByRoom = async (
+  models,
+  roomId,
+  { cursor = null, limit = 5 } = {},
+) =>
+  paginatedQuery(models.Message, {
     cursor,
     limit,
     where: { roomId },
   });
-};
 
 export default {
   createMessage,

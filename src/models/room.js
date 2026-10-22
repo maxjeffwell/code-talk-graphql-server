@@ -5,17 +5,17 @@ const room = (sequelize, DataTypes) => {
       unique: true,
       allowNull: false,
       validate: {
-        notEmpty: true
+        notEmpty: true,
       },
     },
   });
 
   Room.associate = (models) => {
     Room.hasMany(models.Message, {});
-    Room.belongsToMany(models.User, { 
+    Room.belongsToMany(models.User, {
       through: 'user_rooms',
       foreignKey: 'roomId',
-      otherKey: 'userId'
+      otherKey: 'userId',
     });
   };
 
