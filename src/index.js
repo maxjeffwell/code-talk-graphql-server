@@ -49,7 +49,7 @@ console.log('AI routes registered successfully');
 
 // Prometheus metrics setup
 const register = new client.Registry();
-client.collectDefaultMetrics({ register });
+client.collectDefaultMetrics({ register, eventLoopMonitoringPrecision: 100 });
 
 const httpRequestsTotal = new client.Counter({
   name: 'http_requests_total',
