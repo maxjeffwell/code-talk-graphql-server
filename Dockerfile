@@ -1,7 +1,7 @@
 # Multi-stage build for code-talk GraphQL server
 
 # Production stage
-FROM node:20-alpine AS production
+FROM node:24-alpine AS production
 
 WORKDIR /app
 
@@ -34,7 +34,7 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=40s --retries=3 \
 CMD ["npm", "start"]
 
 # Development stage
-FROM node:20-alpine AS development
+FROM node:24-alpine AS development
 
 WORKDIR /app
 
